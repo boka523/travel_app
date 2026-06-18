@@ -1,2 +1,2 @@
 # travel_app
-travel expenses calculator
+calculate your travel cost without hidden expenses
