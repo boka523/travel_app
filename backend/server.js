@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const authenticateToken = require("./middleware/auth");
 const { PrismaClient } = require("@prisma/client");
 
 const app = express();
@@ -53,8 +55,16 @@ app.post("/trips", async (req, res) => {
 
 app.post("/signup", async (req, res) => {
   const { name, email, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
   try{
+    const existingUser = await prisma.users.findUnique({
+      where: {
+        email
+      }
+    });
+    if(existingUser){
+      return res.status(409).json({ error: "Korisnik s ovim emailom već postoji - prijavite se!" });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prisma.users.create({
       data:{
         email,
@@ -75,7 +85,7 @@ app.post("/login", async (req, res) => {
   try {
     const user = await prisma.users.findUnique({
       where: {
-        email: email
+        email
       }
     });
     if (!user) {
@@ -85,8 +95,20 @@ app.post("/login", async (req, res) => {
     if (!passwordMatch) {
       return res.status(401).json({ error: "Pogrešna lozinka" });
     }
+
+    const token = jwt.sign(
+    {
+      id:user.id,
+      email:user.email
+    }, 
+    process.env.JWT_SECRET, 
+    {
+      expiresIn: "1h" 
+    });
+
     res.status(200).json({
       message: "Uspješna prijava",
+      token,
       user: {
         id: user.id,
         name: user.name,
