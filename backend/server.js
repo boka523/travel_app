@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const bcrypt = require("bcrypt");
 const { PrismaClient } = require("@prisma/client");
 
 const app = express();
@@ -51,13 +52,14 @@ app.post("/trips", async (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
-  const { name, email, password_hash } = req.body;
+  const { name, email, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
   try{
     const user = await prisma.users.create({
       data:{
         email,
         name,
-        password_hash
+        password_hash: hashedPassword
       }
     });
     res.status(201).json(user);
@@ -69,7 +71,7 @@ app.post("/signup", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const { email, password_hash } = req.body;
+  const { email, password } = req.body;
   try {
     const user = await prisma.users.findUnique({
       where: {
@@ -79,7 +81,8 @@ app.post("/login", async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "Korisnik nije pronađen" });
     }
-    if (user.password_hash !== password_hash) {
+    const passwordMatch = await bcrypt.compare(password, user.password_hash);
+    if (!passwordMatch) {
       return res.status(401).json({ error: "Pogrešna lozinka" });
     }
     res.status(200).json({
