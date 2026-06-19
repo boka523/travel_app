@@ -30,6 +30,27 @@ app.get("/users", async (req, res) => {
   }
 });
 
+app.post("/trips", async (req, res) => {
+  const { user_id,destination, start_date, end_date, transport_type, passengers_num } = req.body;
+
+  try {
+    const trip = await prisma.trips.create({
+      data: {
+        user_id,
+        destination,
+        start_date: new Date(start_date),
+        end_date: new Date(end_date),
+        transport_type, 
+        passengers_num
+      }
+    });
+    res.status(201).json(trip);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Greška kod stvaranja putovanja" });
+  }
+});
+
 app.listen(5000, () => {
   console.log("Server radi na http://localhost:5000");
 });
