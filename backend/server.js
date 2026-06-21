@@ -33,6 +33,19 @@ app.get("/users", async (req, res) => {
   }
 });
 
+app.get("/my_trips", authenticateToken, async (req, res) => {
+  try {
+    const trips = await prisma.trips.findMany({
+      where: {
+        user_id: req.user.id
+      }
+    });
+    res.json(trips);
+  } catch (error) {
+    res.status(500).json({ error: "Greška kod dohvaćanja putovanja" });
+  }
+});
+
 app.post("/trips", authenticateToken, async (req, res) => {
   const {destination, start_date, end_date, transport_type, passengers_num } = req.body;
   try {
@@ -72,7 +85,23 @@ app.post("/signup", async (req, res) => {
         password_hash: hashedPassword
       }
     });
-    res.status(201).json(user);
+    const token = jwt.sign(
+      {
+        id:user.id,
+        email:user.email
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h"
+      }
+    )
+    res.status(201).json({
+      message: "Uspješna registracija", 
+      token, 
+      user: {
+        id:user.id, 
+        name:user.name, 
+        email:user.email}});
   }
   catch(error){
     console.error(error);
@@ -118,6 +147,29 @@ app.post("/login", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Greška kod prijave korisnika" });
+  }
+});
+
+app.delete("/trips/:id", authenticateToken, async (req, res) => {
+  try {
+    const user_id=req.user.id;
+    const trip_id=Number(req.params.id);
+    const trip = await prisma.trips.findFirst({
+      where:{
+        user_id,
+        id:trip_id
+      }
+    });
+    if (!trip) {
+      return res.status(404).json({ error: "Putovanje nije pronađeno ili ne pripada korisniku!" });
+    }
+    await prisma.trips.delete({
+    where:{
+      id:trip_id
+    }})
+  res.status(200).json({message: "Putovanje uspješno obrisano!"})
+  } catch (error) {
+    res.status(500).json({ error: "Greška kod brisanja putovanja" });
   }
 });
 
