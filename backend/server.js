@@ -174,35 +174,87 @@ app.delete("/trips/:id", authenticateToken, async (req, res) => {
 });
 
 app.put("/trips/:id", authenticateToken, async (req, res) => {
-  const user_id=req.user.id;
-  const trip_id=Number(req.params.id);
-  const {destination, start_date, end_date,  transport_type, passengers_num}=req.body;
-  const trip = await prisma.trips.findFirst({
-    where:{
-      user_id,
-      id:trip_id
+  try {
+    const user_id=req.user.id;
+    const trip_id=Number(req.params.id);
+    const {destination, start_date, end_date,  transport_type, passengers_num}=req.body;
+    const trip = await prisma.trips.findFirst({
+      where:{
+        user_id,
+        id:trip_id
+      }
+    });
+    if (!trip) {
+        return res.status(404).json({ error: "Putovanje nije pronađeno ili ne pripada korisniku!" });
+      }
+    const updatedTrip = {
+      destination:destination,
+      start_date:new Date(start_date),
+      end_date:new Date(end_date),
+      transport_type:transport_type,
+      passengers_num:passengers_num
     }
-  });
-  if (!trip) {
-      return res.status(404).json({ error: "Putovanje nije pronađeno ili ne pripada korisniku!" });
-    }
-  const updatedTrip = {
-    destination:destination,
-    start_date:new Date(start_date),
-    end_date:new Date(end_date),
-    transport_type:transport_type,
-    passengers_num:passengers_num
+    await prisma.trips.update({
+      where:{
+        id:trip_id
+      },
+      data:updatedTrip
+    })
+    res.status(200).json({
+      message:"Detalji putovanja uspješno promijenjeni!",
+      trip: updatedTrip
+    })
+  } catch (error) {
+    res.status(500).json({ error: "Greška kod ažuriranja putovanja" });
   }
-  await prisma.trips.update({
-    where:{
-      id:trip_id
-    },
-    data:updatedTrip
-  })
-  res.status(200).json({
-    message:"Detalji putovanja uspješno promijenjeni!",
-    trip: updatedTrip
-  })
+})
+
+app.patch("/trips/:id", authenticateToken, async (req, res) => {
+  try{
+    const user_id=req.user.id;
+    const trip_id=Number(req.params.id);
+    const {destination, start_date, end_date,  transport_type, passengers_num}=req.body;
+    const trip = await prisma.trips.findFirst({
+      where:{
+        user_id,
+        id:trip_id
+      }
+    });
+    if (!trip) {
+        return res.status(404).json({ error: "Putovanje nije pronađeno ili ne pripada korisniku!" });
+      }
+    const data ={}
+    if (destination !== undefined) {
+      data.destination = destination;
+    }
+    if (start_date !== undefined) {
+      data.start_date = new Date(start_date);
+    }
+    if (end_date !== undefined) {
+      data.end_date = new Date(end_date);
+    }
+    if (transport_type !== undefined) {
+      data.transport_type = transport_type;
+    }
+    if (passengers_num !== undefined) {
+      data.passengers_num = passengers_num;
+    }
+    if (Object.keys(req.body).length === 0) {
+      return res.status(400).json({ error: "Nema podataka za ažuriranje!" });
+    }
+    const updatedTrip = await prisma.trips.update({
+      where:{
+        id:trip_id
+      },
+      data: data
+    })
+    res.status(200).json({
+      message:"Detalji putovanja uspješno promijenjeni!",
+      trip: updatedTrip
+    })
+  } catch (error) {
+    res.status(500).json({ error: "Greška kod ažuriranja putovanja" });
+  }
 })
 
 app.listen(5000, () => {
