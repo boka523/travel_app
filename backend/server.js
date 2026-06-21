@@ -33,12 +33,12 @@ app.get("/users", async (req, res) => {
   }
 });
 
-app.post("/trips", async (req, res) => {
-  const { user_id,destination, start_date, end_date, transport_type, passengers_num } = req.body;
+app.post("/trips", authenticateToken, async (req, res) => {
+  const {destination, start_date, end_date, transport_type, passengers_num } = req.body;
   try {
     const trip = await prisma.trips.create({
       data: {
-        user_id,
+        user_id: req.user.id,
         destination,
         start_date: new Date(start_date),
         end_date: new Date(end_date),
