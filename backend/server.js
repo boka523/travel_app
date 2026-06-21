@@ -173,6 +173,38 @@ app.delete("/trips/:id", authenticateToken, async (req, res) => {
   }
 });
 
+app.put("/trips/:id", authenticateToken, async (req, res) => {
+  const user_id=req.user.id;
+  const trip_id=Number(req.params.id);
+  const {destination, start_date, end_date,  transport_type, passengers_num}=req.body;
+  const trip = await prisma.trips.findFirst({
+    where:{
+      user_id,
+      id:trip_id
+    }
+  });
+  if (!trip) {
+      return res.status(404).json({ error: "Putovanje nije pronađeno ili ne pripada korisniku!" });
+    }
+  const updatedTrip = {
+    destination:destination,
+    start_date:new Date(start_date),
+    end_date:new Date(end_date),
+    transport_type:transport_type,
+    passengers_num:passengers_num
+  }
+  await prisma.trips.update({
+    where:{
+      id:trip_id
+    },
+    data:updatedTrip
+  })
+  res.status(200).json({
+    message:"Detalji putovanja uspješno promijenjeni!",
+    trip: updatedTrip
+  })
+})
+
 app.listen(5000, () => {
   console.log("Server radi na http://localhost:5000");
 });
