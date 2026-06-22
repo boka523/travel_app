@@ -26,7 +26,13 @@ app.get("/trips", async (req, res) => {
 
 app.get("/users", async (req, res) => {
   try {
-    const users = await prisma.users.findMany();
+    const users = await prisma.users.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      }
+    });
     res.json(users);
   } catch (error) {
     res.status(500).json({ error: "Greška kod dohvaćanja korisnika" });
@@ -46,8 +52,28 @@ app.get("/my_trips", authenticateToken, async (req, res) => {
   }
 });
 
+app.get("/me", authenticateToken, async (req, res) => {
+  try{
+    const user=await prisma.users.findUnique({
+      where:{
+        id:req.user.id
+      },
+      select:{
+        id:true,
+        name:true,
+        email:true
+      }});
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ error: "Greška kod dohvaćanja korisnika" });
+  }
+});
+
 app.post("/trips", authenticateToken, async (req, res) => {
   const {destination, start_date, end_date, transport_type, passengers_num } = req.body;
+  if(Object.keys(req.body).length !== 5){
+    return res.status(400).json({error: "Nisu uneseni svi podaci za putovanje!"});
+  }
   try {
     const trip = await prisma.trips.create({
       data: {
@@ -68,6 +94,9 @@ app.post("/trips", authenticateToken, async (req, res) => {
 
 app.post("/signup", async (req, res) => {
   const { name, email, password } = req.body;
+  if(Object.keys(req.body).length !== 3){
+    return res.status(400).json({error: "Nisu uneseni svi podaci za registraciju!"});
+  }
   try{
     const existingUser = await prisma.users.findUnique({
       where: {
@@ -111,6 +140,9 @@ app.post("/signup", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
+  if(Object.keys(req.body).length !== 2){
+    return res.status(400).json({error: "Nisu uneseni svi podaci za prijavu!"});
+  }
   try {
     const user = await prisma.users.findUnique({
       where: {
