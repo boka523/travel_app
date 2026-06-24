@@ -33,4 +33,7 @@ model users {
 enum trips_transport_type {
   car
   plane
+  boat
+  bus
+  train
 }

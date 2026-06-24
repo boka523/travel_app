@@ -74,6 +74,18 @@ app.post("/trips", authenticateToken, async (req, res) => {
   if(Object.keys(req.body).length !== 5){
     return res.status(400).json({error: "Nisu uneseni svi podaci za putovanje!"});
   }
+  if(destination === "" || start_date === "" || end_date === "" || transport_type === ""){
+    return res.status(400).json({error: "Neki od podataka za putovanje je prazan!"});
+  }
+  if(new Date(start_date) > new Date(end_date)){
+    return res.status(400).json({error: "Datum početka putovanja ne može biti nakon datuma završetka!"});
+  }
+  if(passengers_num < 1){
+    return res.status(400).json({error: "Broj putnika mora biti veći od 0!"});
+  }
+  if(!["plane", "train", "bus", "car", "boat"].includes(transport_type)){
+    return res.status(400).json({error: "Nepoznat tip prijevoza!"});
+  }
   try {
     const trip = await prisma.trips.create({
       data: {
@@ -96,6 +108,12 @@ app.post("/signup", async (req, res) => {
   const { name, email, password } = req.body;
   if(Object.keys(req.body).length !== 3){
     return res.status(400).json({error: "Nisu uneseni svi podaci za registraciju!"});
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      error: "Neispravan format email adrese!"
+    });
   }
   try{
     const existingUser = await prisma.users.findUnique({
@@ -142,6 +160,12 @@ app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   if(Object.keys(req.body).length !== 2){
     return res.status(400).json({error: "Nisu uneseni svi podaci za prijavu!"});
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      error: "Neispravan format email adrese!"
+    });
   }
   try {
     const user = await prisma.users.findUnique({
@@ -206,10 +230,25 @@ app.delete("/trips/:id", authenticateToken, async (req, res) => {
 });
 
 app.put("/trips/:id", authenticateToken, async (req, res) => {
+  const user_id=req.user.id;
+  const trip_id=Number(req.params.id);
+  const {destination, start_date, end_date,  transport_type, passengers_num}=req.body;
+  if(Object.keys(req.body).length !== 5){
+    return res.status(400).json({error: "Nisu uneseni svi podaci za putovanje!"});
+  }
+  if(destination === "" || start_date === "" || end_date === "" || transport_type === ""){
+    return res.status(400).json({error: "Neki od podataka za putovanje je prazan!"});
+  }
+  if(new Date(start_date) > new Date(end_date)){
+    return res.status(400).json({error: "Datum početka putovanja ne može biti nakon datuma završetka!"});
+  }
+  if(passengers_num < 1){
+    return res.status(400).json({error: "Broj putnika mora biti veći od 0!"});
+  }
+  if(!["plane", "train", "bus", "car", "boat"].includes(transport_type)){
+    return res.status(400).json({error: "Nepoznat tip prijevoza!"});
+  }
   try {
-    const user_id=req.user.id;
-    const trip_id=Number(req.params.id);
-    const {destination, start_date, end_date,  transport_type, passengers_num}=req.body;
     const trip = await prisma.trips.findFirst({
       where:{
         user_id,
@@ -220,11 +259,11 @@ app.put("/trips/:id", authenticateToken, async (req, res) => {
         return res.status(404).json({ error: "Putovanje nije pronađeno ili ne pripada korisniku!" });
       }
     const updatedTrip = {
-      destination:destination,
+      destination,
       start_date:new Date(start_date),
       end_date:new Date(end_date),
-      transport_type:transport_type,
-      passengers_num:passengers_num
+      transport_type,
+      passengers_num
     }
     await prisma.trips.update({
       where:{
@@ -257,22 +296,52 @@ app.patch("/trips/:id", authenticateToken, async (req, res) => {
       }
     const data ={}
     if (destination !== undefined) {
-      data.destination = destination;
+      if(destination !== ""){
+        data.destination = destination;
+      }
+      else{
+        return res.status(400).json({error: "Destination ne smije biti prazan!"});
+      }
     }
     if (start_date !== undefined) {
-      data.start_date = new Date(start_date);
+      if (start_date !== "") {
+        data.start_date = new Date(start_date);
+      }
+      else{
+        return res.status(400).json({error: "Start date ne smije biti prazan!"});
+      }
     }
     if (end_date !== undefined) {
-      data.end_date = new Date(end_date);
+      if (end_date !== "") {
+        data.end_date = new Date(end_date);
+      }
+      else{
+        return res.status(400).json({error: "End date ne smije biti prazan!"});
+      }
     }
     if (transport_type !== undefined) {
-      data.transport_type = transport_type;
+      if(["plane", "train", "bus", "car", "boat"].includes(transport_type)) {
+        data.transport_type = transport_type;
+      }
+      else{
+        return res.status(400).json({error: "Nepoznat tip prijevoza!"});
+      }
     }
     if (passengers_num !== undefined) {
-      data.passengers_num = passengers_num;
+      if(passengers_num !== "" && passengers_num > 1) {
+        data.passengers_num = passengers_num;
+      }
+      else{
+        return res.status(400).json({error: "Broj putnika mora biti veći od 0!"});
+      }
     }
     if (Object.keys(req.body).length === 0) {
       return res.status(400).json({ error: "Nema podataka za ažuriranje!" });
+    }
+    const finalStartDate = data.start_date ?? new Date(trip.start_date);
+    const finalEndDate = data.end_date ?? new Date(trip.end_date);
+    if (finalStartDate > finalEndDate) {
+      return res.status(400).json({ error: "Start date ne može biti nakon end date!"});
     }
     const updatedTrip = await prisma.trips.update({
       where:{
