@@ -265,11 +265,13 @@ app.delete("/trips/:id", authenticateToken, async (req, res) => {
     if (!trip) {
       return res.status(404).json({ error: "Putovanje nije pronađeno ili ne pripada korisniku!" });
     }
-    await prisma.trips.delete({
+    const deletedTrip = await prisma.trips.delete({
     where:{
       id:trip_id
-    }})
-  res.status(200).json({message: "Putovanje uspješno obrisano!"})
+    }});
+  res.status(200).json({
+    message: "Putovanje uspješno obrisano!", 
+    trip: deletedTrip})
   } catch (error) {
     res.status(500).json({ error: "Greška kod brisanja putovanja" });
   }
@@ -374,7 +376,7 @@ app.patch("/trips/:id", authenticateToken, async (req, res) => {
       }
     }
     if (passengers_num !== undefined) {
-      if(passengers_num !== "" && passengers_num > 1) {
+      if(passengers_num !== "" && passengers_num >= 1) {
         data.passengers_num = passengers_num;
       }
       else{
