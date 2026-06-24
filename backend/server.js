@@ -206,6 +206,52 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.post("/change_password", authenticateToken, async (req, res) => {
+  try{
+    const {old_password, new_password} = req.body;
+    const user_id=req.user.id;
+    const user= await prisma.users.findUnique({
+      where:{
+        id:user_id
+      }
+    })
+    if (!user) {
+      return res.status(404).json({error: "Korisnik nije pronađen!"});
+}
+    if(old_password !== undefined && old_password !== "") {
+      if(new_password !== undefined && new_password !== "") {
+        const isMatch = await bcrypt.compare(old_password, user.password_hash);
+        if (!isMatch) {
+          return res.status(400).json({error: "Stara lozinka nije ispravna!"});
+        }
+        else{
+          if(new_password === old_password){
+            return res.status(400).json({error: "Nova lozinka je ista kao stara!"});
+          }
+          const new_password_hash= await bcrypt.hash(new_password,10);
+          await prisma.users.update({
+            where:{
+              id:user_id
+            },
+            data:{
+              password_hash:new_password_hash
+            }
+          });
+          res.status(200).json({message: "Uspješno ste promijenili lozinku!"});
+        }
+      }
+      else{
+        res.status(400).json({error:"Niste unijeli novu lozinku!"});
+      }
+    }
+    else{
+      res.status(400).json({error:"Niste unijeli staru lozinku!"});
+    }
+  } catch(error) {
+    res.status(500).json({ error: "Greška kod promjene lozinke" });
+  } 
+});
+
 app.delete("/trips/:id", authenticateToken, async (req, res) => {
   try {
     const user_id=req.user.id;
