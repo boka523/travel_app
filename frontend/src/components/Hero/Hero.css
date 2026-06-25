@@ -21,10 +21,15 @@
   font-weight: 600;
 }
 
+.hero-text h2 {
+  line-height: 2;
+}
+
 .hero-text p {
   max-width: 700px;
   margin: 10px auto 20px;
-  line-height: 1.4;
+  line-height: 2;
+  font-size: 20px;
 }
 
 .login-signup {

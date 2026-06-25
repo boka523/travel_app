@@ -11,8 +11,8 @@ const Hero = ({darkMode, toggleMode}) => {
           <p>WayAway is detailed trip expenses calculator. Just enter destination, time-stamps and a few other tweaks to get fully calculated budget for your trip without any hidden expenses.</p>
         </div>
         <div className='login-signup'>
-            <Link to="/Login"><button className={`btn ${darkMode ? "" : "dark-btn"}`}>Login</button></Link>
-            <Link to="/Signup"><button className={`btn ${darkMode ? "" : "dark-btn"}`}>Signup</button></Link>
+            <Link to="/login"><button className={`btn ${darkMode ? "" : "dark-btn"}`}>Login</button></Link>
+            <Link to="/signup"><button className={`btn ${darkMode ? "" : "dark-btn"}`}>Signup</button></Link>
         </div>
     </div>
   )
