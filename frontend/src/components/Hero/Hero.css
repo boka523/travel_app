@@ -1,0 +1,63 @@
+.hero {
+  width: 100%;
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(73, 48, 3, 0.4), rgb(73, 48, 3, 0.4)),
+    url(../../assets/hero.jpg);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-text {
+  text-align: center;
+  max-width: 800px;
+  padding-right: 100px;
+}
+
+.hero-text h1 {
+  font-size: 60px;
+  font-weight: 600;
+}
+
+.hero-text p {
+  max-width: 700px;
+  margin: 10px auto 20px;
+  line-height: 1.4;
+}
+
+.login-signup {
+  padding-left: 100px;
+}
+
+.login-signup .btn {
+  display: block;
+  margin: 30px;
+  font-size: 25px;
+  padding: 25px;
+}
+
+.hero.tint {
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+    url(../../assets/hero.jpg);
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.3);
+  transition: background 0.3s ease;
+  z-index: 1;
+}
+
+.hero.tint::before {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.hero > * {
+  position: relative;
+  z-index: 2;
+}
