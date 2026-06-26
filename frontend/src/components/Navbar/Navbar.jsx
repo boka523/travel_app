@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom'
 
 const Navbar = ({darkMode, toggleMode}) => {
   return (
-    <nav className='container'>
+    <nav className={`container ${darkMode ? "tint" : ""}`}>
         <div className="logo-wrapper">
           <Link to="/"><img src={white_logo} className={`logo ${darkMode ? "show" : "hide"}`} /></Link>
           <Link to="/"><img src={dark_logo} className={`logo ${darkMode ? "hide" : "show"}`} /></Link>
