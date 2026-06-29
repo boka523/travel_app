@@ -1,4 +1,4 @@
-.login-form {
+.signup-form {
   width: 100%;
   min-height: 100vh;
   background: rgba(73, 41, 0, 0.8);
@@ -10,9 +10,10 @@
   transition: 0.3s;
 }
 
-.login-text {
+.signup-text {
   background-color: rgba(255, 255, 255, 0.5);
   margin: 30px;
+  margin-top: 100px;
   padding: 30px;
   border-radius: 30px;
   transition: 0.3s;
@@ -65,7 +66,7 @@
   transition: 0.3s;
 }
 
-.login-text.tint {
+.signup-text.tint {
   background-color: rgb(0, 0, 0, 0.5);
   transition: 0.3s;
 }

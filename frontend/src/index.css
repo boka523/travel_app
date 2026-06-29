@@ -58,3 +58,12 @@ a {
   background-color: rgb(0, 0, 0, 0.5);
   transition: 0.3s;
 }
+
+.show {
+  opacity: 1;
+}
+
+.hide {
+  opacity: 0;
+  pointer-events: none;
+}
