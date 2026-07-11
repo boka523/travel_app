@@ -1,7 +1,7 @@
 import React from 'react'
 import './MyTrips.css'
 
-const MyTrips = ({darkMode, toggleMode}) => {
+const MyTrips = ({darkMode}) => {
   return (
     <div>MyTrips</div>
   )

@@ -7,7 +7,7 @@ const Trips = ({darkMode, toggleMode}) => {
     return (
         <div>
             <Navbar darkMode={darkMode} toggleMode={toggleMode}/>
-            <MyTrips darkMode={darkMode} toggleMode={toggleMode}/>
+            <MyTrips darkMode={darkMode}/>
         </div>
     )
 }
