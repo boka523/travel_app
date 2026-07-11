@@ -39,7 +39,7 @@ const LoginForm = ({darkMode}) => {
       localStorage.setItem("token", data.token);
       toast.success(data.message || "Uspješna prijava!");
       setTimeout(() => {
-        navigate("/trips");
+        navigate("/mytrips");
       }, 1000)
     }
     catch(error){
