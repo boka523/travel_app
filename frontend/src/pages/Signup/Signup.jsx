@@ -7,7 +7,7 @@ const Signup = ({darkMode, toggleMode}) => {
     return (
         <div>
             <Navbar darkMode={darkMode} toggleMode={toggleMode}/>
-            <SignupForm darkMode={darkMode} toggleMode={toggleMode}/>
+            <SignupForm darkMode={darkMode}/>
         </div>
     )
 }

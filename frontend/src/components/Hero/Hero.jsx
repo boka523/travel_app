@@ -2,7 +2,7 @@ import React from 'react'
 import './Hero.css'
 import { Link, Links } from 'react-router-dom'
 
-const Hero = ({darkMode, toggleMode}) => {
+const Hero = ({darkMode}) => {
   return (
     <div className={`hero container ${darkMode ? "dark": ""}`}>
         <div className={`hero-text ${darkMode ? "tint" : "black-letters"}`}>

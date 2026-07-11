@@ -7,7 +7,7 @@ import white_password from '../../assets/white_password.png'
 import black_name from '../../assets/black_name.png'
 import white_name from '../../assets/white_name.png'
 
-const SignupForm = ({darkMode, toggleMode}) => {
+const SignupForm = ({darkMode}) => {
   return (
     <div className='signup-form container'>
       <div className={`signup-text ${darkMode ? "tint white-letters" : ""}`}>

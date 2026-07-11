@@ -7,7 +7,7 @@ const Home = ({darkMode, toggleMode}) => {
     return (
         <div>
             <Navbar darkMode={darkMode} toggleMode={toggleMode}/>
-            <Hero darkMode={darkMode} toggleMode={toggleMode}/>
+            <Hero darkMode={darkMode}/>
         </div>
     )
 }
