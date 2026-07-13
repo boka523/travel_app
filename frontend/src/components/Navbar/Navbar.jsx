@@ -4,20 +4,42 @@ import dark_logo from '../../assets/dark_logo.png'
 import white_logo from '../../assets/white_logo.png'
 import dark_moon from '../../assets/dark_moon.png'
 import white_sun from '../../assets/white_sun.png'
+import white_profile from '../../assets/white_profile.png'
+import dark_profile from '../../assets/dark_profile.png'
+import white_logout from '../../assets/white_logout.png'
+import dark_logout from '../../assets/dark_logout.png'
 import { Link } from 'react-router-dom'
 
 
-const Navbar = ({darkMode, toggleMode}) => {
+const Navbar = ({darkMode, toggleMode, variant}) => {
   return (
     <nav className={`container ${darkMode ? "tint" : ""}`}>
         <div className="logo-wrapper">
           <Link to="/"><img src={white_logo} className={`logo ${darkMode ? "show" : "hide"}`} /></Link>
           <Link to="/"><img src={dark_logo} className={`logo ${darkMode ? "hide" : "show"}`} /></Link>
         </div>
-        <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={toggleMode}>
-          <img src={white_sun} alt="" className='mode'/>
-          <img src={dark_moon} alt="" className='mode'/>
-        </button>
+        <div className="buttons-wrapper">
+          {variant === "my-trips" && (
+            <>
+              <button className={darkMode ? 'btn' : 'btn dark-btn'}>
+                <div className='email-icon'>
+                  <img src={dark_profile} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
+                  <img src={white_profile} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
+                </div>
+              </button>
+              <button className={darkMode ? 'btn' : 'btn dark-btn'}>
+                <div className='email-icon'>
+                  <img src={dark_logout} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
+                  <img src={white_logout} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
+                </div>
+              </button>
+            </>
+          )}
+          <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={toggleMode}>
+            <img src={white_sun} alt="" className='mode'/>
+            <img src={dark_moon} alt="" className='mode'/>
+          </button>
+        </div>
     </nav>
   )
 }

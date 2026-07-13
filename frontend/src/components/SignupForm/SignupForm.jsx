@@ -1,11 +1,11 @@
 import { useState, React } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './SignupForm.css'
-import black_email from '../../assets/black_email.png'
+import dark_email from '../../assets/dark_email.png'
 import white_email from '../../assets/white_email.png'
-import black_password from '../../assets/black_password.png'
+import dark_password from '../../assets/dark_password.png'
 import white_password from '../../assets/white_password.png'
-import black_name from '../../assets/black_name.png'
+import dark_name from '../../assets/dark_name.png'
 import white_name from '../../assets/white_name.png'
 import toast from 'react-hot-toast'
 
@@ -63,7 +63,7 @@ const SignupForm = ({darkMode}) => {
         <div className='inputs'>
           <div className='email-icon'>
             <img src={white_name} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
-            <img src={black_name} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
+            <img src={dark_name} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
           </div>
           <label htmlFor="name">Name</label>
           <input id='name' placeholder='Enter your full name:' value={name} onChange={(e) => setName(e.target.value)} autoComplete='name' required/>
@@ -71,7 +71,7 @@ const SignupForm = ({darkMode}) => {
         <div className='inputs'>
           <div className='email-icon'>
             <img src={white_email} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
-            <img src={black_email} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
+            <img src={dark_email} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
           </div>
           <label htmlFor="email">Email</label>
           <input id='email' type="email" placeholder='Enter your email:' value={email} onChange={(e) => setEmail(e.target.value)} autoComplete='email' required/>
@@ -79,7 +79,7 @@ const SignupForm = ({darkMode}) => {
         <div className='inputs'>
           <div className='email-icon'>
             <img src={white_password} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
-            <img src={black_password} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
+            <img src={dark_password} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
           </div>
           <label htmlFor="password">Password</label>
           <input id='password' type="password" placeholder='Enter your password:' value={password} onChange={(e) => setPassword(e.target.value)} autoComplete='current_password' required/>

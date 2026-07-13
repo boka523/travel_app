@@ -6,7 +6,7 @@ import MyTripsForm from '../../components/MyTripsForm/MyTripsForm'
 const MyTrips = ({darkMode, toggleMode}) => {
     return (
         <div>
-            <Navbar darkMode={darkMode} toggleMode={toggleMode}/>
+            <Navbar darkMode={darkMode} toggleMode={toggleMode} variant="my-trips"/>
             <MyTripsForm darkMode={darkMode}/>
         </div>
     )
