@@ -27,18 +27,21 @@ const MyTripsForm = ({darkMode}) => {
       height: "46px",
       width: "309px",
       boxShadow: "none",
+      transition: "0.3s",
       cursor: "pointer"
     }),
     placeholder: (provided) => ({
       ...provided,
       color: darkMode ? "black" : "white",
       fontSize: "20px",
+      transition: "0.3s",
       textAlign: "center"
     }),
     singleValue: (provided) => ({
       ...provided,
       color: darkMode ? "black" : "white",
       fontSize: "20px",
+      transition: "0.3s",
       textAlign: "center"
     }),
     menu: (provided) => ({
@@ -46,11 +49,13 @@ const MyTripsForm = ({darkMode}) => {
       marginTop: "10px",
       borderRadius: "30px",
       backgroundColor: darkMode ? "white" : "black",
+      transition: "0.3s",
       overflow: "hidden",
     }),
     menuList: (provided) => ({
       ...provided,
       padding: 0,
+      transition: "0.3s",
       backgroundColor: darkMode ? "white" : "black",
     }),
     option: (provided, state) => ({
@@ -62,6 +67,7 @@ const MyTripsForm = ({darkMode}) => {
         : darkMode
         ? "white"
         : "black",
+      transition: "0.3s",
       color: state.isFocused
         ? darkMode
         ? "white"
@@ -74,10 +80,12 @@ const MyTripsForm = ({darkMode}) => {
     }),
     dropdownIndicator: (provided) => ({
       ...provided,
+      transition: "0.3s",
       color: darkMode ? "white" : "black",
     }),
     indicatorSeparator: () => ({
       display: "none",
+      transition: "0.3s",
     }),
   };
 
@@ -153,9 +161,9 @@ const MyTripsForm = ({darkMode}) => {
       </div>
       <div className={`all-trips ${darkMode ? "tint white-letters" : ""}`}>
         {isLoadingTrips 
-          ? ( <p>Učitavanje putovanja...</p> )
+          ? ( <div className='message'>Učitavanje putovanja...</div> )
           : trips.length === 0 
-            ? ( <p>Nemate putovanja.</p>)
+            ? ( <div className='message'>Nemate putovanja.</div>)
             : (
               trips.map((trip) => (
                 <div className={`trip ${darkMode ? "tint" : ""}`}>

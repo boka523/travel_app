@@ -97,3 +97,9 @@
 .sort-select {
   transition: 0.3s;
 }
+
+.message {
+  grid-column: 2;
+  place-self: center;
+  font-size: 30px;
+}
