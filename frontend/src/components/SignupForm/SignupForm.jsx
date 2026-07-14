@@ -82,7 +82,7 @@ const SignupForm = ({darkMode}) => {
             <img src={dark_password} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
           </div>
           <label htmlFor="password">Password</label>
-          <input id='password' type="password" placeholder='Enter your password:' value={password} onChange={(e) => setPassword(e.target.value)} autoComplete='current_password' required/>
+          <input id='password' type="password" placeholder='Enter your password:' value={password} onChange={(e) => setPassword(e.target.value)} autoComplete='new_password' required/>
         </div>
         <button type='submit' className={`btn ${darkMode ? "" : "dark-btn"}`} disabled={isLoading}>{isLoading ? "Signing up..." : "Signup"}</button>
       </form>

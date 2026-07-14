@@ -8,10 +8,24 @@ import white_profile from '../../assets/white_profile.png'
 import dark_profile from '../../assets/dark_profile.png'
 import white_logout from '../../assets/white_logout.png'
 import dark_logout from '../../assets/dark_logout.png'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 
 
 const Navbar = ({darkMode, toggleMode, variant}) => {
+
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    toast.success("Logging out...")
+    setTimeout(() => {
+      navigate("/");
+    }, 2000)
+  }
+  const handleProfile = () => {
+    navigate("/profile");
+  }
+
   return (
     <nav className={`container ${darkMode ? "tint" : ""}`}>
         <div className="logo-wrapper">
@@ -21,13 +35,13 @@ const Navbar = ({darkMode, toggleMode, variant}) => {
         <div className="buttons-wrapper">
           {variant === "my-trips" && (
             <>
-              <button className={darkMode ? 'btn' : 'btn dark-btn'}>
+              <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={handleProfile}>
                 <div className='email-icon'>
                   <img src={dark_profile} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
                   <img src={white_profile} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
                 </div>
               </button>
-              <button className={darkMode ? 'btn' : 'btn dark-btn'}>
+              <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={handleLogout}>
                 <div className='email-icon'>
                   <img src={dark_logout} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
                   <img src={white_logout} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>

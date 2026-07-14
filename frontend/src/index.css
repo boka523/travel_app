@@ -55,6 +55,11 @@ a {
   transition: 0.3s;
 }
 
+.white-letters {
+  color: white;
+  transition: 0.3s;
+}
+
 .tint {
   background-color: rgb(0, 0, 0, 0.5);
   transition: 0.3s;
@@ -74,6 +79,7 @@ a {
   width: 24px;
   height: 24px;
 }
+
 .icon {
   position: absolute;
   inset: 0;

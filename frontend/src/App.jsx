@@ -5,6 +5,7 @@ import Login from './pages/Login/Login'
 import Signup from './pages/Signup/Signup'
 import AddTrip from './pages/AddTrip/AddTrip'
 import MyTrips from './pages/MyTrips/MyTrips'
+import Profile from './pages/Profile/Profile'
 import { Toaster } from 'react-hot-toast'
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -21,6 +22,7 @@ function App() {
           <Route path='/signup' element={<Signup darkMode={darkMode} toggleMode={toggleMode}/>}/>
           <Route path='/addtrip' element={<AddTrip darkMode={darkMode} toggleMode={toggleMode}/>}/>
           <Route path='/mytrips' element={<MyTrips darkMode={darkMode} toggleMode={toggleMode}/>}/>
+          <Route path='/profile' element={<Profile/>}/>
         </Routes>
       </Router>
     </>
