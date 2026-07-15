@@ -1,9 +1,14 @@
 import React from 'react'
 import './AddTrip.css'
+import Navbar from '../../components/Navbar/Navbar'
+import AddTripForm from '../../components/AddTripForm/AddTripForm'
 
-const AddTrip = () => {
+const AddTrip = ({darkMode, toggleMode}) => {
     return (
-        <div>AddTrip</div>
+        <div>
+            <Navbar darkMode={darkMode} toggleMode={toggleMode} variant="add-trips"/>
+            <AddTripForm darkMode={darkMode}/>
+        </div>
     )
 }
 

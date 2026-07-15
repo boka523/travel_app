@@ -1,6 +1,6 @@
 import { useEffect, useState, React }from 'react'
 import toast from 'react-hot-toast'
-import Select from "react-select"
+import Select from "react-select" //koristin umisto <select> jer je puno manipulativniji
 import './MyTripsForm.css'
 import dark_plus_sign from '../../assets/dark_plus_sign.png'
 import white_plus_sign from '../../assets/white_plus_sign.png'
@@ -91,10 +91,11 @@ const MyTripsForm = ({darkMode}) => {
 
   const navigate = useNavigate();
   const [trips, setTrips] = useState([])
-  const [isLoadingTrips, setIsLoadingTrips] = useState(true);
+  const [isLoadingTrips, setIsLoadingTrips] = useState(false);
 
-  useEffect(() => {
-    const fetchTrips = async () => {
+  useEffect(() => { 
+    setIsLoadingTrips(true);
+    const fetchTrips = async () => { //ovo je slicna sema ko handleLogin, samo je pisemo unutar useEffect jer zelimo da se izvrsi odmah
       const token = localStorage.getItem("token");
       if(!token){
         toast.error("Morate se prijaviti!");
@@ -115,11 +116,12 @@ const MyTripsForm = ({darkMode}) => {
         if(!response.ok){
           toast.error(data.error || "Putovanja nisu učitana.");
           if(response.status === 401 || response.status === 403){
+            toast.error("Neautoriziran pristup! Odjava...")
             localStorage.removeItem("token");
             setTimeout(() => {
               navigate("/login");
             }, 1000)
-        return;
+            return;
           }
           return;
         }
@@ -132,8 +134,12 @@ const MyTripsForm = ({darkMode}) => {
         setIsLoadingTrips(false);
       }
     };
-    fetchTrips();
-  }, [navigate]);
+    fetchTrips(); //zadali smo sta radi fetchTrips, al odma ga zelimo i odradit bez ikakvog klika botuna i slicno nego bas automatski
+  }, [navigate]); //"ovaj useEffect ovisi o navigate; ako se on promijeni, ponovno pokreni useEffect"
+
+  const addNewTrip = () => {
+    navigate("/addtrip");
+  }
 
   return (
     <div className='my-trips-form container'>
@@ -148,7 +154,7 @@ const MyTripsForm = ({darkMode}) => {
             isSearchable={false}
             styles={customStyles}
           />
-          <button className={darkMode ? 'btn' : 'btn dark-btn'}>
+          <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={addNewTrip}>
             <div className='email-icon'>
               <img src={dark_plus_sign} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
               <img src={white_plus_sign} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>

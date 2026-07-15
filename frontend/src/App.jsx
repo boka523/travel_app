@@ -7,6 +7,7 @@ import AddTrip from './pages/AddTrip/AddTrip'
 import MyTrips from './pages/MyTrips/MyTrips'
 import Profile from './pages/Profile/Profile'
 import { Toaster } from 'react-hot-toast'
+
 function App() {
   const [darkMode, setDarkMode] = useState(false);
   const toggleMode = () => {

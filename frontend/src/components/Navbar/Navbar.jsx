@@ -8,6 +8,8 @@ import white_profile from '../../assets/white_profile.png'
 import dark_profile from '../../assets/dark_profile.png'
 import white_logout from '../../assets/white_logout.png'
 import dark_logout from '../../assets/dark_logout.png'
+import white_back_button from '../../assets/white_back_button.png'
+import dark_back_button from '../../assets/dark_back_button.png'
 import { Link, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 
@@ -25,6 +27,9 @@ const Navbar = ({darkMode, toggleMode, variant}) => {
   const handleProfile = () => {
     navigate("/profile");
   }
+  const goBack = () => {
+    navigate("/mytrips");
+  }
 
   return (
     <nav className={`container ${darkMode ? "tint" : ""}`}>
@@ -35,16 +40,38 @@ const Navbar = ({darkMode, toggleMode, variant}) => {
         <div className="buttons-wrapper">
           {variant === "my-trips" && (
             <>
+              <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={handleLogout}>
+                <div className='email-icon'>
+                  <img src={dark_logout} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
+                  <img src={white_logout} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
+                </div>
+              </button>
               <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={handleProfile}>
                 <div className='email-icon'>
                   <img src={dark_profile} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
                   <img src={white_profile} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
                 </div>
               </button>
+            </>
+          )}
+          {variant === "add-trips" && (
+            <>
+              <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={goBack}>
+                <div className='email-icon'>
+                  <img src={dark_back_button} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
+                  <img src={white_back_button} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
+                </div>
+              </button>
               <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={handleLogout}>
                 <div className='email-icon'>
                   <img src={dark_logout} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
                   <img src={white_logout} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
+                </div>
+              </button>
+              <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={handleProfile}>
+                <div className='email-icon'>
+                  <img src={dark_profile} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
+                  <img src={white_profile} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
                 </div>
               </button>
             </>
