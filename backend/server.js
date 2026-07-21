@@ -1,12 +1,36 @@
+require("dotenv").config(); //sluzi da bi se varijable zapisane u .env procitale u pohranile u process.env
 const express = require("express"); //server za obradu podataka iz baze
 const cors = require("cors"); //tu je da bi backend i frontend mogli komunicirat
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto"); //triba nan za sha256 hashiranje, to je ka "tip teksta" koji hotelbeds zahtjeva u svojoj dokumentaciji
+//const axios = require("axios"); // sluzi za slanje http zahtjeva
 const authenticateToken = require("./middleware/auth");
 const { PrismaClient } = require("@prisma/client");
 
 const app = express();
 const prisma = new PrismaClient();
+const HOTELBEDS_BASE_URL = "https://api.test.hotelbeds.com";
+
+const createHotelbedsSignature = () => {
+  const apiKey = process.env.HOTELBEDS_API_KEY;
+  const secret = process.env.HOTELBEDS_SECRET;
+  const timeStamp = Math.floor(Date.now() / 1000); //vrijeme u milisekundama koje je proslo od 1.1.1970. do sad pa dijeljeno 1000 da bude u sekundama i zaokruzeno jer to hotelbeds zahtjeva
+
+  return crypto
+    .createHash("sha256") //napravi SHA256 algoritam
+    .update(apiKey + secret + timeStamp) //spoji ovo troje (hotelbeds to zahtjeva)
+    .digest("hex"); //pretvori u heksadekadski (isto zahtjev hotelbedsa)
+};
+
+const getHotelbedsHeaders = () => {
+  return {
+    "Api-key": process.env.HOTELBEDS_API_KEY,
+    "X-Signature": createHotelbedsSignature(),
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  };
+};
 
 app.use(cors());
 app.use(express.json());
@@ -14,6 +38,36 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Bogu fala Backend radi");
 });
+
+//ovo ispod je zasad samo testna ruta
+// app.get("/api/hotelbeds/status", async (req, res) => {
+//   try {
+//     const response = await fetch(`${HOTELBEDS_BASE_URL}/hotel-api/1.0/status`, {
+//       method: "GET",
+//       headers: getHotelbedsHeaders(),
+//     });
+
+//     const data = await response.json();
+
+//     if (!response.ok) {
+//       console.error("Hotelbeds status error:", data);
+//       return res.status(response.status).json({
+//         message: "Hotelbeds autentifikacija nije uspjela.",
+//         details: data,
+//       });
+//     }
+
+//     return res.status(200).json({
+//       message: "Hotelbeds API radi!",
+//       data,
+//     });
+//   } catch (error) {
+//     console.error("Hotelbeds connection error:", error);
+//     return res.status(500).json({
+//       message: "Nije se moguće povezati s Hotelbeds APIjem.",
+//     });
+//   }
+// });
 
 app.get("/trips", async (req, res) => {
   try {
@@ -89,11 +143,9 @@ app.post("/trips", authenticateToken, async (req, res) => {
       .json({ error: "Neki od podataka za putovanje je prazan!" });
   }
   if (new Date(start_date) > new Date(end_date)) {
-    return res
-      .status(400)
-      .json({
-        error: "Datum početka putovanja ne može biti nakon datuma završetka!",
-      });
+    return res.status(400).json({
+      error: "Datum početka putovanja ne može biti nakon datuma završetka!",
+    });
   }
   if (passengers_num < 1) {
     return res.status(400).json({ error: "Broj putnika mora biti veći od 0!" });
@@ -328,11 +380,9 @@ app.put("/trips/:id", authenticateToken, async (req, res) => {
       .json({ error: "Neki od podataka za putovanje je prazan!" });
   }
   if (new Date(start_date) > new Date(end_date)) {
-    return res
-      .status(400)
-      .json({
-        error: "Datum početka putovanja ne može biti nakon datuma završetka!",
-      });
+    return res.status(400).json({
+      error: "Datum početka putovanja ne može biti nakon datuma završetka!",
+    });
   }
   if (passengers_num < 1) {
     return res.status(400).json({ error: "Broj putnika mora biti veći od 0!" });
@@ -462,6 +512,112 @@ app.patch("/trips/:id", authenticateToken, async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: "Greška kod ažuriranja putovanja" });
+  }
+});
+
+app.post("/api/accommodations", async (req, res) => {
+  try {
+    const { destination, checkin, checkout, adults } = req.body;
+
+    if (!destination || !checkin || !checkout || !adults) {
+      return res.status(400).json({
+        message: "Nedostaju podaci za pretragu smještaja.",
+      });
+    }
+
+    //ovo je samo privremeno hardcodeano
+    const destinationCodes = {
+      paris: "PAR",
+    };
+    const destinationCode = destinationCodes[destination.trim().toLowerCase()];
+    if (!destinationCode) {
+      return res.status(400).json({
+        message: "Ta destinacija trenutno nije dostupna.",
+      });
+    }
+
+    const hotelbedsRequestBody = {
+      stay: {
+        checkIn: checkin,
+        checkOut: checkout,
+      },
+      occupancies: [
+        {
+          rooms: 1,
+          adults: Number(adults),
+          children: 0,
+        },
+      ],
+      destination: {
+        code: destinationCode,
+      },
+    };
+
+    const response = await fetch(`${HOTELBEDS_BASE_URL}/hotel-api/1.0/hotels`, {
+      method: "POST",
+      headers: getHotelbedsHeaders(),
+      body: JSON.stringify(hotelbedsRequestBody),
+    });
+
+    const data = await response.json();
+    //ovo su svi hoteli dostupni
+    //console.log(JSON.stringify(data, null, 2));
+    if (!response.ok) {
+      console.error("Hotelbeds availability error:", data);
+      return res.status(response.status).json({
+        message: "Pretraga smještaja nije uspjela",
+        details: data,
+      });
+    }
+    console.log("Hotelbeds odgovor:", data);
+
+    const accommodations = (data.hotels?.hotels || [])
+      .map((hotel) => {
+        const allRates = hotel.rooms?.flatMap((room) => room.rates || []) || [];
+        const firstRate = allRates.find((rate) => rate.packaging === false);
+        if (!firstRate) {
+          return null;
+        }
+        const excludedTaxes =
+          firstRate.taxes?.taxes?.filter((tax) => tax.included === false) || [];
+        const taxAmount = excludedTaxes.reduce(
+          (total, tax) => total + Number(tax.amount || 0),
+          0,
+        );
+        const price = Number(firstRate.net || 0);
+        const totalPrice = price + taxAmount;
+
+        return {
+          id: hotel.code,
+          name: hotel.name,
+          price,
+          currency: data.hotels?.currency || "EUR",
+          allotment: firstRate.allotment ?? null,
+          boardName: firstRate?.boardName || null,
+          rateKey: firstRate?.rateKey || null, //jedinstveni identifikator ponude; u njemu su kodirani datumi dolaska i odlaska, hotela i sobe, broja gostiju...
+          packaging: firstRate.packaging,
+          taxAmount,
+          taxesIncluded: excludedTaxes.length === 0,
+          totalPrice,
+        };
+      })
+      .filter((hotel) => hotel !== null);
+
+    return res.status(200).json({
+      message: "Smještaji su uspješno dohvaćeni.",
+      recievedData: {
+        destination,
+        checkin,
+        checkout,
+        adults,
+      },
+      accommodations,
+    });
+  } catch (error) {
+    console.error("Accomodation search error:", error);
+    return res.status(500).json({
+      message: "Došlo je do greške prilikom pretrage smještaja",
+    });
   }
 });
 
