@@ -1,4 +1,4 @@
-import { useState, React } from 'react'
+import { useState, React, useRef } from 'react'
 import toast from 'react-hot-toast'
 import './AddTripForm.css'
 import dark_destination from '../../assets/dark_destination.png'
@@ -31,6 +31,16 @@ const AddTripForm = ({darkMode}) => {
 
     const [accommodations, setAcommodations] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [hasSearched, setHasSearched] = useState(false);
+
+    const resultsRef = useRef(null);
+
+    const scrollToResults = () => {
+        resultsRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+        });
+    };
 
     const formatDate = (date) => {
         if(!date){
@@ -79,6 +89,7 @@ const AddTripForm = ({darkMode}) => {
         }
         finally{
             setLoading(false);
+            setHasSearched(true);
         }
     };
 
@@ -127,13 +138,18 @@ const AddTripForm = ({darkMode}) => {
                     <input id='transport_type' type="text" placeholder='Enter transport type:' value={transport_type} onChange={(e) => setTransportType(e.target.value)} required/>
                 </div>
                 <button type='submit' className={`btn ${darkMode ? "" : "dark-btn"}`} disabled={loading}>{loading ? "Loading..." : "Show options"}</button>
+                {hasSearched && !loading && (
+                    <button type="button" className={`btn ${darkMode ? "" : "dark-btn"}`} onClick={() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start"})}>
+                        See options below ↓
+                    </button>
+)}
             </form>
         </div>
         <div className={`accommodation-results ${darkMode ? "white-letters" : ""}`}>
             {!loading && accommodations.length > 0 && ( //ako se vec loadalo i ako postoji bar jedan smjestaj, prikazi sljedece
                 <>
                     <h2>Accommodation options</h2>
-                    <div className='accommodation-grid'>
+                    <div className='accommodation-grid' ref={resultsRef} >
                         {accommodations.map((accommodation) => (
                             <article className={`accommodation-card ${darkMode ? "tint" : ""}`} key={accommodation.id}>
                                 {accommodation.photo && (
@@ -174,7 +190,7 @@ const AddTripForm = ({darkMode}) => {
                 </>
             )}
             {!loading && accommodations.length === 0 && (
-                <p>Unesi podatke putovanja za prikaz smještaja.</p>
+                <p className='accommodation-message'>Unesi podatke putovanja za prikaz smještaja.</p>
             )}
         </div>
     </div>

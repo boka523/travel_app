@@ -139,3 +139,9 @@
   display: inline-block;
   text-decoration: none;
 }
+
+.accommodation-message {
+  text-align: center;
+  padding-bottom: 20px;
+  font-size: 25px;
+}

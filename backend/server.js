@@ -39,35 +39,23 @@ app.get("/", (req, res) => {
   res.send("Bogu fala Backend radi");
 });
 
-//ovo ispod je zasad samo testna ruta
-// app.get("/api/hotelbeds/status", async (req, res) => {
-//   try {
-//     const response = await fetch(`${HOTELBEDS_BASE_URL}/hotel-api/1.0/status`, {
-//       method: "GET",
-//       headers: getHotelbedsHeaders(),
-//     });
-
-//     const data = await response.json();
-
-//     if (!response.ok) {
-//       console.error("Hotelbeds status error:", data);
-//       return res.status(response.status).json({
-//         message: "Hotelbeds autentifikacija nije uspjela.",
-//         details: data,
-//       });
-//     }
-
-//     return res.status(200).json({
-//       message: "Hotelbeds API radi!",
-//       data,
-//     });
-//   } catch (error) {
-//     console.error("Hotelbeds connection error:", error);
-//     return res.status(500).json({
-//       message: "Nije se moguće povezati s Hotelbeds APIjem.",
-//     });
-//   }
-// });
+//samo da vidin koje su mi sve destinacije dostupne
+app.get("/api/destinations", async (req, res) => {
+  try {
+    const destinations = await prisma.destination.findMany({
+      orderBy: {
+        name: "asc",
+      },
+      select: {
+        name: true,
+      },
+    });
+    res.json(destinations.map((destination) => destination.name));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Greška pri dohvaćanju destinacija." });
+  }
+});
 
 app.get("/trips", async (req, res) => {
   try {
@@ -525,16 +513,21 @@ app.post("/api/accommodations", async (req, res) => {
       });
     }
 
-    //ovo je samo privremeno hardcodeano
-    const destinationCodes = {
-      paris: "PAR",
-    };
-    const destinationCode = destinationCodes[destination.trim().toLowerCase()];
-    if (!destinationCode) {
+    const foundDestination = await prisma.destination.findFirst({
+      where: {
+        name: {
+          contains: destination.trim(),
+        },
+      },
+    });
+
+    if (!foundDestination) {
       return res.status(400).json({
-        message: "Ta destinacija trenutno nije dostupna.",
+        message: "Upisana destinacija trenutno nije dostupna.",
       });
     }
+
+    const destinationCode = foundDestination.hotelbedsCode;
 
     const hotelbedsRequestBody = {
       stay: {

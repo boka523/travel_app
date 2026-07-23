@@ -1,8 +1,14 @@
 import React from 'react'
+import './Profile.css'
+import Navbar from '../../components/Navbar/Navbar'
+import ProfileForm from '../../components/ProfileForm/ProfileForm'
 
-const Profile = () => {
+const Profile = ({darkMode, toggleMode}) => {
   return (
-    <div>Profile</div>
+    <div>
+      <Navbar darkMode={darkMode} toggleMode={toggleMode}/>
+      <ProfileForm darkMode={darkMode}/>
+    </div>
   )
 }
 

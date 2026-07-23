@@ -23,7 +23,7 @@ function App() {
           <Route path='/signup' element={<Signup darkMode={darkMode} toggleMode={toggleMode}/>}/>
           <Route path='/addtrip' element={<AddTrip darkMode={darkMode} toggleMode={toggleMode}/>}/>
           <Route path='/mytrips' element={<MyTrips darkMode={darkMode} toggleMode={toggleMode}/>}/>
-          <Route path='/profile' element={<Profile/>}/>
+          <Route path='/profile' element={<Profile darkMode={darkMode} toggleMode={toggleMode}/>}/>
         </Routes>
       </Router>
     </>
