@@ -92,6 +92,7 @@ const MyTripsForm = ({darkMode}) => {
   const navigate = useNavigate();
   const [trips, setTrips] = useState([])
   const [isLoadingTrips, setIsLoadingTrips] = useState(false);
+  const [isDeletingTripId, setIsDeletingTripId] = useState(null);
 
   useEffect(() => { 
     setIsLoadingTrips(true);
@@ -141,6 +142,34 @@ const MyTripsForm = ({darkMode}) => {
     navigate("/addtrip");
   }
 
+  const handleDeleteTrip = async (tripId) => {
+    const confirmed = window.confirm("Jeste li sigurni da želite izbrisati ovo putovanje?");
+    if(!confirmed){
+      return;
+    }
+    try{
+      setIsDeletingTripId(tripId);
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:5000/trips/${tripId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if(!response.ok){
+        toast.error(data.error || "Brisanje nije uspjelo.");
+        return;
+      }
+      toast.success(data.message);
+      setTrips((prevTrips) => prevTrips.filter((trip) => trip.id !== tripId));
+    } catch(error){
+      toast.error(error.message);
+    } finally{
+      setIsDeletingTripId(null);
+    }
+  };
+
   return (
     <div className='my-trips-form container'>
       <div className='title'>
@@ -172,7 +201,7 @@ const MyTripsForm = ({darkMode}) => {
             ? ( <div className='message'>Nemate putovanja.</div>)
             : (
               trips.map((trip) => (
-                <div className={`trip ${darkMode ? "tint" : ""}`}>
+                <div key={trip.id} className={`trip ${darkMode ? "tint" : ""}`}>
                   <h1>{trip.destination}</h1>
                   <h1>{trip.total_cost} €</h1>
                   <div className='trip-details'>
@@ -183,7 +212,9 @@ const MyTripsForm = ({darkMode}) => {
                       <h3>Transport: {trip.transport_type}</h3>
                     </div>
                   </div>
-                  <button className={darkMode ? 'btn' : 'btn dark-btn'}>Uredi</button>
+                  <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={() => handleDeleteTrip(trip.id)} disabled={isDeletingTripId === trip.id}>
+                    {isDeletingTripId === trip.id ? "Brisanje..." : "Izbriši"}
+                  </button>
                 </div>
               ))
             )}

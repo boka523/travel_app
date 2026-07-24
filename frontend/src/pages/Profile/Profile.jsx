@@ -6,7 +6,7 @@ import ProfileForm from '../../components/ProfileForm/ProfileForm'
 const Profile = ({darkMode, toggleMode}) => {
   return (
     <div>
-      <Navbar darkMode={darkMode} toggleMode={toggleMode}/>
+      <Navbar darkMode={darkMode} toggleMode={toggleMode} variant="profile"/>
       <ProfileForm darkMode={darkMode}/>
     </div>
   )

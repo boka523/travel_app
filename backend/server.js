@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto"); //triba nan za sha256 hashiranje, to je ka "tip teksta" koji hotelbeds zahtjeva u svojoj dokumentaciji
 //const axios = require("axios"); // sluzi za slanje http zahtjeva
+const multer = require("multer"); //dodatak na express koji obraduje datoteke, tj. stavia san ga zbog uploada slika
+const path = require("path"); //ovo nam je za ekstenzije tipa .jpg ili .png
 const authenticateToken = require("./middleware/auth");
 const { PrismaClient } = require("@prisma/client");
 
@@ -31,9 +33,39 @@ const getHotelbedsHeaders = () => {
     "Content-Type": "application/json",
   };
 };
+//storage govori gdje i pod kojim imenom spremiti sliku
+const storage = multer.diskStorage({
+  //"spremi datoteku na fizicki disk, tj. backend"
+  destination: (req, file, cb) => {
+    //parametri su request, slika koju je korisnik posla i callback (govori di triba spremit datoteku ili jel sve okej)
+    cb(null, "uploads/profile-images"); //"nema greske, datoteku spremi u backend/uploads/profile-images"
+  },
+  filename: (req, file, cb) => {
+    //odreduje ime spremljene slike
+    const uniqueName = `${req.user.id}-${Date.now()}${path.extname(file.originalname)}`; //file.originalname je npr. slika.png, a path.extname uzima samo .png
+    cb(null, uniqueName); //"nema greske, datoteku spremi pod ovim imenom"
+  },
+});
+
+//upload govori kako multer smije prihvatiti datoteku
+const upload = multer({
+  storage, //"kad primis datoteku, koristi storage konfiguraciju od iznad"
+  limits: {
+    fileSize: 5 * 1024 * 1024, //ogranicava datoteku na velicinu od 5MB
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) {
+      //mimetypes su image/jpeg, image/png, image/webp... "ako pocinje sa image/, nema greske, spremi je"
+      cb(null, true);
+    } else {
+      cb(new Error("Možete učitati samo sliku!"));
+    }
+  },
+});
 
 app.use(cors());
 app.use(express.json());
+app.use("/uploads", express.static("uploads")); //ovime omogućujemo expressu da posluzuje slike
 
 app.get("/", (req, res) => {
   res.send("Bogu fala Backend radi");
@@ -104,6 +136,7 @@ app.get("/me", authenticateToken, async (req, res) => {
         id: true,
         name: true,
         email: true,
+        profile_image: true,
       },
     });
     res.status(200).json(user);
@@ -613,6 +646,39 @@ app.post("/api/accommodations", async (req, res) => {
     });
   }
 });
+
+app.post(
+  "/profile-picture",
+  authenticateToken,
+  upload.single("profile_image"),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          error: "Slika nije odabrana",
+        });
+      }
+      const profileImage = `/uploads/profile-images/${req.file.filename}`;
+      await prisma.users.update({
+        where: {
+          id: req.user.id,
+        },
+        data: {
+          profile_image: profileImage,
+        },
+      });
+      res.status(200).json({
+        message: "Profilna slika uspješno promijenjena.",
+        profile_image: profileImage,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        error: "Greška kod spremanja profilne slike.",
+      });
+    }
+  },
+);
 
 app.listen(5000, () => {
   console.log("Server radi na http://localhost:5000");

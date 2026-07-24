@@ -76,6 +76,22 @@ const Navbar = ({darkMode, toggleMode, variant}) => {
               </button>
             </>
           )}
+          {variant === "profile" && (
+            <>
+              <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={goBack}>
+                <div className='email-icon'>
+                  <img src={dark_back_button} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
+                  <img src={white_back_button} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
+                </div>
+              </button>
+              <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={handleLogout}>
+                <div className='email-icon'>
+                  <img src={dark_logout} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
+                  <img src={white_logout} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
+                </div>
+              </button>
+            </>
+          )}
           <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={toggleMode}>
             <img src={white_sun} alt="" className='mode'/>
             <img src={dark_moon} alt="" className='mode'/>
