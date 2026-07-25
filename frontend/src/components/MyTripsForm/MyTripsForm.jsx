@@ -170,6 +170,10 @@ const MyTripsForm = ({darkMode}) => {
     }
   };
 
+  const handleEditTrip = () => {
+    navigate("/edittrip");
+  }
+
   return (
     <div className='my-trips-form container'>
       <div className='title'>
@@ -212,9 +216,14 @@ const MyTripsForm = ({darkMode}) => {
                       <h3>Transport: {trip.transport_type}</h3>
                     </div>
                   </div>
+                  <div className='card-buttons'>
                   <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={() => handleDeleteTrip(trip.id)} disabled={isDeletingTripId === trip.id}>
                     {isDeletingTripId === trip.id ? "Brisanje..." : "Izbriši"}
                   </button>
+                  <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={() => handleEditTrip(trip.id)}>
+                    Uredi
+                  </button>
+                  </div>
                 </div>
               ))
             )}

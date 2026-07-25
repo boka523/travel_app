@@ -9,6 +9,7 @@ const multer = require("multer"); //dodatak na express koji obraduje datoteke, t
 const path = require("path"); //ovo nam je za ekstenzije tipa .jpg ili .png
 const authenticateToken = require("./middleware/auth");
 const { PrismaClient } = require("@prisma/client");
+const { error } = require("console");
 
 const app = express();
 const prisma = new PrismaClient();
@@ -533,6 +534,81 @@ app.patch("/trips/:id", authenticateToken, async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: "Greška kod ažuriranja putovanja" });
+  }
+});
+
+app.patch("/profile", authenticateToken, async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { name, email } = req.body;
+    if (
+      (name === undefined || name.trim() === "") &&
+      (email === undefined || email.trim() === "")
+    ) {
+      return res.status(400).json({
+        error: "Niste unijeli podatke za promjenu!",
+      });
+    }
+    const user = await prisma.users.findUnique({
+      where: {
+        id: user_id,
+      },
+    });
+    if (!user) {
+      return res.status(404).json({
+        error: "Korisnik nije pronađen!",
+      });
+    }
+
+    const updatedData = {};
+    if (name !== undefined && name.trim() !== "") {
+      updatedData.name = name.trim();
+    }
+    if (email !== undefined && email.trim() !== "") {
+      const normalizedEmail = email.trim().toLowerCase();
+      const existingUser = await prisma.users.findUnique({
+        where: {
+          email: normalizedEmail,
+        },
+      });
+      if (existingUser && existingUser.id !== user_id) {
+        return res.status(409).json({
+          error: "Korisnik s tom email adresom već postoji!",
+        });
+      }
+      updatedData.email = normalizedEmail;
+    }
+    const updatedUser = await prisma.users.update({
+      where: {
+        id: user_id,
+      },
+      data: updatedData,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+    const token = jwt.sign(
+      {
+        id: updatedUser.id,
+        email: updatedUser.email,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      },
+    );
+    return res.status(200).json({
+      message: "Podaci su uspješno promijenjeni!",
+      user: updatedUser,
+      token,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: "Greška kod promjene korisničkih podataka.",
+    });
   }
 });
 

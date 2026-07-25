@@ -103,3 +103,8 @@
   place-self: center;
   font-size: 30px;
 }
+
+.card-buttons {
+  display: flex;
+  justify-content: center;
+}

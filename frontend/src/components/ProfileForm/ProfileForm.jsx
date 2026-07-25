@@ -117,6 +117,47 @@ const ProfileForm = ({darkMode}) => {
         }
     };
 
+    const [showProfileForm, setShowProfileForm] = useState(false);
+    const [newName, setNewName] = useState("");
+    const [newEmail, setNewEmail] = useState("");
+    const [changingProfile, setChangingProfile] = useState(false);
+
+    const handleChangeProfile = async (e) => {
+        e.preventDefault();
+        try{
+            setChangingProfile(true);
+            const token=localStorage.getItem("token");
+            const response=await fetch("http://localhost:5000/profile", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    name: newName,
+                    email: newEmail,
+                }),
+            });
+            const data=await response.json();
+            if(!response.ok){
+                toast.error(data.error || "Promjena detalja profila nije uspjela.");
+                return ;
+            }
+            localStorage.setItem("token", data.token);
+            toast.success(data.message);
+            setNewName("");
+            setNewEmail("");
+            setTimeout(() => {
+                setShowProfileForm(false);
+                setUser(data.user);
+            }, 2000);
+        } catch(error){
+            toast.error(error.message);
+        } finally{
+            setChangingProfile(false);
+        }
+    };
+
   return (
     <div className='profile-form container'>
         <div className={`profile-text ${darkMode ? "tint white-letters" : ""}`}>
@@ -165,6 +206,18 @@ const ProfileForm = ({darkMode}) => {
                         <input type="password" placeholder='Confirm new password' value={confirmedPassword} onChange={(e) => setConfirmedPassword(e.target.value)} required/>
                         <button type='submit' className={darkMode ? 'btn' : 'btn dark-btn'} disabled={changingPassword}>
                             {changingPassword ? "Changing..." : "Save new password"}
+                        </button>
+                    </form>
+                )}
+                <button type="button" className={darkMode ? 'btn' : 'btn dark-btn'} onClick={() => setShowProfileForm((prev) => !(prev))}>
+                    {showProfileForm ? "Cancel" : "Change profile details"}
+                </button>
+                {showProfileForm && (
+                    <form onSubmit={handleChangeProfile} className='change-password-form'>
+                        <input type="text" placeholder='Change name' value={newName} onChange={(e) => setNewName(e.target.value)}/>
+                        <input type="email" placeholder='Change email' value={newEmail} onChange={(e) => setNewEmail(e.target.value)}/>
+                        <button type='submit' className={darkMode ? 'btn' : 'btn dark-btn'} disabled={changingProfile}>
+                            {changingProfile ? "Changing..." : "Save new profile details"}
                         </button>
                     </form>
                 )}

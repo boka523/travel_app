@@ -17,6 +17,8 @@ import dark_boat from '../../assets/dark_boat.png'
 import white_boat from '../../assets/white_boat.png'
 import dark_plane from '../../assets/dark_plane.png'
 import white_plane from '../../assets/white_plane.png'
+import dark_train from '../../assets/dark_train.png'
+import white_train from '../../assets/white_train.png'
 import dark_question from '../../assets/dark_question.png'
 import white_question from '../../assets/white_question.png'
 import DatePicker from 'react-datepicker'
@@ -93,6 +95,51 @@ const AddTripForm = ({darkMode}) => {
         }
     };
 
+    const getTransportIcon = () => {
+        const transport = transport_type.trim().toLowerCase();
+        const transportIcons = {
+            car:{
+                white: dark_car,
+                dark: white_car,
+            },
+            auto:{
+                white: dark_car,
+                dark: white_car,
+            },
+            plane:{
+                white: dark_plane,
+                dark: white_plane,
+            },
+            aeroplane:{
+                white: dark_plane,
+                dark: white_plane,
+            },
+            bus:{
+                white: dark_bus,
+                dark: white_bus,
+            },
+            train:{
+                white: dark_train,
+                dark: white_train,
+            },
+            boat:{
+                white: dark_boat,
+                dark: white_boat,
+            },
+            ship:{
+                white: dark_boat,
+                dark: white_boat,
+            },
+        };
+        const selectedIcons = transportIcons[transport];
+        if(!selectedIcons){
+            return darkMode ? white_question : dark_question;
+        }
+        return darkMode ? selectedIcons.dark : selectedIcons.white;
+    };
+
+    const [selectedAccommodation, setSelectedAccommodation] = useState(null);
+
   return (
     <div className='add-trips-form container'>
         <div className='title'>
@@ -132,8 +179,9 @@ const AddTripForm = ({darkMode}) => {
                 </div>
                 <div className='inputs'>
                     <div className='email-icon'>
-                        <img src={white_question} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
-                        <img src={dark_question} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
+                        {/* <img src={white_question} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
+                        <img src={dark_question} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/> */}
+                        <img src={getTransportIcon()} alt="" className='icon show'/>
                     </div>
                     <input id='transport_type' type="text" placeholder='Enter transport type:' value={transport_type} onChange={(e) => setTransportType(e.target.value)} required/>
                 </div>
@@ -151,7 +199,7 @@ const AddTripForm = ({darkMode}) => {
                     <h2>Accommodation options</h2>
                     <div className='accommodation-grid' ref={resultsRef} >
                         {accommodations.map((accommodation) => (
-                            <article className={`accommodation-card ${darkMode ? "tint" : ""}`} key={accommodation.id}>
+                            <article className={`accommodation-card ${darkMode ? "tint" : ""} ${selectedAccommodation === accommodation.id ? "selected" : ""}`} key={accommodation.id} onClick={() => setSelectedAccommodation(accommodation.id)}>
                                 {accommodation.photo && (
                                     <img src={accommodation.photo} alt={accommodation.name} className='accommodation-image'/>
                                 )}
