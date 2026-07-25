@@ -6,7 +6,7 @@ import EditTripForm from '../../components/EditTripForm/EditTripForm'
 const EditTrip = ({darkMode, toggleMode}) => {
   return (
     <div>
-        <Navbar darkMode={darkMode} toggleMode={toggleMode}/>
+        <Navbar darkMode={darkMode} toggleMode={toggleMode} variant="add-trips"/>
         <EditTripForm darkMode={darkMode}/>
     </div>
   )

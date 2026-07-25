@@ -144,7 +144,7 @@ const AddTripForm = ({darkMode}) => {
     <div className='add-trips-form container'>
         <div className='title'>
             <div className={`add-trips-text ${darkMode ? "tint white-letters" : ""}`}>
-            <h1>Create trip</h1>
+                <h1>Create trip</h1>
             </div>
         </div>
         <div className={`add-trips-card ${darkMode ? "tint white-letters" : ""}`}>
