@@ -38,6 +38,33 @@ model destination {
   countryCode   String?
 }
 
+model hotels {
+  id                    Int      @id @default(autoincrement())
+  hotelbedsCode         Int      @unique(map: "hotelbedsCode")
+  name                  String   @db.VarChar(255)
+  countryCode           String?  @db.VarChar(10)
+  destinationCode       String?  @db.VarChar(20)
+  address               String?  @db.VarChar(255)
+  postalCode            String?  @db.VarChar(20)
+  city                  String?  @db.VarChar(100)
+  latitude              Decimal? @db.Decimal(10, 7)
+  longitude             Decimal? @db.Decimal(10, 7)
+  categoryCode          String?  @db.VarChar(20)
+  categoryName          String?  @db.VarChar(100)
+  stars                 Int?
+  mainImagePath         String?  @db.VarChar(500)
+  description           String?  @db.Text
+  accommodationTypeCode String?  @db.VarChar(50)
+  web                   String?  @db.VarChar(255)
+}
+
+model import_progress {
+  id         Int     @id @default(autoincrement())
+  importType String  @unique(map: "importType") @db.VarChar(50)
+  nextFrom   Int
+  completed  Boolean @default(false)
+}
+
 enum trips_transport_type {
   car
   plane
