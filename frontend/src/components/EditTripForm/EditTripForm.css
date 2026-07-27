@@ -34,12 +34,15 @@
 
 .edit-trip-card {
   background-color: rgba(255, 255, 255, 0.5);
-  margin-top: 50px;
+  margin-top: 40px;
   border-radius: 30px;
   width: 100%;
   min-height: 65vh;
   padding: 10px;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   transition: 0.3s;
 }
 

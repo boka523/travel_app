@@ -146,14 +146,49 @@ app.get("/me", authenticateToken, async (req, res) => {
   }
 });
 
-app.post("/trips", authenticateToken, async (req, res) => {
-  const { destination, start_date, end_date, transport_type, passengers_num } =
-    req.body;
-  if (Object.keys(req.body).length !== 5) {
-    return res
-      .status(400)
-      .json({ error: "Nisu uneseni svi podaci za putovanje!" });
+app.get("/trips/:id", authenticateToken, async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const trip_id = Number(req.params.id);
+    if (!Number.isInteger(trip_id) || trip_id < 1) {
+      return res.status(400).json({
+        error: "Neispravan ID putovanja!",
+      });
+    }
+    const trip = await prisma.trips.findFirst({
+      where: {
+        id: trip_id,
+        user_id: user_id,
+      },
+      include: {
+        hotels: true,
+      },
+    });
+    if (!trip) {
+      return res.status(404).json({
+        error: "Putovanje nije pronađeno ili ne pripada korisniku!",
+      });
+    }
+    res.status(200).json({
+      trip: trip,
+    });
+  } catch (error) {
+    console.error("Greška kod dohvaćanja putovanja:", error);
+    res.status(500).json({
+      error: "Greška kod dohvaćanja putovanja!",
+    });
   }
+});
+
+app.post("/trips", authenticateToken, async (req, res) => {
+  const {
+    destination,
+    start_date,
+    end_date,
+    transport_type,
+    passengers_num,
+    hotel_id,
+  } = req.body;
   if (
     destination === "" ||
     start_date === "" ||
@@ -176,6 +211,19 @@ app.post("/trips", authenticateToken, async (req, res) => {
     return res.status(400).json({ error: "Nepoznat tip prijevoza!" });
   }
   try {
+    let selectedHotel = null;
+    if (hotel_id !== null && hotel_id !== undefined) {
+      selectedHotel = await prisma.hotels.findUnique({
+        where: {
+          id: Number(hotel_id),
+        },
+      });
+      if (!selectedHotel) {
+        return res.status(404).json({
+          error: "Odabrani hotel nije pronađen!",
+        });
+      }
+    }
     const trip = await prisma.trips.create({
       data: {
         user_id: req.user.id,
@@ -184,6 +232,7 @@ app.post("/trips", authenticateToken, async (req, res) => {
         end_date: new Date(end_date),
         transport_type,
         passengers_num,
+        hotel_id: selectedHotel ? selectedHotel.id : null,
       },
     });
     res.status(201).json(trip);
@@ -673,8 +722,33 @@ app.post("/api/accommodations", async (req, res) => {
     }
     console.log("Hotelbeds odgovor:", data);
 
-    const accommodations = (data.hotels?.hotels || [])
+    const avaliableHotels = data.hotels?.hotels || [];
+    const hotelbedsCode = avaliableHotels.map((hotel) => Number(hotel.code));
+    const localHotels = await prisma.hotels.findMany({
+      where: {
+        hotelbedsCode: {
+          in: hotelbedsCode,
+        },
+      },
+      select: {
+        id: true,
+        hotelbedsCode: true,
+        name: true,
+        address: true,
+        mainImagePath: true,
+        stars: true,
+      },
+    });
+    const localHotelsByCode = new Map(
+      localHotels.map((hotel) => [hotel.hotelbedsCode, hotel]),
+    );
+
+    const accommodations = avaliableHotels
       .map((hotel) => {
+        const localHotel = localHotelsByCode.get(Number(hotel.code));
+        if (!localHotel) {
+          return null;
+        }
         const allRates = hotel.rooms?.flatMap((room) => room.rates || []) || [];
         const firstRate = allRates.find((rate) => rate.packaging === false);
         if (!firstRate) {
@@ -690,17 +764,29 @@ app.post("/api/accommodations", async (req, res) => {
         const totalPrice = price + taxAmount;
 
         return {
-          id: hotel.code,
-          name: hotel.name,
+          id: localHotel.id,
+          hotelbedsCode: Number(hotel.code),
+          name: localHotel.name || hotel.name,
+          address: localHotel.address,
+          photo: localHotel.mainImagePath
+            ? `https://photos.hotelbeds.com/giata/bigger/${localHotel.mainImagePath}`
+            : null,
           price,
           currency: data.hotels?.currency || "EUR",
           allotment: firstRate.allotment ?? null,
-          boardName: firstRate?.boardName || null,
+          boardName: firstRate?.boardName
+            ? firstRate.boardName
+                .toLowerCase()
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")
+            : null,
           rateKey: firstRate?.rateKey || null, //jedinstveni identifikator ponude; u njemu su kodirani datumi dolaska i odlaska, hotela i sobe, broja gostiju...
           packaging: firstRate.packaging,
           taxAmount,
           taxesIncluded: excludedTaxes.length === 0,
           totalPrice,
+          stars: localHotel.stars,
         };
       })
       .filter((hotel) => hotel !== null);

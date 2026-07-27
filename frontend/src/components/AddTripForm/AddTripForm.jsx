@@ -21,6 +21,10 @@ import dark_train from '../../assets/dark_train.png'
 import white_train from '../../assets/white_train.png'
 import dark_question from '../../assets/dark_question.png'
 import white_question from '../../assets/white_question.png'
+import dark_left_arrow from '../../assets/dark_left_arrow.png'
+import white_left_arrow from '../../assets/white_left_arrow.png'
+import dark_right_arrow from '../../assets/dark_right_arrow.png'
+import white_right_arrow from '../../assets/white_right_arrow.png'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -57,6 +61,7 @@ const AddTripForm = ({darkMode}) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setAcommodations([]);
+        setCurrentSlide(0);
         if(!startDate || !endDate){
             toast.error("Odaberi datum dolaska i odlaska.");
             return;
@@ -140,6 +145,26 @@ const AddTripForm = ({darkMode}) => {
 
     const [selectedAccommodation, setSelectedAccommodation] = useState(null);
 
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const hotelsPerSlide = 4;
+
+    const accommodationSlides = Array.from(
+        {
+            length: Math.ceil(accommodations.length / hotelsPerSlide),
+        },
+        (_, index) => accommodations.slice(index * hotelsPerSlide, index * hotelsPerSlide + hotelsPerSlide)
+    );
+
+    const totalSlides = accommodations.length;
+
+    const handlePreviousSlide = () => {
+        setCurrentSlide((previousSlide) => Math.max(previousSlide-1, 0));
+    };
+    const handleNextSlide = () => {
+        setCurrentSlide((previousSlide) => Math.min(previousSlide+1, totalSlides-1));
+    };
+    
+
   return (
     <div className='add-trips-form container'>
         <div className='title'>
@@ -194,48 +219,71 @@ const AddTripForm = ({darkMode}) => {
             </form>
         </div>
         <div className={`accommodation-results ${darkMode ? "white-letters" : ""}`}>
+            <h2>Accommodation options:</h2>
             {!loading && accommodations.length > 0 && ( //ako se vec loadalo i ako postoji bar jedan smjestaj, prikazi sljedece
-                <>
-                    <h2>Accommodation options</h2>
-                    <div className='accommodation-grid' ref={resultsRef} >
-                        {accommodations.map((accommodation) => (
-                            <article className={`accommodation-card ${darkMode ? "tint" : ""} ${selectedAccommodation === accommodation.id ? "selected" : ""}`} key={accommodation.id} onClick={() => setSelectedAccommodation(accommodation.id)}>
-                                {accommodation.photo && (
-                                    <img src={accommodation.photo} alt={accommodation.name} className='accommodation-image'/>
-                                )}
-                                <div className='accommodation-info'>
-                                    <h3>{accommodation.name}</h3>
-                                    {accommodation.address && (
-                                        <p>{accommodation.address}</p>
-                                    )}
-                                    {accommodation.reviewScore && (
-                                        <p>
-                                            Rating: {accommodation.reviewScore}
-                                            {accommodation.reviewCount
-                                                ? `(${accommodation.reviewCount} reviews)`
-                                                : ""}
-                                        </p>
-                                    )}
-                                    <p className='accommodation-boardName'>
-                                        {accommodation.boardName
-                                            ? `BoardNames: ${accommodation.boardName}`
-                                            : "BoardName unavaliable"}
-                                    </p>
-                                    <p className='accommodation-price'>
-                                        {accommodation.price
-                                            ? `${accommodation.price} ${accommodation.currency}`
-                                            : "Price unavaliable"}
-                                    </p>
-                                    {accommodation.url && (
-                                        <a href={accommodation.url} target='_blank' rel='noopener noreferrer' className={`btn ${darkMode ? "" : "dark-btn"}`}>
-                                            View accommodation
-                                        </a>
-                                    )}
+                <div className='accommodation-slider'>
+                    <button type="button" className={`btn ${darkMode ? "" : "dark-btn"}`} onClick={handlePreviousSlide} disabled={currentSlide === 0} aria-label="Previous accommodations">
+                        <div className='email-icon'>
+                            <img src={white_left_arrow} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
+                            <img src={dark_left_arrow} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
+                        </div>
+                    </button>
+                    <div className='slider-viewport' ref={resultsRef}>
+                        <div className='slider-track' style= {{transform: `translateX(-${currentSlide*100}%)`}}>
+                            {accommodationSlides.map((slide, slideIndex) => (
+                                <div className='accommodation-slide' key={slideIndex}>
+                                    {slide.map((accommodation) => (
+                                        <article className={`accommodation-card ${darkMode ? "tint" : ""} ${selectedAccommodation === accommodation.id ? "selected" : ""}`} key={accommodation.id} onClick={() => {console.log(accommodation); setSelectedAccommodation(accommodation.id)}}>
+                                            {accommodation.photo && (
+                                                <img src={accommodation.photo} alt={accommodation.name} className='accommodation-image'/>
+                                            )}
+                                            <div className='accommodation-info'>
+                                                <h3>{accommodation.name}</h3>
+                                                {accommodation.stars && (
+                                                    <p className='accommodation-stars'>
+                                                        {"Category:" + "⭐".repeat(accommodation.stars)}
+                                                    </p>
+                                                )}
+                                                {accommodation.address && (
+                                                    <p>Address: {accommodation.address}</p>
+                                                )}
+                                                {accommodation.reviewScore && (
+                                                    <p>
+                                                        Rating: {accommodation.reviewScore}
+                                                        {accommodation.reviewCount
+                                                            ? `(${accommodation.reviewCount} reviews)`
+                                                            : ""}
+                                                    </p>
+                                                )}
+                                                <p className='accommodation-boardName'>
+                                                    {accommodation.boardName
+                                                        ? `Type: ${accommodation.boardName}`
+                                                        : "BoardName unavaliable"}
+                                                </p>
+                                                <p className='accommodation-price'>
+                                                    {accommodation.price
+                                                        ? `${accommodation.price} ${accommodation.currency}`
+                                                        : "Price unavaliable"}
+                                                </p>
+                                                {accommodation.url && (
+                                                    <a href={accommodation.url} target='_blank' rel='noopener noreferrer' className={`btn ${darkMode ? "" : "dark-btn"}`}>
+                                                        View accommodation
+                                                    </a>
+                                                )}
+                                            </div>
+                                        </article>
+                                    ))}
                                 </div>
-                            </article>
-                        ))}
+                            ))}
+                        </div>
                     </div>
-                </>
+                    <button type="button" className={`slider-arrow btn ${darkMode ? "" : "dark-btn"}`} onClick={handleNextSlide} disabled={currentSlide === totalSlides - 1 || totalSlides === 0} aria-label="Next accommodations">
+                        <div className='email-icon'>
+                            <img src={white_right_arrow} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
+                            <img src={dark_right_arrow} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
+                        </div>
+                    </button>
+                </div>
             )}
             {!loading && accommodations.length === 0 && (
                 <p className='accommodation-message'>Unesi podatke putovanja za prikaz smještaja.</p>

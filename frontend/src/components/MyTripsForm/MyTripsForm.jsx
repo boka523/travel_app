@@ -170,8 +170,8 @@ const MyTripsForm = ({darkMode}) => {
     }
   };
 
-  const handleEditTrip = () => {
-    navigate("/edittrip");
+  const handleEditTrip = (tripId) => {
+    navigate(`/edittrip/${tripId}`);
   }
 
   return (

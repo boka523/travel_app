@@ -4,7 +4,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const HOTELBEDS_BASE_URL = "https://api.test.hotelbeds.com";
 const PAGE_SIZE = 1000;
-const MAX_REQUESTS_PER_RUN = 10; //mozda smanjit
+const MAX_REQUESTS_PER_RUN = 40; //mozda smanjit
 
 const createHotelbedsSignature = () => {
   const apiKey = process.env.HOTELBEDS_API_KEY;
