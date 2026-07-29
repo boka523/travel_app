@@ -3,6 +3,12 @@
   min-height: 50vh;
 }
 
+.airport-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .airport-selection {
   display: flex;
   gap: 20px;
@@ -14,6 +20,13 @@
 .airport-select {
   flex: 1;
   max-width: 300px;
+}
+
+.show-flights.btn {
+  width: 200px;
+  align-self: center;
+  font-size: 22px;
+  padding: 20px;
 }
 
 .flight-results {
@@ -123,20 +136,8 @@
   background: rgba(0, 0, 0, 0.25);
 }
 
-.airport-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.show-flights.btn {
-  width: 200px;
-  align-self: center;
-  font-size: 22px;
-  padding: 20px;
-}
-
-.flight-slider {
+/* nek stoji za implementaciju slidera*/
+/* .flight-slider {
   width: 100%;
   display: flex;
   align-items: center;
@@ -263,4 +264,4 @@
   font-size: 22px;
   font-weight: 700;
   white-space: nowrap;
-}
+} */
