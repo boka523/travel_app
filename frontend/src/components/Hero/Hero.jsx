@@ -1,6 +1,6 @@
 import React from 'react'
-import './Hero.css'
 import { Link, Links } from 'react-router-dom'
+import './Hero.css'
 
 const Hero = ({darkMode}) => {
   return (

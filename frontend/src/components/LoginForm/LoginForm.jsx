@@ -17,7 +17,9 @@ const LoginForm = ({darkMode}) => {
 
   const handleLogin = async (e) => {
     e.preventDefault(); //sprijeci browser da izvrsi svoju uobicajenu akciju, tj. refresh, jer nam je cilj da se ona ne refresha, nego da React obradi podatke
+
     setIsLoading(true);
+
     try{
       const response = await fetch("http://localhost:5000/login", {
         method: "POST",
@@ -31,6 +33,7 @@ const LoginForm = ({darkMode}) => {
       });
 
       const data = await response.json(); //.json pretvara odgovor servera iz JSON formata u JS objekt
+
       if (!response.ok){
         toast.error(data.error || "Prijava nije uspjela.");
         return;
@@ -38,6 +41,7 @@ const LoginForm = ({darkMode}) => {
 
       localStorage.setItem("token", data.token);
       toast.success(data.message || "Uspješna prijava!");
+      
       setTimeout(() => {
         navigate("/mytrips");
       }, 1000)

@@ -1,5 +1,4 @@
 import React from 'react'
-import './AddTrip.css'
 import Navbar from '../../components/Navbar/Navbar'
 import AddTripForm from '../../components/AddTripForm/AddTripForm'
 

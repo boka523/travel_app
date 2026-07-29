@@ -2,9 +2,10 @@ require("dotenv").config();
 const crypto = require("crypto");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+
 const HOTELBEDS_BASE_URL = "https://api.test.hotelbeds.com";
 const PAGE_SIZE = 1000;
-const MAX_REQUESTS_PER_RUN = 40; //mozda smanjit
+const MAX_REQUESTS_PER_RUN = 40;
 
 const createHotelbedsSignature = () => {
   const apiKey = process.env.HOTELBEDS_API_KEY;
@@ -34,11 +35,14 @@ const fetchHotelsPage = async (from, to) => {
       headers: getHotelbedsHeaders(),
     },
   );
+
   const data = await response.json();
+
   if (!response.ok) {
     console.error("Hotelbeds error:", data);
     throw new Error("Dohvat hotela nije uspio.");
   }
+
   return data.hotels || [];
 };
 
@@ -46,6 +50,7 @@ const getMainImage = (hotel) => {
   if (!hotel.images || hotel.images.length === 0) {
     return null;
   }
+
   return hotel.images[0].path;
 };
 
@@ -73,6 +78,7 @@ const saveHotels = async (hotels) => {
   if (!hotels || hotels.length === 0) {
     return 0;
   }
+
   const formattedHotels = hotels
     .map(formatHotel)
     .filter(
@@ -81,13 +87,16 @@ const saveHotels = async (hotels) => {
         hotel.hotelbedsCode !== undefined &&
         hotel.name,
     ); //filter je tu da ne spremimo hotel bez koda ili imena u bazu podataka
+
   if (formattedHotels.length === 0) {
     return 0;
   }
+
   const result = await prisma.hotels.createMany({
     data: formattedHotels,
     skipDuplicates: true,
   });
+
   return result.count;
 };
 
@@ -97,6 +106,7 @@ const getImportProgress = async () => {
       importType: "hotels",
     },
   });
+
   if (!progress) {
     progress = await prisma.import_progress.create({
       data: {
@@ -106,6 +116,7 @@ const getImportProgress = async () => {
       },
     });
   }
+
   return progress;
 };
 
@@ -123,39 +134,51 @@ const updateImportProgress = async (nextFrom, completed = false) => {
 
 const main = async () => {
   const progress = await getImportProgress();
+
   if (progress.completed) {
     console.log("Import hotela je dovršen.");
     return;
   }
+
   let from = progress.nextFrom;
+
   for (
     let requestNumber = 1;
     requestNumber <= MAX_REQUESTS_PER_RUN;
     requestNumber++
   ) {
     const to = from + PAGE_SIZE - 1;
+
     console.log(
       `Zahtjev ${requestNumber}/${MAX_REQUESTS_PER_RUN}: dohvaćam hotele od ${from} do ${to}...`,
     );
+
     const hotels = await fetchHotelsPage(from, to);
+
     if (hotels.length === 0) {
       await updateImportProgress(from, true);
       console.log("Nema više hotela. Import je dovršen.");
       return;
     }
+
     const savedCount = await saveHotels(hotels);
     const nextFrom = to + 1;
     const importCompleted = hotels.length < PAGE_SIZE;
+
     await updateImportProgress(nextFrom, importCompleted);
+
     console.log(
       `API je vratio ${hotels.length} hotela. Spremljeno novih hotela: ${savedCount}`,
     );
+
     if (importCompleted) {
       console.log("Dohvaćena je zadnja stranica. Import je dovršen.");
       return;
     }
+
     from = nextFrom;
   }
+
   console.log(`Dosegnut je dnevni limit od ${MAX_REQUESTS_PER_RUN} zahtjeva.`);
   console.log(`Sljedeći import nastavlja se od pozicije ${from}.`);
 };

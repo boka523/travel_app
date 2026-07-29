@@ -1,29 +1,34 @@
 import React, { useEffect, useState } from 'react'
-import './EditTrip.css'
-import Navbar from '../../components/Navbar/Navbar'
-import EditTripForm from '../../components/EditTripForm/EditTripForm'
 import { useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import Navbar from '../../components/Navbar/Navbar'
+import EditTripForm from '../../components/EditTripForm/EditTripForm'
 
 const EditTrip = ({darkMode, toggleMode}) => {
   const {id} = useParams();
   const [trip, setTrip] = useState(null);
   const [isLoadingTrip, setIsLoadingTrip] = useState(false);
+
   useEffect(() => {
     const fetchTrips = async () => {
       try{
         setIsLoadingTrip(true);
+
         const token = localStorage.getItem("token");
+
         const response = await fetch(`http://localhost:5000/trips/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+
         const data = await response.json();
+
         if(!response.ok){
           toast.error(data.error);
           return;
         }
+        
         setTrip(data.trip);
       } catch(error){
         toast.error(error);
@@ -33,6 +38,7 @@ const EditTrip = ({darkMode, toggleMode}) => {
     };
     fetchTrips();
   }, [id]);
+
   return (
     <div>
         <Navbar darkMode={darkMode} toggleMode={toggleMode} variant="add-trips"/>

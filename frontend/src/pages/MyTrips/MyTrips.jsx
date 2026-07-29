@@ -1,5 +1,4 @@
 import React from 'react'
-import './MyTrips.css'
 import Navbar from '../../components/Navbar/Navbar'
 import MyTripsForm from '../../components/MyTripsForm/MyTripsForm'
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import './ProfileForm.css'
 import dark_profile_picture from '../../assets/dark_profile_picture.png'
 import white_profile_picture from '../../assets/white_profile_picture.png'
@@ -8,20 +9,34 @@ import dark_password from '../../assets/dark_password.png'
 import white_password from '../../assets/white_password.png'
 import dark_name from '../../assets/dark_name.png'
 import white_name from '../../assets/white_name.png'
-import toast from 'react-hot-toast'
 
 const ProfileForm = ({darkMode}) => {
-
     const [profileImage, setProfileImage] = useState(null);
+    const [user, setUser] = useState(null);
+    const [oldPassword, setOldPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmedPassword, setConfirmedPassword] = useState("");
+    const [newName, setNewName] = useState("");
+    const [newEmail, setNewEmail] = useState("");
+    const [showPasswordForm, setShowPasswordForm] = useState(false);
+    const [showProfileForm, setShowProfileForm] = useState(false);
+    const [changingPassword, setChangingPassword] = useState(false);
+    const [changingProfile, setChangingProfile] = useState(false);
+    const [loading, setLoading] = useState(true);
+
     const handleImageChange = async (e) => {
         const file = e.target.files[0];
+
         if(!file){
             return;
         }
+
         try{
             const token=localStorage.getItem("token");
             const formData = new FormData();
+
             formData.append("profile_image", file);
+
             const response = await fetch("http://localhost:5000/profile-picture", {
                 method: "POST",
                 headers: {
@@ -29,11 +44,14 @@ const ProfileForm = ({darkMode}) => {
                 },
                 body: formData,
             });
+
             const data = await response.json();
+
             if(!response.ok){
                 toast.error(data.error || "Spremanje slike nije uspjelo.");
                 return;
             }
+
             setProfileImage(`http://localhost:5000${data.profile_image}`);
             toast.success(data.message);
         } catch(error){
@@ -41,24 +59,26 @@ const ProfileForm = ({darkMode}) => {
         }
     };
 
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
-
     useEffect(() => {
         const fetchUser = async () => {
             try{
                 const token = localStorage.getItem("token");
+
                 const response = await fetch("http://localhost:5000/me", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },                
                 });
+
                 const data = await response.json();
+
                 if(!response.ok){
                     toast.error(data.error || "Dohvaćanje korisnika nije uspjelo.");
                     return ;
                 }
+
                 setUser(data);
+
                 if(data.profile_image){
                     setProfileImage(`http://localhost:5000${data.profile_image}`);
                 }
@@ -72,21 +92,19 @@ const ProfileForm = ({darkMode}) => {
         fetchUser();
     }, []);
 
-    const [showPasswordForm, setShowPasswordForm] = useState(false);
-    const [oldPassword, setOldPassword] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmedPassword, setConfirmedPassword] = useState("");
-    const [changingPassword, setChangingPassword] = useState(false);
-
     const handleChangePassword = async (e) => {
         e.preventDefault();
+
         if(newPassword !== confirmedPassword){
-                toast.error("Confirmed password nije dobra.");
-                return;
-            }
+            toast.error("Confirmed password nije dobra.");
+            return;
+        }
+
         try{
             setChangingPassword(true);
+
             const token=localStorage.getItem("token");
+
             const response=await fetch("http://localhost:5000/change_password", {
                 method: "POST",
                 headers: {
@@ -98,15 +116,20 @@ const ProfileForm = ({darkMode}) => {
                     new_password: newPassword,
                 }),
             });
+
             const data=await response.json();
+
             if(!response.ok){
                 toast.error(data.error || "Promjena lozinke nije uspjela.");
                 return ;
             }
+
             toast.success(data.message);
+
             setOldPassword("");
             setNewPassword("");
             setConfirmedPassword("");
+
             setTimeout(() => {
                 setShowPasswordForm(false);
             }, 2000);
@@ -117,16 +140,14 @@ const ProfileForm = ({darkMode}) => {
         }
     };
 
-    const [showProfileForm, setShowProfileForm] = useState(false);
-    const [newName, setNewName] = useState("");
-    const [newEmail, setNewEmail] = useState("");
-    const [changingProfile, setChangingProfile] = useState(false);
-
     const handleChangeProfile = async (e) => {
         e.preventDefault();
+
         try{
             setChangingProfile(true);
+
             const token=localStorage.getItem("token");
+
             const response=await fetch("http://localhost:5000/profile", {
                 method: "PATCH",
                 headers: {
@@ -138,15 +159,20 @@ const ProfileForm = ({darkMode}) => {
                     email: newEmail,
                 }),
             });
+
             const data=await response.json();
+
             if(!response.ok){
                 toast.error(data.error || "Promjena detalja profila nije uspjela.");
                 return ;
             }
+
             localStorage.setItem("token", data.token);
             toast.success(data.message);
+
             setNewName("");
             setNewEmail("");
+            
             setTimeout(() => {
                 setShowProfileForm(false);
                 setUser(data.user);

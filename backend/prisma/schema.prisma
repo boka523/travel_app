@@ -8,18 +8,22 @@ datasource db {
 }
 
 model trips {
-  id             Int                  @id @default(autoincrement())
-  user_id        Int
-  destination    String               @db.VarChar(255)
-  start_date     DateTime             @db.Date
-  end_date       DateTime             @db.Date
-  transport_type trips_transport_type
-  total_cost     Decimal?             @default(0.00) @db.Decimal(10, 2)
-  passengers_num Int
-  ai_cost        Int?
-  hotel_id       Int?
-  users          users                @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "trips_ibfk_1")
-  hotels         hotels?              @relation(fields: [hotel_id], references: [id], onUpdate: NoAction, map: "trips_ibfk_2")
+  id                     Int                  @id @default(autoincrement())
+  user_id                Int
+  destination            String               @db.VarChar(255)
+  start_date             DateTime             @db.Date
+  end_date               DateTime             @db.Date
+  transport_type         trips_transport_type
+  total_cost             Decimal?             @default(0.00) @db.Decimal(10, 2)
+  passengers_num         Int
+  ai_cost                Int?
+  hotel_id               Int?
+  departure_location     String?              @db.VarChar(255)
+  departure_airport_code String?              @db.Char(3)
+  arrival_airport_code   String?              @db.Char(3)
+  trip_flights           trip_flights?
+  users                  users                @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "trips_ibfk_1")
+  hotels                 hotels?              @relation(fields: [hotel_id], references: [id], onUpdate: NoAction, map: "trips_ibfk_2")
 
   @@index([user_id], map: "user_id")
   @@index([hotel_id], map: "hotel_id")
@@ -67,6 +71,23 @@ model import_progress {
   importType String  @unique(map: "importType") @db.VarChar(50)
   nextFrom   Int
   completed  Boolean @default(false)
+}
+
+model trip_flights {
+  id                      Int       @id @default(autoincrement())
+  trip_id                 Int       @unique(map: "unique_trip_flight")
+  airline_name            String?   @db.VarChar(100)
+  airline_code            String?   @db.Char(2)
+  outbound_departure_time DateTime? @db.DateTime(0)
+  outbound_arrival_time   DateTime? @db.DateTime(0)
+  return_departure_time   DateTime? @db.DateTime(0)
+  return_arrival_time     DateTime? @db.DateTime(0)
+  stops                   Int?
+  price                   Decimal   @db.Decimal(10, 2)
+  currency                String    @default("EUR") @db.Char(3)
+  provider_offer_id       String?   @db.VarChar(255)
+  provider                String    @default("Duffel") @db.VarChar(50)
+  trips                   trips     @relation(fields: [trip_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_trip_flights_trip")
 }
 
 enum trips_transport_type {

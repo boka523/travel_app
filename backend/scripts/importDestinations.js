@@ -2,6 +2,7 @@ require("dotenv").config();
 const crypto = require("crypto");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+
 const HOTELBEDS_BASE_URL = "https://api.test.hotelbeds.com";
 
 const createHotelbedsSignature = () => {
@@ -34,10 +35,12 @@ const fetchDestinationsPage = async (from, to) => {
   );
 
   const data = await response.json();
+
   if (!response.ok) {
     console.error("Hotelbeds error:", data);
     throw new Error("Dohvat destinacija nije uspio.");
   }
+
   return data.destinations || [];
 };
 
@@ -67,16 +70,21 @@ const saveDestinations = async (destinations) => {
 
 const main = async () => {
   const pageSize = 1000;
+
   try {
     const existingDestinations = await prisma.destination.count();
+
     let from = existingDestinations + 1;
     let to = from + pageSize - 1;
+
     console.log(`U bazi već postoji ${existingDestinations} destinacija.`);
     console.log(`Import nastavljam od destinacije ${from}.`);
 
     while (true) {
       console.log(`Dohvaćam destinacije od ${from} do ${to}...`);
+
       const destinations = await fetchDestinationsPage(from, to);
+
       console.log(`${destinations.length} destinacija dohvaćeno!`);
 
       if (destinations.length === 0) {
@@ -103,5 +111,4 @@ const main = async () => {
   }
 };
 
-//nastavit od 7000
 main();

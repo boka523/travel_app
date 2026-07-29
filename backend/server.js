@@ -1,18 +1,18 @@
 require("dotenv").config(); //sluzi da bi se varijable zapisane u .env procitale u pohranile u process.env
 const express = require("express"); //server za obradu podataka iz baze
 const cors = require("cors"); //tu je da bi backend i frontend mogli komunicirat
+const multer = require("multer"); //dodatak na express koji obraduje datoteke, tj. stavia san ga zbog uploada slika
+const authenticateToken = require("./middleware/auth");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const duffel = require("./duffel");
 const crypto = require("crypto"); //triba nan za sha256 hashiranje, to je ka "tip teksta" koji hotelbeds zahtjeva u svojoj dokumentaciji
-//const axios = require("axios"); // sluzi za slanje http zahtjeva
-const multer = require("multer"); //dodatak na express koji obraduje datoteke, tj. stavia san ga zbog uploada slika
 const path = require("path"); //ovo nam je za ekstenzije tipa .jpg ili .png
-const authenticateToken = require("./middleware/auth");
+
 const { PrismaClient } = require("@prisma/client");
 const { error } = require("console");
+//const { off } = require("cluster");
 
-const app = express();
-const prisma = new PrismaClient();
 const HOTELBEDS_BASE_URL = "https://api.test.hotelbeds.com";
 
 const createHotelbedsSignature = () => {
@@ -34,6 +34,7 @@ const getHotelbedsHeaders = () => {
     "Content-Type": "application/json",
   };
 };
+
 //storage govori gdje i pod kojim imenom spremiti sliku
 const storage = multer.diskStorage({
   //"spremi datoteku na fizicki disk, tj. backend"
@@ -64,6 +65,9 @@ const upload = multer({
   },
 });
 
+const app = express();
+const prisma = new PrismaClient();
+
 app.use(cors());
 app.use(express.json());
 app.use("/uploads", express.static("uploads")); //ovime omogućujemo expressu da posluzuje slike
@@ -72,27 +76,10 @@ app.get("/", (req, res) => {
   res.send("Bogu fala Backend radi");
 });
 
-//samo da vidin koje su mi sve destinacije dostupne
-app.get("/api/destinations", async (req, res) => {
-  try {
-    const destinations = await prisma.destination.findMany({
-      orderBy: {
-        name: "asc",
-      },
-      select: {
-        name: true,
-      },
-    });
-    res.json(destinations.map((destination) => destination.name));
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Greška pri dohvaćanju destinacija." });
-  }
-});
-
 app.get("/trips", async (req, res) => {
   try {
     const trips = await prisma.trips.findMany();
+
     res.json(trips);
   } catch (error) {
     res.status(500).json({ error: "Greška kod dohvaćanja putovanja" });
@@ -108,6 +95,7 @@ app.get("/users", async (req, res) => {
         email: true,
       },
     });
+
     res.json(users);
   } catch (error) {
     res.status(500).json({ error: "Greška kod dohvaćanja korisnika" });
@@ -121,6 +109,7 @@ app.get("/my_trips", authenticateToken, async (req, res) => {
         user_id: req.user.id,
       },
     });
+
     res.json(trips);
   } catch (error) {
     res.status(500).json({ error: "Greška kod dohvaćanja putovanja" });
@@ -140,6 +129,7 @@ app.get("/me", authenticateToken, async (req, res) => {
         profile_image: true,
       },
     });
+
     res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ error: "Greška kod dohvaćanja korisnika" });
@@ -150,11 +140,13 @@ app.get("/trips/:id", authenticateToken, async (req, res) => {
   try {
     const user_id = req.user.id;
     const trip_id = Number(req.params.id);
+
     if (!Number.isInteger(trip_id) || trip_id < 1) {
       return res.status(400).json({
         error: "Neispravan ID putovanja!",
       });
     }
+
     const trip = await prisma.trips.findFirst({
       where: {
         id: trip_id,
@@ -162,501 +154,99 @@ app.get("/trips/:id", authenticateToken, async (req, res) => {
       },
       include: {
         hotels: true,
+        trip_flights: true,
       },
     });
+
     if (!trip) {
       return res.status(404).json({
         error: "Putovanje nije pronađeno ili ne pripada korisniku!",
       });
     }
+
     res.status(200).json({
       trip: trip,
     });
   } catch (error) {
     console.error("Greška kod dohvaćanja putovanja:", error);
+
     res.status(500).json({
       error: "Greška kod dohvaćanja putovanja!",
     });
   }
 });
 
-app.post("/trips", authenticateToken, async (req, res) => {
-  const {
-    destination,
-    start_date,
-    end_date,
-    transport_type,
-    passengers_num,
-    hotel_id,
-  } = req.body;
-  if (
-    destination === "" ||
-    start_date === "" ||
-    end_date === "" ||
-    transport_type === ""
-  ) {
-    return res
-      .status(400)
-      .json({ error: "Neki od podataka za putovanje je prazan!" });
-  }
-  if (new Date(start_date) > new Date(end_date)) {
-    return res.status(400).json({
-      error: "Datum početka putovanja ne može biti nakon datuma završetka!",
-    });
-  }
-  if (passengers_num < 1) {
-    return res.status(400).json({ error: "Broj putnika mora biti veći od 0!" });
-  }
-  if (!["plane", "train", "bus", "car", "boat"].includes(transport_type)) {
-    return res.status(400).json({ error: "Nepoznat tip prijevoza!" });
-  }
+//samo da vidin koje su mi sve destinacije dostupne
+app.get("/api/destinations", async (req, res) => {
   try {
-    let selectedHotel = null;
-    if (hotel_id !== null && hotel_id !== undefined) {
-      selectedHotel = await prisma.hotels.findUnique({
-        where: {
-          id: Number(hotel_id),
-        },
-      });
-      if (!selectedHotel) {
-        return res.status(404).json({
-          error: "Odabrani hotel nije pronađen!",
-        });
-      }
-    }
-    const trip = await prisma.trips.create({
-      data: {
-        user_id: req.user.id,
-        destination,
-        start_date: new Date(start_date),
-        end_date: new Date(end_date),
-        transport_type,
-        passengers_num,
-        hotel_id: selectedHotel ? selectedHotel.id : null,
+    const destinations = await prisma.destination.findMany({
+      orderBy: {
+        name: "asc",
       },
-    });
-    res.status(201).json(trip);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Greška kod stvaranja putovanja" });
-  }
-});
-
-app.post("/signup", async (req, res) => {
-  const { name, email, password } = req.body;
-  if (Object.keys(req.body).length !== 3) {
-    return res
-      .status(400)
-      .json({ error: "Nisu uneseni svi podaci za registraciju!" });
-  }
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({
-      error: "Neispravan format email adrese!",
-    });
-  }
-  try {
-    const existingUser = await prisma.users.findUnique({
-      where: {
-        email,
-      },
-    });
-    if (existingUser) {
-      return res
-        .status(409)
-        .json({ error: "Korisnik s ovim emailom već postoji - prijavite se!" });
-    }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await prisma.users.create({
-      data: {
-        email,
-        name,
-        password_hash: hashedPassword,
-      },
-    });
-    const token = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "1h",
-      },
-    );
-    res.status(201).json({
-      message: "Uspješna registracija",
-      token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Greška kod registracije korisnika" });
-  }
-});
-
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  if (Object.keys(req.body).length !== 2) {
-    return res
-      .status(400)
-      .json({ error: "Nisu uneseni svi podaci za prijavu!" });
-  }
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({
-      error: "Neispravan format email adrese!",
-    });
-  }
-  try {
-    const user = await prisma.users.findUnique({
-      where: {
-        email,
-      },
-    });
-    if (!user) {
-      return res.status(404).json({ error: "Korisnik nije pronađen" });
-    }
-    const passwordMatch = await bcrypt.compare(password, user.password_hash);
-    if (!passwordMatch) {
-      return res.status(401).json({ error: "Pogrešna lozinka" });
-    }
-
-    const token = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "1h",
-      },
-    );
-
-    res.status(200).json({
-      message: "Uspješna prijava",
-      token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Greška kod prijave korisnika" });
-  }
-});
-
-app.post("/change_password", authenticateToken, async (req, res) => {
-  try {
-    const { old_password, new_password } = req.body;
-    const user_id = req.user.id;
-    const user = await prisma.users.findUnique({
-      where: {
-        id: user_id,
-      },
-    });
-    if (!user) {
-      return res.status(404).json({ error: "Korisnik nije pronađen!" });
-    }
-    if (old_password !== undefined && old_password !== "") {
-      if (new_password !== undefined && new_password !== "") {
-        const isMatch = await bcrypt.compare(old_password, user.password_hash);
-        if (!isMatch) {
-          return res
-            .status(400)
-            .json({ error: "Stara lozinka nije ispravna!" });
-        } else {
-          if (new_password === old_password) {
-            return res
-              .status(400)
-              .json({ error: "Nova lozinka je ista kao stara!" });
-          }
-          const new_password_hash = await bcrypt.hash(new_password, 10);
-          await prisma.users.update({
-            where: {
-              id: user_id,
-            },
-            data: {
-              password_hash: new_password_hash,
-            },
-          });
-          res
-            .status(200)
-            .json({ message: "Uspješno ste promijenili lozinku!" });
-        }
-      } else {
-        res.status(400).json({ error: "Niste unijeli novu lozinku!" });
-      }
-    } else {
-      res.status(400).json({ error: "Niste unijeli staru lozinku!" });
-    }
-  } catch (error) {
-    res.status(500).json({ error: "Greška kod promjene lozinke" });
-  }
-});
-
-app.delete("/trips/:id", authenticateToken, async (req, res) => {
-  try {
-    const user_id = req.user.id;
-    const trip_id = Number(req.params.id);
-    const trip = await prisma.trips.findFirst({
-      where: {
-        user_id,
-        id: trip_id,
-      },
-    });
-    if (!trip) {
-      return res
-        .status(404)
-        .json({ error: "Putovanje nije pronađeno ili ne pripada korisniku!" });
-    }
-    const deletedTrip = await prisma.trips.delete({
-      where: {
-        id: trip_id,
-      },
-    });
-    res.status(200).json({
-      message: "Putovanje uspješno obrisano!",
-      trip: deletedTrip,
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Greška kod brisanja putovanja" });
-  }
-});
-
-app.put("/trips/:id", authenticateToken, async (req, res) => {
-  const user_id = req.user.id;
-  const trip_id = Number(req.params.id);
-  const { destination, start_date, end_date, transport_type, passengers_num } =
-    req.body;
-  if (Object.keys(req.body).length !== 5) {
-    return res
-      .status(400)
-      .json({ error: "Nisu uneseni svi podaci za putovanje!" });
-  }
-  if (
-    destination === "" ||
-    start_date === "" ||
-    end_date === "" ||
-    transport_type === ""
-  ) {
-    return res
-      .status(400)
-      .json({ error: "Neki od podataka za putovanje je prazan!" });
-  }
-  if (new Date(start_date) > new Date(end_date)) {
-    return res.status(400).json({
-      error: "Datum početka putovanja ne može biti nakon datuma završetka!",
-    });
-  }
-  if (passengers_num < 1) {
-    return res.status(400).json({ error: "Broj putnika mora biti veći od 0!" });
-  }
-  if (!["plane", "train", "bus", "car", "boat"].includes(transport_type)) {
-    return res.status(400).json({ error: "Nepoznat tip prijevoza!" });
-  }
-  try {
-    const trip = await prisma.trips.findFirst({
-      where: {
-        user_id,
-        id: trip_id,
-      },
-    });
-    if (!trip) {
-      return res
-        .status(404)
-        .json({ error: "Putovanje nije pronađeno ili ne pripada korisniku!" });
-    }
-    const updatedTrip = {
-      destination,
-      start_date: new Date(start_date),
-      end_date: new Date(end_date),
-      transport_type,
-      passengers_num,
-    };
-    await prisma.trips.update({
-      where: {
-        id: trip_id,
-      },
-      data: updatedTrip,
-    });
-    res.status(200).json({
-      message: "Detalji putovanja uspješno promijenjeni!",
-      trip: updatedTrip,
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Greška kod ažuriranja putovanja" });
-  }
-});
-
-app.patch("/trips/:id", authenticateToken, async (req, res) => {
-  try {
-    const user_id = req.user.id;
-    const trip_id = Number(req.params.id);
-    const {
-      destination,
-      start_date,
-      end_date,
-      transport_type,
-      passengers_num,
-    } = req.body;
-    const trip = await prisma.trips.findFirst({
-      where: {
-        user_id,
-        id: trip_id,
-      },
-    });
-    if (!trip) {
-      return res
-        .status(404)
-        .json({ error: "Putovanje nije pronađeno ili ne pripada korisniku!" });
-    }
-    const data = {};
-    if (destination !== undefined) {
-      if (destination !== "") {
-        data.destination = destination;
-      } else {
-        return res
-          .status(400)
-          .json({ error: "Destination ne smije biti prazan!" });
-      }
-    }
-    if (start_date !== undefined) {
-      if (start_date !== "") {
-        data.start_date = new Date(start_date);
-      } else {
-        return res
-          .status(400)
-          .json({ error: "Start date ne smije biti prazan!" });
-      }
-    }
-    if (end_date !== undefined) {
-      if (end_date !== "") {
-        data.end_date = new Date(end_date);
-      } else {
-        return res
-          .status(400)
-          .json({ error: "End date ne smije biti prazan!" });
-      }
-    }
-    if (transport_type !== undefined) {
-      if (["plane", "train", "bus", "car", "boat"].includes(transport_type)) {
-        data.transport_type = transport_type;
-      } else {
-        return res.status(400).json({ error: "Nepoznat tip prijevoza!" });
-      }
-    }
-    if (passengers_num !== undefined) {
-      if (passengers_num !== "" && passengers_num >= 1) {
-        data.passengers_num = passengers_num;
-      } else {
-        return res
-          .status(400)
-          .json({ error: "Broj putnika mora biti veći od 0!" });
-      }
-    }
-    if (Object.keys(req.body).length === 0) {
-      return res.status(400).json({ error: "Nema podataka za ažuriranje!" });
-    }
-    const finalStartDate = data.start_date ?? new Date(trip.start_date);
-    const finalEndDate = data.end_date ?? new Date(trip.end_date);
-    if (finalStartDate > finalEndDate) {
-      return res
-        .status(400)
-        .json({ error: "Start date ne može biti nakon end date!" });
-    }
-    const updatedTrip = await prisma.trips.update({
-      where: {
-        id: trip_id,
-      },
-      data: data,
-    });
-    res.status(200).json({
-      message: "Detalji putovanja uspješno promijenjeni!",
-      trip: updatedTrip,
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Greška kod ažuriranja putovanja" });
-  }
-});
-
-app.patch("/profile", authenticateToken, async (req, res) => {
-  try {
-    const user_id = req.user.id;
-    const { name, email } = req.body;
-    if (
-      (name === undefined || name.trim() === "") &&
-      (email === undefined || email.trim() === "")
-    ) {
-      return res.status(400).json({
-        error: "Niste unijeli podatke za promjenu!",
-      });
-    }
-    const user = await prisma.users.findUnique({
-      where: {
-        id: user_id,
-      },
-    });
-    if (!user) {
-      return res.status(404).json({
-        error: "Korisnik nije pronađen!",
-      });
-    }
-
-    const updatedData = {};
-    if (name !== undefined && name.trim() !== "") {
-      updatedData.name = name.trim();
-    }
-    if (email !== undefined && email.trim() !== "") {
-      const normalizedEmail = email.trim().toLowerCase();
-      const existingUser = await prisma.users.findUnique({
-        where: {
-          email: normalizedEmail,
-        },
-      });
-      if (existingUser && existingUser.id !== user_id) {
-        return res.status(409).json({
-          error: "Korisnik s tom email adresom već postoji!",
-        });
-      }
-      updatedData.email = normalizedEmail;
-    }
-    const updatedUser = await prisma.users.update({
-      where: {
-        id: user_id,
-      },
-      data: updatedData,
       select: {
-        id: true,
         name: true,
-        email: true,
       },
     });
-    const token = jwt.sign(
-      {
-        id: updatedUser.id,
-        email: updatedUser.email,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "1h",
-      },
-    );
-    return res.status(200).json({
-      message: "Podaci su uspješno promijenjeni!",
-      user: updatedUser,
-      token,
-    });
+
+    res.json(destinations.map((destination) => destination.name));
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      error: "Greška kod promjene korisničkih podataka.",
+
+    res.status(500).json({ error: "Greška pri dohvaćanju destinacija." });
+  }
+});
+
+app.get("/airports", async (req, res) => {
+  try {
+    const { city } = req.query;
+
+    if (!city || city.trim().length < 2) {
+      return res.status(400).json({
+        error: "Unesite barem dva znaka.",
+      });
+    }
+
+    const response = await fetch(
+      `https://api.duffel.com/places/suggestions?query=${encodeURIComponent(city.trim())}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.DUFFEL_API_KEY}`,
+          "Duffel-Version": "v2",
+          Accept: "application/json",
+        },
+      },
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+
+      return res.status(response.status).json({
+        error: "Duffel nije uspio dohvatiti zračne luke.",
+        details: errorData,
+      });
+    }
+
+    const result = await response.json();
+    const airports = result.data
+      .filter((place) => place.type === "airport")
+      .map((place) => ({
+        name: place.name,
+        code: place.iata_code,
+        cityName: place.city_name || null,
+        countryCode: place.iata_country_code || null,
+      }));
+    const filteredAirports = airports.filter(
+      (airport) => airport.cityName.toLowerCase() === city.trim().toLowerCase(),
+    );
+
+    res.json(filteredAirports);
+  } catch (error) {
+    console.error("Duffel airports error:", error);
+
+    res.status(500).json({
+      error: "Greška pri dohvaćanju aerodroma.",
+      details: error.message,
     });
   }
 });
@@ -720,10 +310,12 @@ app.post("/api/accommodations", async (req, res) => {
         details: data,
       });
     }
+
     console.log("Hotelbeds odgovor:", data);
 
     const avaliableHotels = data.hotels?.hotels || [];
     const hotelbedsCode = avaliableHotels.map((hotel) => Number(hotel.code));
+
     const localHotels = await prisma.hotels.findMany({
       where: {
         hotelbedsCode: {
@@ -739,6 +331,7 @@ app.post("/api/accommodations", async (req, res) => {
         stars: true,
       },
     });
+
     const localHotelsByCode = new Map(
       localHotels.map((hotel) => [hotel.hotelbedsCode, hotel]),
     );
@@ -746,20 +339,26 @@ app.post("/api/accommodations", async (req, res) => {
     const accommodations = avaliableHotels
       .map((hotel) => {
         const localHotel = localHotelsByCode.get(Number(hotel.code));
+
         if (!localHotel) {
           return null;
         }
+
         const allRates = hotel.rooms?.flatMap((room) => room.rates || []) || [];
         const firstRate = allRates.find((rate) => rate.packaging === false);
+
         if (!firstRate) {
           return null;
         }
+
         const excludedTaxes =
           firstRate.taxes?.taxes?.filter((tax) => tax.included === false) || [];
+
         const taxAmount = excludedTaxes.reduce(
           (total, tax) => total + Number(tax.amount || 0),
           0,
         );
+
         const price = Number(firstRate.net || 0);
         const totalPrice = price + taxAmount;
 
@@ -809,6 +408,559 @@ app.post("/api/accommodations", async (req, res) => {
   }
 });
 
+app.post("/search-flights", async (req, res) => {
+  const {
+    departureAirport,
+    arrivalAirport,
+    departureDate,
+    returnDate,
+    passengers,
+  } = req.body;
+
+  try {
+    const offerRequest = await duffel.offerRequests.create({
+      slices: [
+        {
+          origin: departureAirport,
+          destination: arrivalAirport,
+          departure_date: departureDate,
+        },
+        {
+          origin: arrivalAirport,
+          destination: departureAirport,
+          departure_date: returnDate,
+        },
+      ],
+      passengers: Array.from({ length: Number(passengers) }, () => ({
+        type: "adult",
+      })),
+      cabin_class: "economy",
+    });
+
+    const formattedOffers = offerRequest.data.offers.map((offer) => {
+      const outboundSlice = offer.slices[0];
+      const returnSlice = offer.slices[1];
+
+      return {
+        offerId: offer.id,
+        airlineName: offer.owner.name,
+        airlineCode: offer.owner.iata_code,
+        price: offer.total_amount,
+        currency: offer.total_currency,
+        outbound: {
+          departureAirport: outboundSlice.origin.iata_code,
+          arrivalAirport: outboundSlice.destination.iata_code,
+          departureTime: outboundSlice.segments[0].departing_at,
+          arrivalTime:
+            outboundSlice.segments[outboundSlice.segments.length - 1]
+              .arriving_at,
+          duration: outboundSlice.duration,
+          stops: outboundSlice.segments.length - 1,
+          segments: outboundSlice.segments.map((segment) => ({
+            flightNumber: `${segment.marketing_carrier.iata_code}${segment.marketing_carrier_flight_number}`,
+            departureAirport: segment.origin.iata_code,
+            arrivalAirport: segment.destination.iata_code,
+            departureTime: segment.departing_at,
+            arrivalTime: segment.arriving_at,
+            aircraft: segment.aircraft?.name || null,
+          })),
+        },
+        return: {
+          departureAirport: returnSlice.origin.iata_code,
+          arrivalAirport: returnSlice.destination.iata_code,
+          departureTime: returnSlice.segments[0].departing_at,
+          arrivalTime:
+            returnSlice.segments[returnSlice.segments.length - 1].arriving_at,
+          duration: returnSlice.duration,
+          stops: returnSlice.segments.length - 1,
+          segments: returnSlice.segments.map((segment) => ({
+            flightNumber: `${segment.marketing_carrier.iata_code}${segment.marketing_carrier_flight_number}`,
+            departureAirport: segment.origin.iata_code,
+            arrivalAirport: segment.destination.iata_code,
+            departureTime: segment.departing_at,
+            arrivalTime: segment.arriving_at,
+            aircraft: segment.aircraft?.name || null,
+          })),
+        },
+      };
+    });
+    res.json(formattedOffers);
+  } catch (error) {
+    console.error("Duffel error:", error);
+
+    res.status(500).json({
+      error: "Greška pri dohvaćanju letova.",
+      details: error.message,
+    });
+  }
+});
+
+app.post("/trips", authenticateToken, async (req, res) => {
+  const {
+    destination,
+    start_date,
+    end_date,
+    transport_type,
+    passengers_num,
+    hotel_id,
+  } = req.body;
+
+  if (
+    destination === "" ||
+    start_date === "" ||
+    end_date === "" ||
+    transport_type === ""
+  ) {
+    return res
+      .status(400)
+      .json({ error: "Neki od podataka za putovanje je prazan!" });
+  }
+
+  if (new Date(start_date) > new Date(end_date)) {
+    return res.status(400).json({
+      error: "Datum početka putovanja ne može biti nakon datuma završetka!",
+    });
+  }
+
+  if (passengers_num < 1) {
+    return res.status(400).json({ error: "Broj putnika mora biti veći od 0!" });
+  }
+
+  if (!["plane", "train", "bus", "car", "boat"].includes(transport_type)) {
+    return res.status(400).json({ error: "Nepoznat tip prijevoza!" });
+  }
+
+  try {
+    let selectedHotel = null;
+
+    if (hotel_id !== null && hotel_id !== undefined) {
+      selectedHotel = await prisma.hotels.findUnique({
+        where: {
+          id: Number(hotel_id),
+        },
+      });
+
+      if (!selectedHotel) {
+        return res.status(404).json({
+          error: "Odabrani hotel nije pronađen!",
+        });
+      }
+    }
+
+    const trip = await prisma.trips.create({
+      data: {
+        user_id: req.user.id,
+        destination,
+        start_date: new Date(start_date),
+        end_date: new Date(end_date),
+        transport_type,
+        passengers_num,
+        hotel_id: selectedHotel ? selectedHotel.id : null,
+      },
+    });
+
+    res.status(201).json(trip);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({ error: "Greška kod stvaranja putovanja" });
+  }
+});
+
+app.delete("/trips/:id", authenticateToken, async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const trip_id = Number(req.params.id);
+    const trip = await prisma.trips.findFirst({
+      where: {
+        user_id,
+        id: trip_id,
+      },
+    });
+
+    if (!trip) {
+      return res
+        .status(404)
+        .json({ error: "Putovanje nije pronađeno ili ne pripada korisniku!" });
+    }
+
+    const deletedTrip = await prisma.trips.delete({
+      where: {
+        id: trip_id,
+      },
+    });
+
+    res.status(200).json({
+      message: "Putovanje uspješno obrisano!",
+      trip: deletedTrip,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Greška kod brisanja putovanja" });
+  }
+});
+
+app.put("/trips/:id", authenticateToken, async (req, res) => {
+  const user_id = req.user.id;
+  const trip_id = Number(req.params.id);
+  const { destination, start_date, end_date, transport_type, passengers_num } =
+    req.body;
+
+  if (Object.keys(req.body).length !== 5) {
+    return res
+      .status(400)
+      .json({ error: "Nisu uneseni svi podaci za putovanje!" });
+  }
+
+  if (
+    destination === "" ||
+    start_date === "" ||
+    end_date === "" ||
+    transport_type === ""
+  ) {
+    return res
+      .status(400)
+      .json({ error: "Neki od podataka za putovanje je prazan!" });
+  }
+
+  if (new Date(start_date) > new Date(end_date)) {
+    return res.status(400).json({
+      error: "Datum početka putovanja ne može biti nakon datuma završetka!",
+    });
+  }
+
+  if (passengers_num < 1) {
+    return res.status(400).json({ error: "Broj putnika mora biti veći od 0!" });
+  }
+
+  if (!["plane", "train", "bus", "car", "boat"].includes(transport_type)) {
+    return res.status(400).json({ error: "Nepoznat tip prijevoza!" });
+  }
+
+  try {
+    const trip = await prisma.trips.findFirst({
+      where: {
+        user_id,
+        id: trip_id,
+      },
+    });
+
+    if (!trip) {
+      return res
+        .status(404)
+        .json({ error: "Putovanje nije pronađeno ili ne pripada korisniku!" });
+    }
+
+    const updatedTrip = {
+      destination,
+      start_date: new Date(start_date),
+      end_date: new Date(end_date),
+      transport_type,
+      passengers_num,
+    };
+
+    await prisma.trips.update({
+      where: {
+        id: trip_id,
+      },
+      data: updatedTrip,
+    });
+
+    res.status(200).json({
+      message: "Detalji putovanja uspješno promijenjeni!",
+      trip: updatedTrip,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Greška kod ažuriranja putovanja" });
+  }
+});
+
+app.patch("/trips/:id", authenticateToken, async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const trip_id = Number(req.params.id);
+    const {
+      destination,
+      start_date,
+      end_date,
+      transport_type,
+      passengers_num,
+    } = req.body;
+
+    const trip = await prisma.trips.findFirst({
+      where: {
+        user_id,
+        id: trip_id,
+      },
+    });
+
+    if (!trip) {
+      return res
+        .status(404)
+        .json({ error: "Putovanje nije pronađeno ili ne pripada korisniku!" });
+    }
+
+    const data = {};
+
+    if (destination !== undefined) {
+      if (destination !== "") {
+        data.destination = destination;
+      } else {
+        return res
+          .status(400)
+          .json({ error: "Destination ne smije biti prazan!" });
+      }
+    }
+
+    if (start_date !== undefined) {
+      if (start_date !== "") {
+        data.start_date = new Date(start_date);
+      } else {
+        return res
+          .status(400)
+          .json({ error: "Start date ne smije biti prazan!" });
+      }
+    }
+
+    if (end_date !== undefined) {
+      if (end_date !== "") {
+        data.end_date = new Date(end_date);
+      } else {
+        return res
+          .status(400)
+          .json({ error: "End date ne smije biti prazan!" });
+      }
+    }
+
+    if (transport_type !== undefined) {
+      if (["plane", "train", "bus", "car", "boat"].includes(transport_type)) {
+        data.transport_type = transport_type;
+      } else {
+        return res.status(400).json({ error: "Nepoznat tip prijevoza!" });
+      }
+    }
+
+    if (passengers_num !== undefined) {
+      if (passengers_num !== "" && passengers_num >= 1) {
+        data.passengers_num = passengers_num;
+      } else {
+        return res
+          .status(400)
+          .json({ error: "Broj putnika mora biti veći od 0!" });
+      }
+    }
+
+    if (Object.keys(req.body).length === 0) {
+      return res.status(400).json({ error: "Nema podataka za ažuriranje!" });
+    }
+
+    const finalStartDate = data.start_date ?? new Date(trip.start_date);
+    const finalEndDate = data.end_date ?? new Date(trip.end_date);
+
+    if (finalStartDate > finalEndDate) {
+      return res
+        .status(400)
+        .json({ error: "Start date ne može biti nakon end date!" });
+    }
+
+    const updatedTrip = await prisma.trips.update({
+      where: {
+        id: trip_id,
+      },
+      data: data,
+    });
+
+    res.status(200).json({
+      message: "Detalji putovanja uspješno promijenjeni!",
+      trip: updatedTrip,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Greška kod ažuriranja putovanja" });
+  }
+});
+
+app.post("/signup", async (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (Object.keys(req.body).length !== 3) {
+    return res
+      .status(400)
+      .json({ error: "Nisu uneseni svi podaci za registraciju!" });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      error: "Neispravan format email adrese!",
+    });
+  }
+
+  try {
+    const existingUser = await prisma.users.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (existingUser) {
+      return res
+        .status(409)
+        .json({ error: "Korisnik s ovim emailom već postoji - prijavite se!" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await prisma.users.create({
+      data: {
+        email,
+        name,
+        password_hash: hashedPassword,
+      },
+    });
+
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      },
+    );
+
+    res.status(201).json({
+      message: "Uspješna registracija",
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({ error: "Greška kod registracije korisnika" });
+  }
+});
+
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  if (Object.keys(req.body).length !== 2) {
+    return res
+      .status(400)
+      .json({ error: "Nisu uneseni svi podaci za prijavu!" });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      error: "Neispravan format email adrese!",
+    });
+  }
+
+  try {
+    const user = await prisma.users.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "Korisnik nije pronađen" });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password_hash);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: "Pogrešna lozinka" });
+    }
+
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      },
+    );
+
+    res.status(200).json({
+      message: "Uspješna prijava",
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({ error: "Greška kod prijave korisnika" });
+  }
+});
+
+app.post("/change_password", authenticateToken, async (req, res) => {
+  try {
+    const { old_password, new_password } = req.body;
+    const user_id = req.user.id;
+    const user = await prisma.users.findUnique({
+      where: {
+        id: user_id,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "Korisnik nije pronađen!" });
+    }
+
+    if (old_password !== undefined && old_password !== "") {
+      if (new_password !== undefined && new_password !== "") {
+        const isMatch = await bcrypt.compare(old_password, user.password_hash);
+
+        if (!isMatch) {
+          return res
+            .status(400)
+            .json({ error: "Stara lozinka nije ispravna!" });
+        } else {
+          if (new_password === old_password) {
+            return res
+              .status(400)
+              .json({ error: "Nova lozinka je ista kao stara!" });
+          }
+
+          const new_password_hash = await bcrypt.hash(new_password, 10);
+
+          await prisma.users.update({
+            where: {
+              id: user_id,
+            },
+            data: {
+              password_hash: new_password_hash,
+            },
+          });
+
+          res
+            .status(200)
+            .json({ message: "Uspješno ste promijenili lozinku!" });
+        }
+      } else {
+        res.status(400).json({ error: "Niste unijeli novu lozinku!" });
+      }
+    } else {
+      res.status(400).json({ error: "Niste unijeli staru lozinku!" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Greška kod promjene lozinke" });
+  }
+});
+
 app.post(
   "/profile-picture",
   authenticateToken,
@@ -820,7 +972,9 @@ app.post(
           error: "Slika nije odabrana",
         });
       }
+
       const profileImage = `/uploads/profile-images/${req.file.filename}`;
+
       await prisma.users.update({
         where: {
           id: req.user.id,
@@ -829,18 +983,106 @@ app.post(
           profile_image: profileImage,
         },
       });
+
       res.status(200).json({
         message: "Profilna slika uspješno promijenjena.",
         profile_image: profileImage,
       });
     } catch (error) {
       console.error(error);
+
       res.status(500).json({
         error: "Greška kod spremanja profilne slike.",
       });
     }
   },
 );
+
+app.patch("/profile", authenticateToken, async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { name, email } = req.body;
+
+    if (
+      (name === undefined || name.trim() === "") &&
+      (email === undefined || email.trim() === "")
+    ) {
+      return res.status(400).json({
+        error: "Niste unijeli podatke za promjenu!",
+      });
+    }
+
+    const user = await prisma.users.findUnique({
+      where: {
+        id: user_id,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        error: "Korisnik nije pronađen!",
+      });
+    }
+
+    const updatedData = {};
+
+    if (name !== undefined && name.trim() !== "") {
+      updatedData.name = name.trim();
+    }
+
+    if (email !== undefined && email.trim() !== "") {
+      const normalizedEmail = email.trim().toLowerCase();
+      const existingUser = await prisma.users.findUnique({
+        where: {
+          email: normalizedEmail,
+        },
+      });
+
+      if (existingUser && existingUser.id !== user_id) {
+        return res.status(409).json({
+          error: "Korisnik s tom email adresom već postoji!",
+        });
+      }
+
+      updatedData.email = normalizedEmail;
+    }
+
+    const updatedUser = await prisma.users.update({
+      where: {
+        id: user_id,
+      },
+      data: updatedData,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+
+    const token = jwt.sign(
+      {
+        id: updatedUser.id,
+        email: updatedUser.email,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      },
+    );
+
+    return res.status(200).json({
+      message: "Podaci su uspješno promijenjeni!",
+      user: updatedUser,
+      token,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      error: "Greška kod promjene korisničkih podataka.",
+    });
+  }
+});
 
 app.listen(5000, () => {
   console.log("Server radi na http://localhost:5000");

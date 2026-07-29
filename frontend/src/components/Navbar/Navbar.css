@@ -13,13 +13,6 @@ nav {
   transition: 0.3s;
 }
 
-.mode {
-  width: 25px;
-  padding: 0;
-  display: block;
-  object-fit: contain;
-}
-
 .logo-wrapper {
   position: relative;
   width: 160px;
@@ -40,4 +33,11 @@ nav {
 
 .buttons-wrapper .icon {
   padding: 2px;
+}
+
+.mode {
+  width: 25px;
+  padding: 0;
+  display: block;
+  object-fit: contain;
 }

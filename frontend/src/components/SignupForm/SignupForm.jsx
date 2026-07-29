@@ -1,5 +1,6 @@
 import { useState, React } from 'react'
 import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 import './SignupForm.css'
 import dark_email from '../../assets/dark_email.png'
 import white_email from '../../assets/white_email.png'
@@ -7,7 +8,6 @@ import dark_password from '../../assets/dark_password.png'
 import white_password from '../../assets/white_password.png'
 import dark_name from '../../assets/dark_name.png'
 import white_name from '../../assets/white_name.png'
-import toast from 'react-hot-toast'
 
 const SignupForm = ({darkMode}) => {
   const navigate = useNavigate("");
@@ -19,7 +19,9 @@ const SignupForm = ({darkMode}) => {
 
   const handleSignup = async (e) =>  {
     e.preventDefault();
+
     setIsLoading(true);
+
     try{
       const response = await fetch("http://localhost:5000/signup", {
         method: "POST",
@@ -34,12 +36,14 @@ const SignupForm = ({darkMode}) => {
       });
 
       const data = await response.json();
+
       if (!response.ok){
         toast.error(data.error || "Signup nije uspio.");
         return
       }
 
       localStorage.setItem("token", data.token);
+
       toast.success(data.message || "Uspješna prijava!")
       setTimeout(() => {
         navigate("/mytrips");
@@ -47,6 +51,7 @@ const SignupForm = ({darkMode}) => {
     }
     catch(error){
       console.error("Signup error", error);
+
       toast.error("Greška pri spajanju na server!");
     }
     finally{

@@ -18,6 +18,11 @@
   transition: 0.3s;
 }
 
+.login-text.tint {
+  background-color: rgb(0, 0, 0, 0.5);
+  transition: 0.3s;
+}
+
 .form {
   background-color: rgba(255, 255, 255, 0.5);
   margin: 30px;
@@ -36,6 +41,11 @@
   padding: 20px;
 }
 
+.form.tint {
+  background-color: rgb(0, 0, 0, 0.5);
+  transition: 0.3s;
+}
+
 .inputs {
   display: grid;
   grid-template-columns: 30px 120px 200px;
@@ -50,27 +60,4 @@
   font-size: 16px;
   border-radius: 15px;
   border: 1px solid #999;
-}
-
-.email-icon {
-  position: relative;
-  width: 24px;
-  height: 24px;
-}
-.icon {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  transition: 0.3s;
-}
-
-.login-text.tint {
-  background-color: rgb(0, 0, 0, 0.5);
-  transition: 0.3s;
-}
-
-.form.tint {
-  background-color: rgb(0, 0, 0, 0.5);
-  transition: 0.3s;
 }

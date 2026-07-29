@@ -1,4 +1,6 @@
 import React from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 import './Navbar.css'
 import dark_logo from '../../assets/dark_logo.png'
 import white_logo from '../../assets/white_logo.png'
@@ -10,23 +12,23 @@ import white_logout from '../../assets/white_logout.png'
 import dark_logout from '../../assets/dark_logout.png'
 import white_back_button from '../../assets/white_back_button.png'
 import dark_back_button from '../../assets/dark_back_button.png'
-import { Link, useNavigate } from 'react-router-dom'
-import toast from 'react-hot-toast'
-
 
 const Navbar = ({darkMode, toggleMode, variant}) => {
-
   const navigate = useNavigate();
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     toast.success("Logging out...")
+
     setTimeout(() => {
       navigate("/");
     }, 2000)
   }
+
   const handleProfile = () => {
     navigate("/profile");
   }
+  
   const goBack = () => {
     navigate("/mytrips");
   }

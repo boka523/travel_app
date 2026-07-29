@@ -6,6 +6,29 @@
   transition: 0.3s;
 }
 
+.title {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 170px;
+  top: 80px;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sort-select {
+  transition: 0.3s;
+}
+
+.sort-select:hover {
+  transform: scale(1.1);
+  transition: 0.3s;
+}
+
 .my-trips-text {
   background-color: rgba(255, 255, 255, 0.5);
   padding: 15px 30px;
@@ -27,20 +50,6 @@
   transition: 0.3s;
 }
 
-.buttons {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.title {
-  position: relative;
-  display: flex;
-  align-items: center;
-  min-height: 170px;
-  top: 80px;
-}
-
 .all-trips {
   background-color: rgba(255, 255, 255, 0.5);
   margin-top: 40px;
@@ -59,27 +68,20 @@
   transition: 0.3s;
 }
 
+.message {
+  grid-column: 2;
+  place-self: center;
+  font-size: 30px;
+}
+
 .trip {
   background-color: white;
   border-radius: 30px;
   padding: 20px;
 }
 
-.trip.tint {
-  background-color: rgb(0, 0, 0, 0.5);
-  transition: 0.3s;
-}
-
 .trip h1 {
   text-align: center;
-}
-
-.trip-details {
-  margin: 30px;
-}
-
-.trip-subdetails {
-  margin: 20px 0;
 }
 
 .trip .btn {
@@ -89,19 +91,17 @@
   padding: 20px;
 }
 
-.sort-select:hover {
-  transform: scale(1.1);
+.trip.tint {
+  background-color: rgb(0, 0, 0, 0.5);
   transition: 0.3s;
 }
 
-.sort-select {
-  transition: 0.3s;
+.trip-details {
+  margin: 30px;
 }
 
-.message {
-  grid-column: 2;
-  place-self: center;
-  font-size: 30px;
+.trip-subdetails {
+  margin: 20px 0;
 }
 
 .card-buttons {

@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import './EditTripForm.css'
 
 const EditTripForm = ({darkMode, trip, setTrip}) => {
-    const [editingField, setEditingField] = useState(null);
   return (
     <div className='edit-trip-form container'>
         <div className='title'>
@@ -27,13 +26,30 @@ const EditTripForm = ({darkMode, trip, setTrip}) => {
                 <span>Transport type: {trip.transport_type}</span>
             </div> 
             {trip.hotels ? (
-                <div className='detail-value'>
-                    <span>Hotel: {trip.hotels.name}</span>
-                </div>
+                <>
+                    <div className='detail-value'>
+                        <span>Hotel: {trip.hotels.name}</span>
+                    </div>
+                    <div className='detail-value'>
+                        <span>Adresa: {trip.hotels.address}</span>
+                    </div>
+                    <div className='detail-value'>
+                        <span>Kategorija: {"⭐".repeat(trip.hotels.stars)}</span>
+                    </div>
+                </>
             ) : (
                 <div className='detail-value'>
                     <span>Hotel nije odabran</span>
                 </div>
+            )}
+            {trip.trip_flights ? (
+                <>
+                    <p>Let postoji.</p>
+                </>
+            ) : (
+                <>
+                    <p>Nema odabranog leta.</p>
+                </>
             )}
             {trip.ai_cost ? (
                 <div className='detail-value'>
