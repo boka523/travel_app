@@ -14,27 +14,27 @@ const AccommodationResults = ({
   const [selectedAccommodation, setSelectedAccommodation] = useState(null);
 
   const [currentAccommodationSlide, setCurrentAccommodationSlide] = useState(0);
-  const hotelsPerSlide = 4;
+  const accommodationsPerSlide = 4;
   const accommodationSlides = Array.from(
     {
-      length: Math.ceil(accommodations.length / hotelsPerSlide),
+      length: Math.ceil(accommodations.length / accommodationsPerSlide),
     },
     (_, index) =>
       accommodations.slice(
-        index * hotelsPerSlide,
-        index * hotelsPerSlide + hotelsPerSlide,
+        index * accommodationsPerSlide,
+        index * accommodationsPerSlide + accommodationsPerSlide,
       ),
   );
 
   const totalAccommodationSlides = accommodationSlides.length;
 
-  const handlePreviousSlide = () => {
+  const handlePreviousAccommodationSlide = () => {
     setCurrentAccommodationSlide((previousSlide) =>
       Math.max(previousSlide - 1, 0),
     );
   };
 
-  const handleNextSlide = () => {
+  const handleNextAccommodationSlide = () => {
     setCurrentAccommodationSlide((previousSlide) =>
       Math.min(previousSlide + 1, totalAccommodationSlides - 1),
     );
@@ -50,7 +50,7 @@ const AccommodationResults = ({
               <button
                 type="button"
                 className={`btn ${darkMode ? "" : "dark-btn"}`}
-                onClick={handlePreviousSlide}
+                onClick={handlePreviousAccommodationSlide}
                 disabled={currentAccommodationSlide === 0}
                 aria-label="Previous accommodations"
               >
@@ -140,7 +140,7 @@ const AccommodationResults = ({
               <button
                 type="button"
                 className={`slider-arrow btn ${darkMode ? "" : "dark-btn"}`}
-                onClick={handleNextSlide}
+                onClick={handleNextAccommodationSlide}
                 disabled={
                   currentAccommodationSlide === totalAccommodationSlides - 1 ||
                   totalAccommodationSlides === 0
