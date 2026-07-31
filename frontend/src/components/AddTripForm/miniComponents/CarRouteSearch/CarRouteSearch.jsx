@@ -48,6 +48,29 @@ const CarRouteSearch = ({
   const [fuelPrice, setFuelPrice] = useState(defaultFuelPrices.diesel);
   const [fuelCalculation, setFuelCalculation] = useState(null);
 
+  const [currentTollSlide, setCurrentTollSlide] = useState(0);
+  const tollsPerSlide = 1;
+
+  const tollSlides = [];
+
+  for (
+    let i = 0;
+    i < (route?.tollCost?.details?.length || 0);
+    i += tollsPerSlide
+  ) {
+    tollSlides.push(route.tollCost.details.slice(i, i + tollsPerSlide));
+  }
+
+  const totalTollSlides = tollSlides.length;
+
+  const handlePreviousTollSlide = () => {
+    setCurrentTollSlide((prev) => Math.max(prev - 1, 0));
+  };
+
+  const handleNextTollSlide = () => {
+    setCurrentTollSlide((prev) => Math.min(prev + 1, totalTollSlides - 1));
+  };
+
   const handleStartAddressChange = async (e) => {
     const value = e.target.value;
 
@@ -336,21 +359,98 @@ const CarRouteSearch = ({
             </MapContainer>
           </div>
           <div className="car-route-text">
-            <div className="car-route-info">
-              <h3>Info</h3>
-              <div>
-                <p>
-                  <strong>Distance:</strong> {route.distanceKm} km
-                </p>
-                <p>
-                  <strong>Duration:</strong>{" "}
-                  {transformTime(route.durationSeconds)}
-                </p>
-                <p>
-                  <strong>Toll road:</strong> {route.toll ? "Yes" : "No"}
-                </p>
+            <div className="info-tolls">
+              <div className="info">
+                <h3>Info</h3>
+                <div>
+                  <p>
+                    <strong>Distance:</strong> {route.distanceKm} km
+                  </p>
+                  <p>
+                    <strong>Duration:</strong>{" "}
+                    {transformTime(route.durationSeconds)}
+                  </p>
+                  <p>
+                    <strong>Toll road:</strong> {route.toll ? "Yes" : "No"}
+                  </p>
+                </div>
+              </div>
+              <div className="tolls">
+                {route.toll && route.tollCost.details.length > 0 && (
+                  <>
+                    <h3>Toll details</h3>
+                    <div className="tolls-slider">
+                      <button
+                        type="button"
+                        className={`tolls-slider-btn ${
+                          darkMode ? "btn" : "btn dark-btn"
+                        }`}
+                        onClick={handlePreviousTollSlide}
+                        disabled={currentTollSlide === 0}
+                        aria-label="Previous toll details"
+                      >
+                        ←
+                      </button>
+                      <div className="tolls-slider-viewport">
+                        <div
+                          className="tolls-slider-track"
+                          style={{
+                            transform: `translateX(-${currentTollSlide * 100}%)`,
+                          }}
+                        >
+                          {tollSlides.map((slide, slideIndex) => (
+                            <div className="tolls-slide" key={slideIndex}>
+                              {slide.map((detail, detailIndex) => (
+                                <div
+                                  className="toll-detail"
+                                  key={`${detail.tollSystem}-${slideIndex}-${detailIndex}`}
+                                >
+                                  {detail.collectionLocations.length > 0 ? (
+                                    <>
+                                      <p>Collection points:</p>
+
+                                      <p>
+                                        {detail.collectionLocations
+                                          .map((location) => location.name)
+                                          .join(" → ")}
+                                      </p>
+                                    </>
+                                  ) : (
+                                    <p>No collection points available.</p>
+                                  )}
+
+                                  <p>Price: {detail.price} €</p>
+                                </div>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        className={`tolls-slider-btn ${
+                          darkMode ? "btn" : "btn dark-btn"
+                        }`}
+                        onClick={handleNextTollSlide}
+                        disabled={
+                          currentTollSlide === totalTollSlides - 1 ||
+                          totalTollSlides === 0
+                        }
+                        aria-label="Next toll details"
+                      >
+                        →
+                      </button>
+                    </div>
+                    <p className="total-toll-cost">
+                      <strong>Total toll cost: </strong>
+                      {route.tollCost.total * 2} €
+                    </p>
+                  </>
+                )}
               </div>
             </div>
+          </div>
+          <div className="fuel-calculator-results">
             <div className="fuel-calculator">
               <h3>Fuel cost calculator</h3>
               <div>
@@ -458,3 +558,197 @@ const CarRouteSearch = ({
 };
 
 export default CarRouteSearch;
+
+{
+  /* <div className="car-route-info">
+              <h3>Info</h3>
+              <div>
+                <p>
+                  <strong>Distance:</strong> {route.distanceKm} km
+                </p>
+                <p>
+                  <strong>Duration:</strong>{" "}
+                  {transformTime(route.durationSeconds)}
+                </p>
+                <p>
+                  <strong>Toll road:</strong> {route.toll ? "Yes" : "No"}
+                </p>
+              </div>
+            </div>
+            <div className="tolls-info">
+              {route.toll && route.tollCost.details.length > 0 && (
+                <>
+                  <h3>Toll details</h3>
+
+                  <div className="tolls-slider">
+                    <button
+                      type="button"
+                      className={`tolls-slider-btn ${
+                        darkMode ? "btn" : "btn dark-btn"
+                      }`}
+                      onClick={handlePreviousTollSlide}
+                      disabled={currentTollSlide === 0}
+                      aria-label="Previous toll details"
+                    >
+                      ←
+                    </button>
+
+                    <div className="tolls-slider-viewport">
+                      <div
+                        className="tolls-slider-track"
+                        style={{
+                          transform: `translateX(-${currentTollSlide * 100}%)`,
+                        }}
+                      >
+                        {tollSlides.map((slide, slideIndex) => (
+                          <div className="tolls-slide" key={slideIndex}>
+                            {slide.map((detail, detailIndex) => (
+                              <div
+                                className="toll-detail"
+                                key={`${detail.tollSystem}-${slideIndex}-${detailIndex}`}
+                              >
+                                {detail.collectionLocations.length > 0 ? (
+                                  <>
+                                    <p>Collection points:</p>
+
+                                    <p>
+                                      {detail.collectionLocations
+                                        .map((location) => location.name)
+                                        .join(" → ")}
+                                    </p>
+                                  </>
+                                ) : (
+                                  <p>No collection points available.</p>
+                                )}
+
+                                <p>Price: {detail.price} €</p>
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      className={`tolls-slider-btn ${
+                        darkMode ? "btn" : "btn dark-btn"
+                      }`}
+                      onClick={handleNextTollSlide}
+                      disabled={
+                        currentTollSlide === totalTollSlides - 1 ||
+                        totalTollSlides === 0
+                      }
+                      aria-label="Next toll details"
+                    >
+                      →
+                    </button>
+                  </div>
+
+                  <p className="total-toll-cost">
+                    <strong>Total toll cost: </strong>
+                    {route.tollCost.total * 2} €
+                  </p>
+                </>
+              )}
+            </div>
+            <div className="fuel-calculator">
+              <h3>Fuel cost calculator</h3>
+              <div>
+                <div className="fuel-field">
+                  <label htmlFor="fuel-type">
+                    <strong>Fuel type:</strong>
+                  </label>
+                  <div className="fuel-type-options">
+                    <label>
+                      <input
+                        type="radio"
+                        name="fuelType"
+                        value="diesel"
+                        checked={fuelType === "diesel"}
+                        onChange={handleFuelTypeChange}
+                      />
+                      Diesel
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="fuelType"
+                        value="petrol"
+                        checked={fuelType === "petrol"}
+                        onChange={handleFuelTypeChange}
+                      />
+                      Petrol
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="fuelType"
+                        value="lpg"
+                        checked={fuelType === "lpg"}
+                        onChange={handleFuelTypeChange}
+                      />
+                      LPG
+                    </label>
+                  </div>
+                </div>
+                <div className="fuel-field">
+                  <label htmlFor="fuel-consumption">
+                    <strong>Fuel consumption:</strong>
+                  </label>
+                  <input
+                    type="number"
+                    value={fuelConsumption}
+                    onChange={(e) => {
+                      setFuelConsumption(e.target.value);
+                      setFuelCalculation(null);
+                    }}
+                  />
+                  L/100km
+                </div>
+                <div className="fuel-field">
+                  <label htmlFor="fuel-price">
+                    <strong>Fuel price:</strong>
+                  </label>
+                  <input
+                    id="fuel-price"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={fuelPrice}
+                    onChange={(e) => {
+                      setFuelPrice(e.target.value);
+                      setFuelCalculation(null);
+                    }}
+                  />
+                  €
+                </div>
+              </div>
+              <button
+                type="button"
+                className={`calculate-fuel-btn ${darkMode ? "btn" : "btn dark-btn"}`}
+                onClick={handleCalculateFuelCost}
+              >
+                Calculate fuel cost
+              </button>
+            </div>
+            {fuelCalculation && (
+              <div className="fuel-results">
+                <h3>Calculation</h3>
+                <div>
+                  <p>
+                    <strong>Fuel needed: </strong>
+                    {`${fuelCalculation.litersNeeded} L`}
+                  </p>
+                  <p>
+                    <strong>Total fuel cost: </strong>
+                    {`${fuelCalculation.totalCost} €`}
+                  </p>
+                  <p>
+                    <strong>Cost per passenger: </strong>
+                    {`${fuelCalculation.costPerPassenger} €`}
+                  </p>
+                </div>
+              </div>
+            )} */
+}

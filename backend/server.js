@@ -290,6 +290,59 @@ app.get("/api/addresses/autocomplete", async (req, res) => {
   }
 });
 
+app.get("/api/here-test", async (req, res) => {
+  try {
+    const response = await fetch(
+      `https://router.hereapi.com/v8/routes?transportMode=car&origin=43.511431,16.449751&destination=45.809159,15.967673&return=summary,tolls&apiKey=${process.env.HERE_API_KEY}`,
+    );
+
+    const data = await response.json();
+
+    const section = data.routes?.[0]?.sections?.[0];
+
+    if (!section) {
+      return res.status(404).json({
+        message: "HERE route not found.",
+      });
+    }
+
+    const tolls = section.tolls || [];
+
+    const tollDetails = tolls.flatMap((toll) =>
+      (toll.fares || []).map((fare) => ({
+        countryCode: toll.countryCode,
+        tollSystem: fare.name || null,
+        reason: fare.reason || null,
+        price: fare.price?.value || 0,
+        currency: fare.price?.currency || "EUR",
+        paymentMethods: fare.paymentMethods || [],
+        collectionLocations: (fare.tollCollectionLocations || []).map(
+          (location) => ({
+            name: location.name,
+            latitude: location.location?.lat,
+            longitude: location.location?.lng,
+          }),
+        ),
+      })),
+    );
+
+    const totalTollCost = tollDetails.reduce(
+      (total, toll) => total + toll.price,
+      0,
+    );
+
+    res.json({
+      totalTollCost: Number(totalTollCost.toFixed(2)),
+      currency: tollDetails[0]?.currency || "EUR",
+      tollDetails,
+      data,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "HERE request failed." });
+  }
+});
+
 app.post("/api/car-route", async (req, res) => {
   const { start, destination } = req.body;
 
@@ -322,6 +375,45 @@ app.post("/api/car-route", async (req, res) => {
     const distanceMeters = route.properties.distance;
     const durationSeconds = route.properties.time;
 
+    const hereResponse = await fetch(
+      `https://router.hereapi.com/v8/routes?transportMode=car&origin=${start.latitude},${start.longitude}&destination=${destination.latitude},${destination.longitude}&return=summary,tolls&currency=EUR&apiKey=${process.env.HERE_API_KEY}`,
+    );
+    const hereData = await hereResponse.json();
+
+    if (!hereResponse.ok) {
+      console.error("HERE error:", hereData);
+      throw new Error("Failed to calculate toll costs.");
+    }
+
+    const hereSections = hereData.routes?.[0]?.sections || [];
+
+    const tollDetails = hereSections.flatMap((section) =>
+      (section.tolls || []).flatMap((toll) =>
+        (toll.fares || [])
+          .filter((fare) => !fare.pass)
+          .map((fare) => ({
+            countryCode: toll.countryCode || null,
+            tollSystem: toll.tollSystem || fare.name || null,
+            reason: fare.reason || null,
+            price: Number(fare.price?.value || 0),
+            currency: fare.price?.currency || "EUR",
+            paymentMethods: fare.paymentMethods || [],
+            collectionLocations: (toll.tollCollectionLocations || []).map(
+              (location) => ({
+                name: location.name || null,
+                latitude: location.location?.lat || null,
+                longitude: location.location?.lng || null,
+              }),
+            ),
+          })),
+      ),
+    );
+
+    const totalTollCost = tollDetails.reduce(
+      (total, detail) => total + detail.price,
+      0,
+    );
+
     res.json({
       start,
       destination,
@@ -334,6 +426,11 @@ app.post("/api/car-route", async (req, res) => {
       durationHours: Number((durationSeconds / 3600).toFixed(2)),
 
       toll: route.properties.toll || false,
+      tollCost: {
+        total: Number(totalTollCost.toFixed(2)),
+        currency: tollDetails[0]?.currency || "EUR",
+        details: tollDetails,
+      },
       geometry: route.geometry,
     });
   } catch (error) {
