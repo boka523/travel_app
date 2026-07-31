@@ -92,12 +92,13 @@
 .flight-card {
   width: 100%;
   padding: 30px;
-  border-radius: 30px;
+  border-radius: 16px;
+  border: 3px solid transparent;
+  cursor: pointer;
   background: white;
   box-sizing: border-box; /* mislin da mi ovo ne triba */
-  transition:
-    transform 0.3s,
-    background-color 0.3s;
+  /* transition: transform 0.3s;
+  background-color 0.3s; */
 }
 
 .flight-card.selected {

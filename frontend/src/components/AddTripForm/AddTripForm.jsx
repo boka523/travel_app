@@ -1,9 +1,10 @@
 import { useState, React, useRef } from "react";
 import toast from "react-hot-toast";
 import "./AddTripForm.css";
-import TripDetails from "./miniComponents/TripDetails";
-import AccommodationResults from "./miniComponents/AccommodationResults";
-import FlightSearch from "./miniComponents/FlightSearch";
+import TripDetails from "./miniComponents/TripDetails/TripDetails";
+import AccommodationResults from "./miniComponents/AccommodationResults/AccommodationResults";
+import FlightSearch from "./miniComponents/FlightSearch/FlightSearch";
+import CarRouteSearch from "./miniComponents/CarRouteSearch/CarRouteSearch";
 import { formatDate } from "./utilities/DateUtilities";
 
 const AddTripForm = ({ darkMode }) => {
@@ -144,6 +145,15 @@ const AddTripForm = ({ darkMode }) => {
             passengersNum={passengers_num}
           />
         )}
+
+      {(transport_type === "car" || transport_type === "auto") && (
+        <CarRouteSearch
+          darkMode={darkMode}
+          departureCity={departure}
+          destinationCity={destination}
+          passengersNum={passengers_num}
+        />
+      )}
     </div>
   );
 };

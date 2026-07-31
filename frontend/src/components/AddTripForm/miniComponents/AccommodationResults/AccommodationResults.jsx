@@ -1,9 +1,9 @@
 import { useState, React, useRef } from "react";
 import "./AccommodationResults.css";
-import dark_left_arrow from "../../../assets/dark_left_arrow.png";
-import white_left_arrow from "../../../assets/white_left_arrow.png";
-import dark_right_arrow from "../../../assets/dark_right_arrow.png";
-import white_right_arrow from "../../../assets/white_right_arrow.png";
+import dark_left_arrow from "../../../../assets/dark_left_arrow.png";
+import white_left_arrow from "../../../../assets/white_left_arrow.png";
+import dark_right_arrow from "../../../../assets/dark_right_arrow.png";
+import white_right_arrow from "../../../../assets/white_right_arrow.png";
 
 const AccommodationResults = ({
   darkMode,

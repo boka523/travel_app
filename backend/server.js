@@ -11,6 +11,7 @@ const path = require("path"); //ovo nam je za ekstenzije tipa .jpg ili .png
 
 const { PrismaClient } = require("@prisma/client");
 const { error } = require("console");
+const { start } = require("repl");
 //const { off } = require("cluster");
 
 const HOTELBEDS_BASE_URL = "https://api.test.hotelbeds.com";
@@ -247,6 +248,99 @@ app.get("/airports", async (req, res) => {
     res.status(500).json({
       error: "Greška pri dohvaćanju aerodroma.",
       details: error.message,
+    });
+  }
+});
+
+app.get("/api/addresses/autocomplete", async (req, res) => {
+  const { text, city } = req.query;
+
+  if (!text) {
+    return res.status(400).json({
+      message: "Missing query parameter 'text'.",
+    });
+  }
+
+  try {
+    const searchText = city ? `${text}, ${city}` : text;
+
+    const response = await fetch(
+      `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(searchText)}&limit=5&apiKey=${process.env.GEOAPIFY_API_KEY}`,
+    );
+
+    const data = await response.json();
+
+    const suggestions = data.features.map((feature) => ({
+      placeId: feature.properties.place_id,
+      name: feature.properties.formatted,
+      latitude: feature.properties.lat,
+      longitude: feature.properties.lon,
+      resultType: feature.properties.result_type,
+      country: feature.properties.country,
+      city: feature.properties.city || null,
+    }));
+
+    res.json(suggestions);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch addresses.",
+    });
+  }
+});
+
+app.post("/api/car-route", async (req, res) => {
+  const { start, destination } = req.body;
+
+  if (
+    !start?.latitude ||
+    !start?.longitude ||
+    !destination?.latitude ||
+    !destination?.longitude
+  ) {
+    return res.status(400).json({
+      message: "Missing coordinates.",
+    });
+  }
+
+  try {
+    const response = await fetch(
+      `https://api.geoapify.com/v1/routing?waypoints=${start.latitude},${start.longitude}|${destination.latitude},${destination.longitude}&mode=drive&apiKey=${process.env.GEOAPIFY_API_KEY}`,
+    );
+
+    const data = await response.json();
+
+    const route = data.features?.[0];
+
+    if (!route) {
+      return res.status(404).json({
+        message: "Route not found.",
+      });
+    }
+
+    const distanceMeters = route.properties.distance;
+    const durationSeconds = route.properties.time;
+
+    res.json({
+      start,
+      destination,
+
+      distanceMeters,
+      distanceKm: Number((distanceMeters / 1000).toFixed(2)),
+
+      durationSeconds,
+      durationMinutes: Number((durationSeconds / 60).toFixed(2)),
+      durationHours: Number((durationSeconds / 3600).toFixed(2)),
+
+      toll: route.properties.toll || false,
+      geometry: route.geometry,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to calculate route.",
     });
   }
 });

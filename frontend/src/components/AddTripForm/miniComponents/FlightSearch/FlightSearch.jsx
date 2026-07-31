@@ -1,12 +1,12 @@
 import { useState, React, useRef } from "react";
 import Select from "react-select";
 import toast from "react-hot-toast";
-import { formatDate } from "../utilities/DateUtilities";
+import { formatDate } from "../../utilities/DateUtilities";
 import "./FlightSearch.css";
-import dark_left_arrow from "../../../assets/dark_left_arrow.png";
-import white_left_arrow from "../../../assets/white_left_arrow.png";
-import dark_right_arrow from "../../../assets/dark_right_arrow.png";
-import white_right_arrow from "../../../assets/white_right_arrow.png";
+import dark_left_arrow from "../../../../assets/dark_left_arrow.png";
+import white_left_arrow from "../../../../assets/white_left_arrow.png";
+import dark_right_arrow from "../../../../assets/dark_right_arrow.png";
+import white_right_arrow from "../../../../assets/white_right_arrow.png";
 
 const FlightSearch = ({
   darkMode,
@@ -261,7 +261,7 @@ const FlightSearch = ({
                         className={`flight-card ${darkMode ? "tint" : ""} ${selectedFlight === flight.offerId ? "selected" : ""}`}
                         key={flight.offerId}
                         onClick={() => {
-                          console.log(flight);
+                          // console.log(flight);
                           setSelectedFlight(flight.offerId);
                         }}
                       >

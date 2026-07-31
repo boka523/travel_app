@@ -1,0 +1,186 @@
+.car-route-search {
+  width: 100%;
+  margin-top: 40px;
+  min-height: 100vh;
+}
+
+.car-route-search h2 {
+  margin-bottom: 20px;
+}
+
+.fields-and-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fields {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+}
+
+.car-route-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+  font-size: 20px;
+  position: relative;
+}
+
+.car-route-field label {
+  font-weight: 600;
+}
+
+.car-route-field input {
+  width: 100%;
+  min-width: 500px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid white;
+  font-size: 18px;
+  outline: none;
+}
+
+.car-route-field input:focus {
+  border-color: black;
+}
+
+.address-suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.address-suggestion {
+  display: block;
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  border-bottom: 1px solid rgba(73, 41, 0, 0.8);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.address-suggestion:last-child {
+  border-bottom: none;
+}
+
+.address-suggestion:hover {
+  background: rgba(73, 41, 0, 0.2);
+}
+
+.show-route-btn {
+  width: 200px;
+  margin-top: 4px;
+  border-radius: 30px;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 20px;
+}
+
+.car-route-result {
+  width: 100%;
+  padding: 20px;
+  min-height: 300px;
+  border-radius: 15px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.route-map {
+  margin: 20px 0;
+  width: 100%;
+  height: 500px;
+  border-radius: 15px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.car-route-text {
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 30px;
+  padding: 20px;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 100px;
+}
+
+.car-route-text h3 {
+  margin-bottom: 10px;
+}
+
+.car-route-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.car-route-info p {
+  margin: 10px 0;
+}
+
+.fuel-calculator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fuel-field {
+  display: flex;
+  margin: 10px 0;
+  gap: 10px;
+}
+
+.fuel-field input[type="number"] {
+  width: 60px;
+  font-size: 18px;
+  text-align: center;
+  border-radius: 10px;
+  border: none;
+}
+
+.fuel-type-options {
+  display: flex;
+  gap: 10px;
+}
+
+.fuel-type-options label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-right: 10px;
+  cursor: pointer;
+}
+
+.fuel-type-options input[type="radio"] {
+  cursor: pointer;
+  accent-color: rgba(73, 41, 0);
+}
+
+.calculate-fuel-btn {
+  margin-top: 20px;
+  width: 200px;
+  font-size: 18px;
+  padding: 15px;
+}
+
+.fuel-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fuel-results p {
+  margin: 10px 0;
+}
