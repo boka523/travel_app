@@ -10,9 +10,9 @@ const AccommodationResults = ({
   accommodations,
   loading,
   resultsRef,
+  selectedAccommodation,
+  setSelectedAccommodation,
 }) => {
-  const [selectedAccommodation, setSelectedAccommodation] = useState(null);
-
   const [currentAccommodationSlide, setCurrentAccommodationSlide] = useState(0);
   const accommodationsPerSlide = 4;
   const accommodationSlides = Array.from(
@@ -78,11 +78,11 @@ const AccommodationResults = ({
                     <div className="accommodation-slide" key={slideIndex}>
                       {slide.map((accommodation) => (
                         <article
-                          className={`accommodation-card ${darkMode ? "tint" : ""} ${selectedAccommodation === accommodation.id ? "selected" : ""}`}
+                          className={`accommodation-card ${darkMode ? "tint" : ""} ${selectedAccommodation?.id === accommodation.id ? "selected" : ""}`}
                           key={accommodation.id}
                           onClick={() => {
                             console.log(accommodation);
-                            setSelectedAccommodation(accommodation.id);
+                            setSelectedAccommodation(accommodation);
                           }}
                         >
                           {accommodation.photo && (
@@ -116,8 +116,8 @@ const AccommodationResults = ({
                                 : "BoardName unavaliable"}
                             </p>
                             <p className="accommodation-price">
-                              {accommodation.price
-                                ? `${accommodation.price} ${accommodation.currency}`
+                              {accommodation.totalPrice
+                                ? `${accommodation.totalPrice} ${accommodation.currency}`
                                 : "Price unavaliable"}
                             </p>
                             {accommodation.url && (

@@ -14,14 +14,8 @@ import dark_passengers from "../../../../assets/dark_passengers.png";
 import white_passengers from "../../../../assets/white_passengers.png";
 import dark_car from "../../../../assets/dark_car.png";
 import white_car from "../../../../assets/white_car.png";
-import dark_bus from "../../../../assets/dark_bus.png";
-import white_bus from "../../../../assets/white_bus.png";
-import dark_boat from "../../../../assets/dark_boat.png";
-import white_boat from "../../../../assets/white_boat.png";
 import dark_plane from "../../../../assets/dark_plane.png";
 import white_plane from "../../../../assets/white_plane.png";
-import dark_train from "../../../../assets/dark_train.png";
-import white_train from "../../../../assets/white_train.png";
 import dark_question from "../../../../assets/dark_question.png";
 import white_question from "../../../../assets/white_question.png";
 
@@ -63,22 +57,6 @@ const TripDetails = ({
       aeroplane: {
         white: dark_plane,
         dark: white_plane,
-      },
-      bus: {
-        white: dark_bus,
-        dark: white_bus,
-      },
-      train: {
-        white: dark_train,
-        dark: white_train,
-      },
-      boat: {
-        white: dark_boat,
-        dark: white_boat,
-      },
-      ship: {
-        white: dark_boat,
-        dark: white_boat,
       },
     };
 

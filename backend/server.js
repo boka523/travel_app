@@ -9,6 +9,11 @@ const duffel = require("./duffel");
 const crypto = require("crypto"); //triba nan za sha256 hashiranje, to je ka "tip teksta" koji hotelbeds zahtjeva u svojoj dokumentaciji
 const path = require("path"); //ovo nam je za ekstenzije tipa .jpg ili .png
 
+const OpenAI = require("openai");
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 const { PrismaClient } = require("@prisma/client");
 const { error } = require("console");
 const { start } = require("repl");
@@ -156,6 +161,7 @@ app.get("/trips/:id", authenticateToken, async (req, res) => {
       include: {
         hotels: true,
         trip_flights: true,
+        trip_car_details: true,
       },
     });
 
@@ -265,7 +271,7 @@ app.get("/api/addresses/autocomplete", async (req, res) => {
     const searchText = city ? `${text}, ${city}` : text;
 
     const response = await fetch(
-      `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(searchText)}&limit=5&apiKey=${process.env.GEOAPIFY_API_KEY}`,
+      `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(searchText)}&limit=10&apiKey=${process.env.GEOAPIFY_API_KEY}`,
     );
 
     const data = await response.json();
@@ -340,6 +346,109 @@ app.get("/api/here-test", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "HERE request failed." });
+  }
+});
+
+//za AI
+app.post("/api/ai/chat", async (req, res) => {
+  try {
+    const { message, trip, messages } = req.body;
+
+    if (!message || !message.trim()) {
+      return res.status(400).json({
+        error: "Message is required.",
+      });
+    }
+
+    if (message.length > 300) {
+      return res.status(400).json({
+        error: "Message is too long.",
+      });
+    }
+
+    if (!trip) {
+      return res.status(400).json({
+        error: "Trip data is required.",
+      });
+    }
+
+    const previousMessages = Array.isArray(messages)
+      ? messages
+          .filter(
+            (chatMessage) =>
+              chatMessage.role === "user" || chatMessage.role === "assistant",
+          )
+          .slice(-10)
+      : [];
+
+    const {
+      departure,
+      destination,
+      startDate,
+      endDate,
+      passengers_num,
+      transport_type,
+    } = trip;
+
+    if (!departure || !departure.trim()) {
+      return res.status(400).json({
+        error: "Trip departure is required.",
+      });
+    }
+
+    if (!destination || !destination.trim()) {
+      return res.status(400).json({
+        error: "Trip destination is required.",
+      });
+    }
+
+    const passengerCount = Number(passengers_num) || 1;
+
+    const tripContext = `
+    Trip departure: ${departure.trim()}
+    Trip destination: ${destination.trim()}
+    Trip start date: ${startDate || "not provided"}
+    Trip end date: ${endDate || "not provided"}
+    Number of travelers: ${passengerCount}
+    Transport type: ${transport_type || "not provided"}
+    Preferred currency: EUR`.trim();
+
+    const response = await openai.responses.create({
+      model: "gpt-5-mini",
+      reasoning: {
+        effort: "minimal",
+      },
+      input: [
+        {
+          role: "developer",
+          content:
+            `You are WayAway AI, a concise travel cost estimation assistant.
+            Trip information: ${tripContext} .
+            Always respond in English. 
+            Give realistic approximate price ranges. 
+            Use the trip information when it is relevant to the user's question. 
+            Use additional details provided by the user. 
+            If important details are missing, make simple conservative assumptions and state them briefly. 
+            Do not assume luxury meals, multiple courses, alcohol, or extra services unless the user mentions them. 
+            Keep the answer under 70 words.`.trim(),
+        },
+        ...previousMessages,
+        {
+          role: "user",
+          content: message.trim(),
+        },
+      ],
+      max_output_tokens: 200,
+    });
+
+    res.json({
+      reply: response.output_text,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "AI request failed.",
+    });
   }
 });
 
@@ -551,7 +660,7 @@ app.post("/api/accommodations", async (req, res) => {
         );
 
         const price = Number(firstRate.net || 0);
-        const totalPrice = price + taxAmount;
+        const totalPrice = (price + taxAmount).toFixed(2);
 
         return {
           id: localHotel.id,
@@ -694,6 +803,12 @@ app.post("/trips", authenticateToken, async (req, res) => {
     transport_type,
     passengers_num,
     hotel_id,
+    hotel_price,
+    hotel_currency,
+    hotel_board_name,
+    selectedFlight,
+    carDetails,
+    ai_cost,
   } = req.body;
 
   if (
@@ -717,7 +832,7 @@ app.post("/trips", authenticateToken, async (req, res) => {
     return res.status(400).json({ error: "Broj putnika mora biti veći od 0!" });
   }
 
-  if (!["plane", "train", "bus", "car", "boat"].includes(transport_type)) {
+  if (!["plane", "car"].includes(transport_type)) {
     return res.status(400).json({ error: "Nepoznat tip prijevoza!" });
   }
 
@@ -747,8 +862,62 @@ app.post("/trips", authenticateToken, async (req, res) => {
         transport_type,
         passengers_num,
         hotel_id: selectedHotel ? selectedHotel.id : null,
+        hotel_price: selectedHotel ? hotel_price : null,
+        hotel_currency: selectedHotel ? hotel_currency : null,
+        hotel_board_name: selectedHotel ? hotel_board_name : null,
+        ai_cost:
+          ai_cost !== null && ai_cost !== undefined ? Number(ai_cost) : null,
       },
     });
+
+    if (
+      (transport_type === "plane" || transport_type === "aeroplane") &&
+      selectedFlight
+    ) {
+      await prisma.trip_flights.create({
+        data: {
+          trip_id: trip.id,
+          airline_name: selectedFlight.airlineName || null,
+          airline_code: selectedFlight.airlineCode || null,
+          outbound_departure_time: selectedFlight.outbound?.departureTime
+            ? new Date(selectedFlight.outbound.departureTime)
+            : null,
+          outbound_arrival_time: selectedFlight.outbound?.arrivalTime
+            ? new Date(selectedFlight.outbound.arrivalTime)
+            : null,
+          return_departure_time: selectedFlight.return?.departureTime
+            ? new Date(selectedFlight.return.departureTime)
+            : null,
+          return_arrival_time: selectedFlight.return?.arrivalTime
+            ? new Date(selectedFlight.return.arrivalTime)
+            : null,
+          stops:
+            Number(selectedFlight.outbound?.stops || 0) +
+            Number(selectedFlight.return?.stops || 0),
+          price: Number(selectedFlight.price),
+          currency: selectedFlight.currency || "EUR",
+          provider_offer_id: selectedFlight.offerId || null,
+          provider: "Duffel",
+        },
+      });
+    }
+
+    if ((transport_type === "car" || transport_type === "auto") && carDetails) {
+      await prisma.trip_car_details.create({
+        data: {
+          trip_id: trip.id,
+          distance_km: Number(carDetails.distanceKm),
+          duration_seconds: Number(carDetails.durationSeconds),
+
+          fuel_type: carDetails.fuelType || null,
+          fuel_consumption: Number(carDetails.fuelConsumption),
+          fuel_price: Number(carDetails.fuelPrice),
+          fuel_cost: Number(carDetails.fuelCost),
+
+          toll_cost: Number(carDetails.tollCost || 0),
+        },
+      });
+    }
 
     res.status(201).json(trip);
   } catch (error) {
@@ -823,7 +992,7 @@ app.put("/trips/:id", authenticateToken, async (req, res) => {
     return res.status(400).json({ error: "Broj putnika mora biti veći od 0!" });
   }
 
-  if (!["plane", "train", "bus", "car", "boat"].includes(transport_type)) {
+  if (!["plane", "car"].includes(transport_type)) {
     return res.status(400).json({ error: "Nepoznat tip prijevoza!" });
   }
 
@@ -923,7 +1092,7 @@ app.patch("/trips/:id", authenticateToken, async (req, res) => {
     }
 
     if (transport_type !== undefined) {
-      if (["plane", "train", "bus", "car", "boat"].includes(transport_type)) {
+      if (["plane", "car"].includes(transport_type)) {
         data.transport_type = transport_type;
       } else {
         return res.status(400).json({ error: "Nepoznat tip prijevoza!" });

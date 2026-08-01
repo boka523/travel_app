@@ -1,25 +1,25 @@
-import { useEffect, useState, React }from 'react'
-import { useNavigate } from 'react-router-dom'
-import toast from 'react-hot-toast'
-import Select from "react-select" //koristin umisto <select> jer je puno manipulativniji
-import './MyTripsForm.css'
-import dark_plus_sign from '../../assets/dark_plus_sign.png'
-import white_plus_sign from '../../assets/white_plus_sign.png'
+import { useEffect, useState, React } from "react";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import Select from "react-select"; //koristin umisto <select> jer je puno manipulativniji
+import "./MyTripsForm.css";
+import dark_plus_sign from "../../assets/dark_plus_sign.png";
+import white_plus_sign from "../../assets/white_plus_sign.png";
 
-const MyTripsForm = ({darkMode}) => {
+const MyTripsForm = ({ darkMode }) => {
   const navigate = useNavigate();
-  
+
   const [sortOption, setSortOption] = useState(null);
-  const [trips, setTrips] = useState([])
+  const [trips, setTrips] = useState([]);
   const [isLoadingTrips, setIsLoadingTrips] = useState(false);
   const [isDeletingTripId, setIsDeletingTripId] = useState(null);
 
   const sortOptions = [
-  { value: "alphabetical", label: "Abecedno" },
-  { value: "priceAsc", label: "Po cijeni - uzlazno" },
-  { value: "priceDesc", label: "Po cijeni - silazno" },
-  { value: "dateAsc", label: "Po datumu polaska - uzlazno" },
-  { value: "dateDesc", label: "Po datumu polaska - silazno" },
+    { value: "alphabetical", label: "Abecedno" },
+    { value: "priceAsc", label: "Po cijeni - uzlazno" },
+    { value: "priceDesc", label: "Po cijeni - silazno" },
+    { value: "dateAsc", label: "Po datumu polaska - uzlazno" },
+    { value: "dateDesc", label: "Po datumu polaska - silazno" },
   ];
 
   const customStyles = {
@@ -32,7 +32,7 @@ const MyTripsForm = ({darkMode}) => {
       width: "309px",
       boxShadow: "none",
       transition: "0.3s",
-      cursor: "pointer"
+      cursor: "pointer",
     }),
 
     placeholder: (provided) => ({
@@ -40,7 +40,7 @@ const MyTripsForm = ({darkMode}) => {
       color: darkMode ? "black" : "white",
       fontSize: "20px",
       transition: "0.3s",
-      textAlign: "center"
+      textAlign: "center",
     }),
 
     singleValue: (provided) => ({
@@ -48,7 +48,7 @@ const MyTripsForm = ({darkMode}) => {
       color: darkMode ? "black" : "white",
       fontSize: "20px",
       transition: "0.3s",
-      textAlign: "center"
+      textAlign: "center",
     }),
 
     menu: (provided) => ({
@@ -71,19 +71,19 @@ const MyTripsForm = ({darkMode}) => {
       ...provided,
       backgroundColor: state.isFocused
         ? darkMode
-        ? "#362A19"
-        : "#B6AA99"
+          ? "#362A19"
+          : "#B6AA99"
         : darkMode
-        ? "white"
-        : "black",
+          ? "white"
+          : "black",
       transition: "0.3s",
       color: state.isFocused
         ? darkMode
-        ? "white"
-        : "black"
+          ? "white"
+          : "black"
         : darkMode
-        ? "black"
-        : "white",
+          ? "black"
+          : "white",
       cursor: "pointer",
       fontSize: "18px",
     }),
@@ -100,52 +100,51 @@ const MyTripsForm = ({darkMode}) => {
     }),
   };
 
-  useEffect(() => { 
+  useEffect(() => {
     setIsLoadingTrips(true);
 
-    const fetchTrips = async () => { //ovo je slicna sema ko handleLogin, samo je pisemo unutar useEffect jer zelimo da se izvrsi odmah
+    const fetchTrips = async () => {
+      //ovo je slicna sema ko handleLogin, samo je pisemo unutar useEffect jer zelimo da se izvrsi odmah
       const token = localStorage.getItem("token");
 
-      if(!token){
+      if (!token) {
         toast.error("Morate se prijaviti!");
 
         setTimeout(() => {
           navigate("/login");
-        }, 1000)
+        }, 1000);
         return;
       }
 
-      try{
+      try {
         const response = await fetch("http://localhost:5000/my_trips", {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         const data = await response.json();
 
-        if(!response.ok){
+        if (!response.ok) {
           toast.error(data.error || "Putovanja nisu učitana.");
 
-          if(response.status === 401 || response.status === 403){
-            toast.error("Neautoriziran pristup! Odjava...")
+          if (response.status === 401 || response.status === 403) {
+            toast.error("Neautoriziran pristup! Odjava...");
             localStorage.removeItem("token");
 
             setTimeout(() => {
               navigate("/login");
-            }, 1000)
+            }, 1000);
             return;
           }
 
           return;
         }
         setTrips(data);
-      }
-      catch(error){
+      } catch (error) {
         toast.error("Greška pri spajanju na server.");
-      }
-      finally{
+      } finally {
         setIsLoadingTrips(false);
       }
     };
@@ -153,13 +152,15 @@ const MyTripsForm = ({darkMode}) => {
   }, [navigate]); //"ovaj useEffect ovisi o navigate; ako se on promijeni, ponovno pokreni useEffect"
 
   const handleDeleteTrip = async (tripId) => {
-    const confirmed = window.confirm("Jeste li sigurni da želite izbrisati ovo putovanje?");
+    const confirmed = window.confirm(
+      "Jeste li sigurni da želite izbrisati ovo putovanje?",
+    );
 
-    if(!confirmed){
+    if (!confirmed) {
       return;
     }
 
-    try{
+    try {
       setIsDeletingTripId(tripId);
 
       const token = localStorage.getItem("token");
@@ -172,85 +173,111 @@ const MyTripsForm = ({darkMode}) => {
       });
 
       const data = await response.json();
-      
-      if(!response.ok){
+
+      if (!response.ok) {
         toast.error(data.error || "Brisanje nije uspjelo.");
         return;
       }
 
       toast.success(data.message);
       setTrips((prevTrips) => prevTrips.filter((trip) => trip.id !== tripId));
-    } catch(error){
+    } catch (error) {
       toast.error(error.message);
-    } finally{
+    } finally {
       setIsDeletingTripId(null);
     }
   };
 
   const addNewTrip = () => {
     navigate("/addtrip");
-  }
+  };
 
   const handleEditTrip = (tripId) => {
     navigate(`/edittrip/${tripId}`);
-  }
+  };
 
   return (
-    <div className='my-trips-form container'>
-      <div className='title'>
-        <div className='buttons'>
+    <div className="my-trips-form container">
+      <div className="title">
+        <div className="buttons">
           <Select
             options={sortOptions}
             value={sortOption}
-            className='sort-select'
+            className="sort-select"
             onChange={setSortOption}
             placeholder="Sortiraj putovanja"
             isSearchable={false}
             styles={customStyles}
           />
-          <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={addNewTrip}>
-            <div className='email-icon'>
-              <img src={dark_plus_sign} alt="" className={`icon ${darkMode ? "show" : "hide"}`}/>
-              <img src={white_plus_sign} alt="" className={`icon ${darkMode ? "hide" : "show"}`}/>
+          <button
+            className={darkMode ? "btn" : "btn dark-btn"}
+            onClick={addNewTrip}
+          >
+            <div className="email-icon">
+              <img
+                src={dark_plus_sign}
+                alt=""
+                className={`icon ${darkMode ? "show" : "hide"}`}
+              />
+              <img
+                src={white_plus_sign}
+                alt=""
+                className={`icon ${darkMode ? "hide" : "show"}`}
+              />
             </div>
           </button>
         </div>
-        <div className={`my-trips-text ${darkMode ? "tint white-letters" : ""}`}>
+        <div
+          className={`my-trips-text ${darkMode ? "tint white-letters" : ""}`}
+        >
           <h1>My trips</h1>
         </div>
       </div>
       <div className={`all-trips ${darkMode ? "tint white-letters" : ""}`}>
-        {isLoadingTrips 
-          ? ( <div className='message'>Učitavanje putovanja...</div> )
-          : trips.length === 0 
-            ? ( <div className='message'>Nemate putovanja.</div>)
-            : (
-              trips.map((trip) => (
-                <div key={trip.id} className={`trip ${darkMode ? "tint" : ""}`}>
-                  <h1>{trip.destination}</h1>
-                  <h1>{trip.total_cost} €</h1>
-                  <div className='trip-details'>
-                    <h2>Polazak: {new Date(trip.start_date).toLocaleDateString("hr-HR")}</h2>
-                    <h2>Povratak: {new Date(trip.end_date).toLocaleDateString("hr-HR")}</h2>
-                    <div className='trip-subdetails'>
-                      <h3>Broj putnika: {trip.passengers_num}</h3>
-                      <h3>Transport: {trip.transport_type}</h3>
-                    </div>
-                  </div>
-                  <div className='card-buttons'>
-                  <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={() => handleDeleteTrip(trip.id)} disabled={isDeletingTripId === trip.id}>
-                    {isDeletingTripId === trip.id ? "Brisanje..." : "Izbriši"}
-                  </button>
-                  <button className={darkMode ? 'btn' : 'btn dark-btn'} onClick={() => handleEditTrip(trip.id)}>
-                    Uredi
-                  </button>
-                  </div>
+        {isLoadingTrips ? (
+          <div className="message">Učitavanje putovanja...</div>
+        ) : trips.length === 0 ? (
+          <div className="message">Nemate putovanja.</div>
+        ) : (
+          trips.map((trip) => (
+            <div key={trip.id} className={`trip ${darkMode ? "tint" : ""}`}>
+              <h1>{trip.destination}</h1>
+              <h1>{trip.total_cost} €</h1>
+              <div className="trip-details">
+                <h2>
+                  Polazak:{" "}
+                  {new Date(trip.start_date).toLocaleDateString("hr-HR")}
+                </h2>
+                <h2>
+                  Povratak:{" "}
+                  {new Date(trip.end_date).toLocaleDateString("hr-HR")}
+                </h2>
+                <div className="trip-subdetails">
+                  <h3>Broj putnika: {trip.passengers_num}</h3>
+                  <h3>Transport: {trip.transport_type}</h3>
                 </div>
-              ))
-            )}
+              </div>
+              <div className="card-buttons">
+                <button
+                  className={darkMode ? "btn" : "btn dark-btn"}
+                  onClick={() => handleDeleteTrip(trip.id)}
+                  disabled={isDeletingTripId === trip.id}
+                >
+                  {isDeletingTripId === trip.id ? "Brisanje..." : "Izbriši"}
+                </button>
+                <button
+                  className={darkMode ? "btn" : "btn dark-btn"}
+                  onClick={() => handleEditTrip(trip.id)}
+                >
+                  Detalji
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MyTripsForm
+export default MyTripsForm;

@@ -1,4 +1,4 @@
-import { useState, React, useRef } from "react";
+import { useState, React, useRef, useEffect } from "react";
 import toast from "react-hot-toast";
 import "./AddTripForm.css";
 import TripDetails from "./miniComponents/TripDetails/TripDetails";
@@ -6,6 +6,7 @@ import AccommodationResults from "./miniComponents/AccommodationResults/Accommod
 import FlightSearch from "./miniComponents/FlightSearch/FlightSearch";
 import CarRouteSearch from "./miniComponents/CarRouteSearch/CarRouteSearch";
 import { formatDate } from "./utilities/DateUtilities";
+import AIChat from "./miniComponents/AIChat/AIChat";
 
 const AddTripForm = ({ darkMode }) => {
   const [departure, setDeparture] = useState("");
@@ -22,6 +23,11 @@ const AddTripForm = ({ darkMode }) => {
   const [accommodations, setAccommodations] = useState([]);
   const [departureAirports, setDepartureAirports] = useState([]);
   const [arrivalAirports, setArrivalAirports] = useState([]);
+
+  const [selectedAccommodation, setSelectedAccommodation] = useState(null);
+  const [selectedFlight, setSelectedFlight] = useState(null);
+  const [carDetails, setCarDetails] = useState(null);
+  const [AICost, setAICost] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -96,6 +102,60 @@ const AddTripForm = ({ darkMode }) => {
     }
   };
 
+  const handleSaveTrip = async () => {
+    if (!destination || !startDate || !endDate || !transport_type) {
+      toast.error("Please fill in all required trip details.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch("http://localhost:5000/trips", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          destination,
+          start_date: formatDate(startDate),
+          end_date: formatDate(endDate),
+          transport_type,
+          passengers_num: Number(passengers_num),
+          hotel_id: selectedAccommodation?.id || null,
+          hotel_price: selectedAccommodation?.totalPrice || null,
+          hotel_currency: selectedAccommodation?.currency || null,
+          hotel_board_name: selectedAccommodation?.boardName || null,
+          selectedFlight:
+            (transport_type === "plane" || transport_type === "aeroplane") &&
+            selectedFlight
+              ? selectedFlight
+              : null,
+          carDetails:
+            (transport_type === "car" || transport_type === "auto") &&
+            carDetails
+              ? carDetails
+              : null,
+          ai_cost: AICost ? Number(AICost) : null,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.error || "Trip could not be saved.");
+        return;
+      }
+
+      toast.success("Trip saved successfully.");
+      console.log("Saved trip:", data);
+    } catch (error) {
+      console.error("Save trip error:", error);
+      toast.error("An error occured while saving the trip.");
+    }
+  };
+
   return (
     <div className="add-trips-form container">
       <div className="title">
@@ -131,6 +191,8 @@ const AddTripForm = ({ darkMode }) => {
         accommodations={accommodations}
         loading={loading}
         resultsRef={resultsRef}
+        selectedAccommodation={selectedAccommodation}
+        setSelectedAccommodation={setSelectedAccommodation}
       />
 
       {(transport_type === "plane" || transport_type === "aeroplane") &&
@@ -143,6 +205,8 @@ const AddTripForm = ({ darkMode }) => {
             startDate={startDate}
             endDate={endDate}
             passengersNum={passengers_num}
+            selectedFlight={selectedFlight}
+            setSelectedFlight={setSelectedFlight}
           />
         )}
 
@@ -152,8 +216,40 @@ const AddTripForm = ({ darkMode }) => {
           departureCity={departure}
           destinationCity={destination}
           passengersNum={passengers_num}
+          carDetails={carDetails}
+          setCarDetails={setCarDetails}
         />
       )}
+
+      <AIChat
+        darkMode={darkMode}
+        trip={{
+          departure,
+          destination,
+          startDate,
+          endDate,
+          passengers_num,
+          transport_type,
+        }}
+      />
+
+      <div className="ai-cost">
+        <label>Unesite AI cost:</label>
+        <input
+          type="number"
+          placeholder="unesite ai cijenu"
+          value={AICost}
+          onChange={(e) => setAICost(e.target.value)}
+        />
+      </div>
+
+      <button
+        type="button"
+        onClick={handleSaveTrip}
+        className={`btn ${darkMode ? "" : "dark-btn"}`}
+      >
+        Save trip
+      </button>
     </div>
   );
 };

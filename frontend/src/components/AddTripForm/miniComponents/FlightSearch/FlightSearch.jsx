@@ -15,6 +15,8 @@ const FlightSearch = ({
   startDate,
   endDate,
   passengersNum,
+  selectedFlight,
+  setSelectedFlight,
 }) => {
   const [selectedDepartureAirport, setSelectedDepartureAirport] = useState("");
   const [selectedArrivalAirport, setSelectedArrivalAirport] = useState("");
@@ -22,7 +24,6 @@ const FlightSearch = ({
   const [flightsLoading, setFlightsLoading] = useState(false);
 
   const flightsRef = useRef(null);
-  const [selectedFlight, setSelectedFlight] = useState(null);
 
   const [currentFlightSlide, setCurrentFlightSlide] = useState(0);
   const flightsPerSlide = 2;
@@ -258,11 +259,11 @@ const FlightSearch = ({
                   <div className="flight-slide" key={slideIndex}>
                     {slide.map((flight) => (
                       <div
-                        className={`flight-card ${darkMode ? "tint" : ""} ${selectedFlight === flight.offerId ? "selected" : ""}`}
+                        className={`flight-card ${darkMode ? "tint" : ""} ${selectedFlight?.offerId === flight.offerId ? "selected" : ""}`}
                         key={flight.offerId}
                         onClick={() => {
-                          // console.log(flight);
-                          setSelectedFlight(flight.offerId);
+                          console.log(flight);
+                          setSelectedFlight(flight);
                         }}
                       >
                         <div className="flight-card-header">
