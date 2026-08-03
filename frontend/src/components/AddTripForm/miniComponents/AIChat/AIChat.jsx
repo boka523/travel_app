@@ -93,14 +93,16 @@ const AIChat = ({ darkMode, trip }) => {
   return (
     <div className={`ai-chat-wrapper ${darkMode ? "white-letters" : ""}`}>
       {isOpen && (
-        <div className="ai-chat">
+        <div className={`ai-chat ${darkMode ? "ai-chat-dark" : ""}`}>
           <div className="ai-chat-header">
             <div>
               <h3>WayAway AI</h3>
               <span>Travel cost assistant</span>
             </div>
           </div>
-          <div className="ai-chat-messages">
+          <div
+            className={`ai-chat-messages ${darkMode ? "ai-chat-messages-dark" : ""}`}
+          >
             {messages.map((chatMessage, index) => (
               <div
                 key={index}
@@ -124,9 +126,12 @@ const AIChat = ({ darkMode, trip }) => {
             )}
             <div ref={messagesEndRef}></div>
           </div>
-          <div className="ai-chat-input-area">
+          <div
+            className={`ai-chat-input-area ${darkMode ? "ai-chat-input-area-dark" : ""}`}
+          >
             <div className="ai-chat-input-wrapper">
               <textarea
+                className={darkMode ? "ai-chat-textarea-dark" : ""}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Ask about your estimated travel costs..."
@@ -149,7 +154,7 @@ const AIChat = ({ darkMode, trip }) => {
       )}
       <button
         type="button"
-        className="ai-chat-toggle"
+        className={`ai-chat-toggle ${darkMode ? "ai-chat-toggle-dark" : ""}`}
         onClick={() => setIsOpen((prev) => !prev)}
       >
         {isOpen ? "X" : "AI"}

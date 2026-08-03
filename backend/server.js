@@ -809,6 +809,7 @@ app.post("/trips", authenticateToken, async (req, res) => {
     selectedFlight,
     carDetails,
     ai_cost,
+    ai_description,
   } = req.body;
 
   if (
@@ -867,6 +868,7 @@ app.post("/trips", authenticateToken, async (req, res) => {
         hotel_board_name: selectedHotel ? hotel_board_name : null,
         ai_cost:
           ai_cost !== null && ai_cost !== undefined ? Number(ai_cost) : null,
+        ai_description: ai_description || null,
       },
     });
 

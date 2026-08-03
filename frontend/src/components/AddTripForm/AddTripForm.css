@@ -31,3 +31,54 @@
   background-color: rgb(0, 0, 0, 0.5);
   transition: 0.3s;
 }
+
+.ai {
+  margin: 40px 0;
+}
+
+.ai-cost {
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  font-size: 20px;
+}
+
+.ai-cost input {
+  font-size: 18px;
+  height: 35px;
+  width: 100px;
+  text-align: center;
+  border-radius: 10px;
+  border: none;
+}
+
+.ai-cost-btn {
+  width: 160px;
+  margin-top: 4px;
+  border-radius: 30px;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 20px;
+}
+
+.ai-cost textarea {
+  width: 400px;
+  height: 100px;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 16px;
+}
+
+.save-trip-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+  padding-bottom: 40px;
+}
+
+.save-trip-wrapper .btn {
+  font-size: 28px;
+  padding: 25px;
+}

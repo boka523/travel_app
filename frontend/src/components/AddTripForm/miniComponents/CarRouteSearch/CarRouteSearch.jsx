@@ -374,7 +374,7 @@ const CarRouteSearch = ({
               )}
             </MapContainer>
           </div>
-          <div className="car-route-text">
+          <div className={`car-route-text ${darkMode ? "tint" : ""}`}>
             <div className="info-tolls">
               <div className="info">
                 <h3>Info</h3>
@@ -418,7 +418,7 @@ const CarRouteSearch = ({
                             <div className="tolls-slide" key={slideIndex}>
                               {slide.map((detail, detailIndex) => (
                                 <div
-                                  className="toll-detail"
+                                  className={`toll-detail ${darkMode ? "tint" : ""}`}
                                   key={`${detail.tollSystem}-${slideIndex}-${detailIndex}`}
                                 >
                                   {detail.collectionLocations.length > 0 ? (
@@ -466,7 +466,7 @@ const CarRouteSearch = ({
               </div>
             </div>
           </div>
-          <div className="fuel-calculator-results">
+          <div className={`fuel-calculator-results ${darkMode ? "tint" : ""}`}>
             <div className="fuel-calculator">
               <h3>Fuel cost calculator</h3>
               <div>

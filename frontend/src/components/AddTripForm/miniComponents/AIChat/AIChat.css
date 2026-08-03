@@ -11,7 +11,7 @@
   bottom: 72px;
 
   width: 380px;
-  height: 520px;
+  height: 500px;
 
   display: flex;
   flex-direction: column;
@@ -43,7 +43,6 @@
 
 .ai-chat-header span {
   font-size: 12px;
-  opacity: 0.7;
 }
 
 .ai-chat-messages {
@@ -214,4 +213,68 @@
 
 .ai-chat-toggle:hover {
   transform: translateY(-3px);
+}
+
+/*dark mode*/
+.ai-chat-dark {
+  background-color: #1f1f1f;
+  color: white;
+  transition: 0.3s;
+}
+
+.ai-chat-messages-dark {
+  background-color: #2b2b2b;
+  transition: 0.3s;
+}
+
+.ai-chat-dark .ai-chat-assistant-message {
+  background-color: #3a3a3a;
+  color: white;
+  transition: 0.3s;
+}
+
+.ai-chat-dark .ai-chat-user-message {
+  background-color: white;
+  color: black;
+  transition: 0.3s;
+}
+
+.ai-chat-input-area-dark {
+  background-color: #1f1f1f;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  transition: 0.3s;
+}
+
+.ai-chat-textarea-dark {
+  background-color: #2f2f2f;
+  color: white;
+  border-color: #555;
+  transition: 0.3s;
+}
+
+.ai-chat-textarea-dark::placeholder {
+  color: #bcbcbc;
+  transition: 0.3s;
+}
+
+.ai-chat-textarea-dark:focus {
+  border-color: white;
+  transition: 0.3s;
+}
+
+.ai-chat-dark .ai-chat-counter {
+  color: #bcbcbc;
+  transition: 0.3s;
+}
+
+.ai-chat-dark .ai-chat-send {
+  background-color: white;
+  color: black;
+  transition: 0.3s;
+}
+
+.ai-chat-toggle-dark {
+  background-color: white;
+  color: black;
+  transition: 0.3s;
 }

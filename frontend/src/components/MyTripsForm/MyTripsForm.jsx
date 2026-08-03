@@ -100,6 +100,25 @@ const MyTripsForm = ({ darkMode }) => {
     }),
   };
 
+  const sortedTrips = [...trips].sort((a, b) => {
+    switch (sortOption?.value) {
+      case "alphabetical":
+        return a.destination.localeCompare(b.destination, "hr", {
+          sensitivity: "base",
+        });
+      case "priceAsc":
+        return Number(a.total_cost) - Number(b.total_cost);
+      case "priceDesc":
+        return Number(b.total_cost) - Number(a.total_cost);
+      case "dateAsc":
+        return new Date(a.start_date) - new Date(b.start_date);
+      case "dateDesc":
+        return new Date(b.start_date) - new Date(a.start_date);
+      default:
+        return 0;
+    }
+  });
+
   useEffect(() => {
     setIsLoadingTrips(true);
 
@@ -239,7 +258,7 @@ const MyTripsForm = ({ darkMode }) => {
         ) : trips.length === 0 ? (
           <div className="message">Nemate putovanja.</div>
         ) : (
-          trips.map((trip) => (
+          sortedTrips.map((trip) => (
             <div key={trip.id} className={`trip ${darkMode ? "tint" : ""}`}>
               <h1>{trip.destination}</h1>
               <h1>{trip.total_cost} €</h1>

@@ -7,6 +7,7 @@ import FlightSearch from "./miniComponents/FlightSearch/FlightSearch";
 import CarRouteSearch from "./miniComponents/CarRouteSearch/CarRouteSearch";
 import { formatDate } from "./utilities/DateUtilities";
 import AIChat from "./miniComponents/AIChat/AIChat";
+import TripPreview from "./miniComponents/TripPreview/TripPreview";
 
 const AddTripForm = ({ darkMode }) => {
   const [departure, setDeparture] = useState("");
@@ -28,6 +29,8 @@ const AddTripForm = ({ darkMode }) => {
   const [selectedFlight, setSelectedFlight] = useState(null);
   const [carDetails, setCarDetails] = useState(null);
   const [AICost, setAICost] = useState("");
+  const [AIDescription, setAIDescription] = useState("");
+  const [showAICost, setShowAICost] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -138,6 +141,7 @@ const AddTripForm = ({ darkMode }) => {
               ? carDetails
               : null,
           ai_cost: AICost ? Number(AICost) : null,
+          ai_description: AIDescription || null,
         }),
       });
 
@@ -155,6 +159,14 @@ const AddTripForm = ({ darkMode }) => {
       toast.error("An error occured while saving the trip.");
     }
   };
+
+  const transportPrice = selectedFlight
+    ? Number(selectedFlight.price * passengers_num)
+    : Number(carDetails?.price || 0);
+  const totalPrice =
+    Number(selectedAccommodation?.totalPrice || 0) +
+    transportPrice +
+    Number(AICost || 0);
 
   return (
     <div className="add-trips-form container">
@@ -195,7 +207,8 @@ const AddTripForm = ({ darkMode }) => {
         setSelectedAccommodation={setSelectedAccommodation}
       />
 
-      {(transport_type === "plane" || transport_type === "aeroplane") &&
+      {hasSearched &&
+        (transport_type === "plane" || transport_type === "aeroplane") &&
         departureAirports.length > 0 &&
         arrivalAirports.length > 0 && (
           <FlightSearch
@@ -210,16 +223,17 @@ const AddTripForm = ({ darkMode }) => {
           />
         )}
 
-      {(transport_type === "car" || transport_type === "auto") && (
-        <CarRouteSearch
-          darkMode={darkMode}
-          departureCity={departure}
-          destinationCity={destination}
-          passengersNum={passengers_num}
-          carDetails={carDetails}
-          setCarDetails={setCarDetails}
-        />
-      )}
+      {hasSearched &&
+        (transport_type === "car" || transport_type === "auto") && (
+          <CarRouteSearch
+            darkMode={darkMode}
+            departureCity={departure}
+            destinationCity={destination}
+            passengersNum={passengers_num}
+            carDetails={carDetails}
+            setCarDetails={setCarDetails}
+          />
+        )}
 
       <AIChat
         darkMode={darkMode}
@@ -232,24 +246,73 @@ const AddTripForm = ({ darkMode }) => {
           transport_type,
         }}
       />
+      {hasSearched && (
+        <div className={`ai ${darkMode ? "white-letters" : ""}`}>
+          <h2>AI Cost:</h2>
+          <div className="ai-cost">
+            <button
+              type="button"
+              className={`ai-cost-btn btn ${darkMode ? "" : "dark-btn"}`}
+              onClick={() => setShowAICost(!showAICost)}
+            >
+              {showAICost ? "Hide AI cost" : "Add AI cost"}
+            </button>
 
-      <div className="ai-cost">
-        <label>Unesite AI cost:</label>
-        <input
-          type="number"
-          placeholder="unesite ai cijenu"
-          value={AICost}
-          onChange={(e) => setAICost(e.target.value)}
-        />
-      </div>
+            {showAICost && (
+              <div>
+                <input
+                  type="number"
+                  value={AICost}
+                  onChange={(e) => setAICost(e.target.value)}
+                />{" "}
+                €
+              </div>
+            )}
+          </div>
+          {showAICost && (
+            <div className="ai-cost">
+              <textarea
+                placeholder="Unesite AI opis"
+                value={AIDescription}
+                onChange={(e) => setAIDescription(e.target.value)}
+              />
+            </div>
+          )}
+        </div>
+      )}
 
-      <button
-        type="button"
-        onClick={handleSaveTrip}
-        className={`btn ${darkMode ? "" : "dark-btn"}`}
-      >
-        Save trip
-      </button>
+      {hasSearched && (
+        <div className={darkMode ? "white-letters" : ""}>
+          <h2>Trip preview:</h2>
+          <TripPreview
+            darkMode={darkMode}
+            departure={departure}
+            destination={destination}
+            startDate={startDate}
+            endDate={endDate}
+            passengersNum={passengers_num}
+            transportType={transport_type}
+            selectedAccommodation={selectedAccommodation}
+            selectedFlight={selectedFlight}
+            carDetails={carDetails}
+            AICost={AICost}
+            AIDescription={AIDescription}
+            totalPrice={totalPrice}
+          />
+        </div>
+      )}
+
+      {hasSearched && (
+        <div className="save-trip-wrapper">
+          <button
+            type="button"
+            onClick={handleSaveTrip}
+            className={`btn ${darkMode ? "" : "dark-btn"}`}
+          >
+            Save trip
+          </button>
+        </div>
+      )}
     </div>
   );
 };
