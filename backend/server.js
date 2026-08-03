@@ -810,6 +810,7 @@ app.post("/trips", authenticateToken, async (req, res) => {
     carDetails,
     ai_cost,
     ai_description,
+    total_cost,
   } = req.body;
 
   if (
@@ -869,6 +870,7 @@ app.post("/trips", authenticateToken, async (req, res) => {
         ai_cost:
           ai_cost !== null && ai_cost !== undefined ? Number(ai_cost) : null,
         ai_description: ai_description || null,
+        total_cost: total_cost || null,
       },
     });
 

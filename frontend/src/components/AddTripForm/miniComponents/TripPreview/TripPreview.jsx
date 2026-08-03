@@ -32,6 +32,7 @@ const TripPreview = ({
     return `${Number(price).toFixed(2)} €`;
   };
 
+  console.log("CAR DETAILS:", carDetails);
   return (
     <div className={`trip-preview ${darkMode ? "tint" : ""}`}>
       <div className="trip-preview-grid">
@@ -132,22 +133,30 @@ const TripPreview = ({
             {carDetails ? (
               <>
                 <div className="trip-preview-detail">
+                  <span>Departure address</span>
+                  <strong>{carDetails.startAddress}</strong>
+                </div>
+                <div className="trip-preview-detail">
+                  <span>Destination address</span>
+                  <strong>{carDetails.destinationAddress}</strong>
+                </div>
+                <div className="trip-preview-detail">
                   <span>Total distance</span>
                   <strong>
-                    {carDetails.distance_km
-                      ? `${Number(carDetails.distance_km).toFixed(2)} km`
+                    {carDetails.distanceKm
+                      ? `${Number(carDetails.distanceKm).toFixed(2)} km`
                       : "Not available"}
                   </strong>
                 </div>
 
                 <div className="trip-preview-detail">
                   <span>Fuel cost</span>
-                  <strong>{formatPrice(carDetails.fuel_cost)}</strong>
+                  <strong>{formatPrice(carDetails.fuelCost)}</strong>
                 </div>
 
                 <div className="trip-preview-detail">
                   <span>Toll cost</span>
-                  <strong>{formatPrice(carDetails.toll_cost)}</strong>
+                  <strong>{formatPrice(carDetails.tollCost)}</strong>
                 </div>
               </>
             ) : (

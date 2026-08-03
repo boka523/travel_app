@@ -173,6 +173,19 @@ const CarRouteSearch = ({
 
       setRoute(data);
 
+      setCarDetails({
+        distanceKm: Number((data.distanceKm * 2).toFixed(2)),
+        durationSeconds: Number(data.durationSeconds * 2),
+        tollCost: Number(data.tollCost?.total || 0) * 2,
+
+        fuelType: null,
+        fuelConsumption: null,
+        fuelPrice: null,
+        fuelCost: null,
+        startAddress: startAddress,
+        destinationAddress: destinationAddress,
+      });
+
       console.log("Route:", data);
     } catch (error) {
       console.error("Failed to load route:", error);
@@ -224,6 +237,8 @@ const CarRouteSearch = ({
       fuelPrice: Number(fuelPrice),
       fuelCost: Number(totalCost.toFixed(2)),
       tollCost: Number(route.tollCost?.total || 0) * 2,
+      startAddress: startAddress,
+      destinationAddress: destinationAddress,
     });
   };
 

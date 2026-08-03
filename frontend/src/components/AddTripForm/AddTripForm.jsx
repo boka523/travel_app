@@ -105,6 +105,14 @@ const AddTripForm = ({ darkMode }) => {
     }
   };
 
+  const transportPrice = selectedFlight
+    ? Number(selectedFlight.price * passengers_num)
+    : Number((carDetails?.fuelCost || 0) + (carDetails?.tollCost || 0));
+  const totalPrice =
+    Number(selectedAccommodation?.totalPrice || 0) +
+    transportPrice +
+    Number(AICost || 0);
+
   const handleSaveTrip = async () => {
     if (!destination || !startDate || !endDate || !transport_type) {
       toast.error("Please fill in all required trip details.");
@@ -142,6 +150,7 @@ const AddTripForm = ({ darkMode }) => {
               : null,
           ai_cost: AICost ? Number(AICost) : null,
           ai_description: AIDescription || null,
+          total_cost: totalPrice,
         }),
       });
 
@@ -159,14 +168,6 @@ const AddTripForm = ({ darkMode }) => {
       toast.error("An error occured while saving the trip.");
     }
   };
-
-  const transportPrice = selectedFlight
-    ? Number(selectedFlight.price * passengers_num)
-    : Number(carDetails?.price || 0);
-  const totalPrice =
-    Number(selectedAccommodation?.totalPrice || 0) +
-    transportPrice +
-    Number(AICost || 0);
 
   return (
     <div className="add-trips-form container">
