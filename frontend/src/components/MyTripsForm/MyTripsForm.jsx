@@ -15,11 +15,11 @@ const MyTripsForm = ({ darkMode }) => {
   const [isDeletingTripId, setIsDeletingTripId] = useState(null);
 
   const sortOptions = [
-    { value: "alphabetical", label: "Abecedno" },
-    { value: "priceAsc", label: "Po cijeni - uzlazno" },
-    { value: "priceDesc", label: "Po cijeni - silazno" },
-    { value: "dateAsc", label: "Po datumu polaska - uzlazno" },
-    { value: "dateDesc", label: "Po datumu polaska - silazno" },
+    { value: "alphabetical", label: "Alphabetical" },
+    { value: "priceAsc", label: "By price - ascending" },
+    { value: "priceDesc", label: "By price - descending" },
+    { value: "dateAsc", label: "By date - ascending" },
+    { value: "dateDesc", label: "By date - descending" },
   ];
 
   const customStyles = {
@@ -171,9 +171,7 @@ const MyTripsForm = ({ darkMode }) => {
   }, [navigate]); //"ovaj useEffect ovisi o navigate; ako se on promijeni, ponovno pokreni useEffect"
 
   const handleDeleteTrip = async (tripId) => {
-    const confirmed = window.confirm(
-      "Jeste li sigurni da želite izbrisati ovo putovanje?",
-    );
+    const confirmed = window.confirm("Are you sure about deleting this trip?");
 
     if (!confirmed) {
       return;
@@ -224,7 +222,7 @@ const MyTripsForm = ({ darkMode }) => {
             value={sortOption}
             className="sort-select"
             onChange={setSortOption}
-            placeholder="Sortiraj putovanja"
+            placeholder="Sort trips"
             isSearchable={false}
             styles={customStyles}
           />
@@ -254,9 +252,12 @@ const MyTripsForm = ({ darkMode }) => {
       </div>
       <div className={`all-trips ${darkMode ? "tint white-letters" : ""}`}>
         {isLoadingTrips ? (
-          <div className="message">Učitavanje putovanja...</div>
+          <div className="message">Loading trips...</div>
         ) : trips.length === 0 ? (
-          <div className="message">Nemate putovanja.</div>
+          <div className="message">
+            You don't seem to have any planed trips. Wait no more and start
+            planing!.
+          </div>
         ) : (
           sortedTrips.map((trip) => (
             <div key={trip.id} className={`trip ${darkMode ? "tint" : ""}`}>
@@ -264,15 +265,14 @@ const MyTripsForm = ({ darkMode }) => {
               <h1>{trip.total_cost} €</h1>
               <div className="trip-details">
                 <h2>
-                  Polazak:{" "}
+                  Departure:{" "}
                   {new Date(trip.start_date).toLocaleDateString("hr-HR")}
                 </h2>
                 <h2>
-                  Povratak:{" "}
-                  {new Date(trip.end_date).toLocaleDateString("hr-HR")}
+                  Return: {new Date(trip.end_date).toLocaleDateString("hr-HR")}
                 </h2>
                 <div className="trip-subdetails">
-                  <h3>Broj putnika: {trip.passengers_num}</h3>
+                  <h3>Passengers: {trip.passengers_num}</h3>
                   <h3>Transport: {trip.transport_type}</h3>
                 </div>
               </div>
@@ -282,13 +282,13 @@ const MyTripsForm = ({ darkMode }) => {
                   onClick={() => handleDeleteTrip(trip.id)}
                   disabled={isDeletingTripId === trip.id}
                 >
-                  {isDeletingTripId === trip.id ? "Brisanje..." : "Izbriši"}
+                  {isDeletingTripId === trip.id ? "Deleting..." : "Delete"}
                 </button>
                 <button
                   className={darkMode ? "btn" : "btn dark-btn"}
                   onClick={() => handleEditTrip(trip.id)}
                 >
-                  Detalji
+                  Details
                 </button>
               </div>
             </div>

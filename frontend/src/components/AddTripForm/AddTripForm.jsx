@@ -32,6 +32,9 @@ const AddTripForm = ({ darkMode }) => {
   const [AIDescription, setAIDescription] = useState("");
   const [showAICost, setShowAICost] = useState(false);
 
+  const [notes, setNotes] = useState("");
+  const [showNotes, setShowNotes] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -108,10 +111,11 @@ const AddTripForm = ({ darkMode }) => {
   const transportPrice = selectedFlight
     ? Number(selectedFlight.price * passengers_num)
     : Number((carDetails?.fuelCost || 0) + (carDetails?.tollCost || 0));
-  const totalPrice =
+  const totalPrice = (
     Number(selectedAccommodation?.totalPrice || 0) +
     transportPrice +
-    Number(AICost || 0);
+    Number(AICost || 0)
+  ).toFixed(2);
 
   const handleSaveTrip = async () => {
     if (!destination || !startDate || !endDate || !transport_type) {
@@ -151,6 +155,8 @@ const AddTripForm = ({ darkMode }) => {
           ai_cost: AICost ? Number(AICost) : null,
           ai_description: AIDescription || null,
           total_cost: totalPrice,
+          departure: departure,
+          notes: notes || null,
         }),
       });
 
@@ -249,7 +255,7 @@ const AddTripForm = ({ darkMode }) => {
       />
       {hasSearched && (
         <div className={`ai ${darkMode ? "white-letters" : ""}`}>
-          <h2>AI Cost:</h2>
+          <h2>Additional details:</h2>
           <div className="ai-cost">
             <button
               type="button"
@@ -273,9 +279,27 @@ const AddTripForm = ({ darkMode }) => {
           {showAICost && (
             <div className="ai-cost">
               <textarea
-                placeholder="Unesite AI opis"
+                placeholder="Describe AI calculation..."
                 value={AIDescription}
                 onChange={(e) => setAIDescription(e.target.value)}
+              />
+            </div>
+          )}
+          <div className="ai-cost">
+            <button
+              type="button"
+              className={`ai-cost-btn btn ${darkMode ? "" : "dark-btn"}`}
+              onClick={() => setShowNotes(!showNotes)}
+            >
+              {showNotes ? "Hide notes" : "Add notes"}
+            </button>
+          </div>
+          {showNotes && (
+            <div className="ai-cost">
+              <textarea
+                placeholder="Enter notes here..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
               />
             </div>
           )}
@@ -299,6 +323,7 @@ const AddTripForm = ({ darkMode }) => {
             AICost={AICost}
             AIDescription={AIDescription}
             totalPrice={totalPrice}
+            notes={notes}
           />
         </div>
       )}

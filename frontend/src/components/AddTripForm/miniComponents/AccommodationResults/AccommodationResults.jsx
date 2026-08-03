@@ -164,7 +164,9 @@ const AccommodationResults = ({
           </>
         )}
       {!loading && accommodations.length === 0 && (
-        <p className="accommodation-message">Unesi podatke putovanja.</p>
+        <p className="accommodation-message">
+          Enter trip details to plan your trip.
+        </p>
       )}
     </div>
   );

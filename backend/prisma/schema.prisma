@@ -25,6 +25,8 @@ model trips {
   hotel_currency         String?              @db.Char(3)
   hotel_board_name       String?              @db.VarChar(100)
   ai_description         String?              @db.Text
+  departure              String?              @db.VarChar(255)
+  notes                  String?              @db.VarChar(255)
   trip_car_details       trip_car_details?
   trip_flights           trip_flights?
   users                  users                @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "trips_ibfk_1")
@@ -96,16 +98,18 @@ model trip_flights {
 }
 
 model trip_car_details {
-  id               Int      @id @default(autoincrement())
-  trip_id          Int      @unique(map: "trip_id")
-  distance_km      Decimal? @db.Decimal(10, 2)
-  duration_seconds Int?
-  fuel_type        String?  @db.VarChar(20)
-  fuel_consumption Decimal? @db.Decimal(5, 2)
-  fuel_price       Decimal? @db.Decimal(10, 2)
-  fuel_cost        Decimal? @db.Decimal(10, 2)
-  toll_cost        Decimal? @db.Decimal(10, 2)
-  trips            trips    @relation(fields: [trip_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_trip_car_details_trip")
+  id                  Int      @id @default(autoincrement())
+  trip_id             Int      @unique(map: "trip_id")
+  distance_km         Decimal? @db.Decimal(10, 2)
+  duration_seconds    Int?
+  fuel_type           String?  @db.VarChar(20)
+  fuel_consumption    Decimal? @db.Decimal(5, 2)
+  fuel_price          Decimal? @db.Decimal(10, 2)
+  fuel_cost           Decimal? @db.Decimal(10, 2)
+  toll_cost           Decimal? @db.Decimal(10, 2)
+  departure_address   String?  @db.VarChar(255)
+  destination_address String?  @db.VarChar(255)
+  trips               trips    @relation(fields: [trip_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_trip_car_details_trip")
 }
 
 enum trips_transport_type {

@@ -168,7 +168,7 @@ const FlightSearch = ({
   return (
     <div className={`transport-results ${darkMode ? "white-letters" : ""}`}>
       <>
-        <h2>Transport options:</h2>
+        <h2>Airplane tickets:</h2>
         <div className="airport-buttons">
           <div className="airport-selection">
             <Select

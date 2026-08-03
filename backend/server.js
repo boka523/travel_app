@@ -66,7 +66,7 @@ const upload = multer({
       //mimetypes su image/jpeg, image/png, image/webp... "ako pocinje sa image/, nema greske, spremi je"
       cb(null, true);
     } else {
-      cb(new Error("Možete učitati samo sliku!"));
+      cb(new Error("You cannot upload any file types other than images."));
     }
   },
 });
@@ -79,7 +79,7 @@ app.use(express.json());
 app.use("/uploads", express.static("uploads")); //ovime omogućujemo expressu da posluzuje slike
 
 app.get("/", (req, res) => {
-  res.send("Bogu fala Backend radi");
+  res.send("Backend works fine.");
 });
 
 app.get("/trips", async (req, res) => {
@@ -88,7 +88,7 @@ app.get("/trips", async (req, res) => {
 
     res.json(trips);
   } catch (error) {
-    res.status(500).json({ error: "Greška kod dohvaćanja putovanja" });
+    res.status(500).json({ error: "Error fetching trips." });
   }
 });
 
@@ -104,7 +104,7 @@ app.get("/users", async (req, res) => {
 
     res.json(users);
   } catch (error) {
-    res.status(500).json({ error: "Greška kod dohvaćanja korisnika" });
+    res.status(500).json({ error: "Error fetching users." });
   }
 });
 
@@ -118,7 +118,7 @@ app.get("/my_trips", authenticateToken, async (req, res) => {
 
     res.json(trips);
   } catch (error) {
-    res.status(500).json({ error: "Greška kod dohvaćanja putovanja" });
+    res.status(500).json({ error: "Error fetching trips." });
   }
 });
 
@@ -138,7 +138,7 @@ app.get("/me", authenticateToken, async (req, res) => {
 
     res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ error: "Greška kod dohvaćanja korisnika" });
+    res.status(500).json({ error: "Error fetching users." });
   }
 });
 
@@ -149,7 +149,7 @@ app.get("/trips/:id", authenticateToken, async (req, res) => {
 
     if (!Number.isInteger(trip_id) || trip_id < 1) {
       return res.status(400).json({
-        error: "Neispravan ID putovanja!",
+        error: "Invalid trip ID.",
       });
     }
 
@@ -167,7 +167,7 @@ app.get("/trips/:id", authenticateToken, async (req, res) => {
 
     if (!trip) {
       return res.status(404).json({
-        error: "Putovanje nije pronađeno ili ne pripada korisniku!",
+        error: "Trip not found or you don't have permission to access it.",
       });
     }
 
@@ -175,10 +175,10 @@ app.get("/trips/:id", authenticateToken, async (req, res) => {
       trip: trip,
     });
   } catch (error) {
-    console.error("Greška kod dohvaćanja putovanja:", error);
+    console.error("Error fetching trips:", error);
 
     res.status(500).json({
-      error: "Greška kod dohvaćanja putovanja!",
+      error: "Error fetching trips.",
     });
   }
 });
@@ -199,7 +199,7 @@ app.get("/api/destinations", async (req, res) => {
   } catch (error) {
     console.error(error);
 
-    res.status(500).json({ error: "Greška pri dohvaćanju destinacija." });
+    res.status(500).json({ error: "Error fetching destinations." });
   }
 });
 
@@ -209,7 +209,7 @@ app.get("/airports", async (req, res) => {
 
     if (!city || city.trim().length < 2) {
       return res.status(400).json({
-        error: "Unesite barem dva znaka.",
+        error: "Enter at least two characters.",
       });
     }
 
@@ -229,7 +229,7 @@ app.get("/airports", async (req, res) => {
       const errorData = await response.json();
 
       return res.status(response.status).json({
-        error: "Duffel nije uspio dohvatiti zračne luke.",
+        error: "Duffel failed to retrieve airports.",
         details: errorData,
       });
     }
@@ -252,7 +252,7 @@ app.get("/airports", async (req, res) => {
     console.error("Duffel airports error:", error);
 
     res.status(500).json({
-      error: "Greška pri dohvaćanju aerodroma.",
+      error: "Error fetching airports.",
       details: error.message,
     });
   }
@@ -557,7 +557,7 @@ app.post("/api/accommodations", async (req, res) => {
 
     if (!destination || !checkin || !checkout || !adults) {
       return res.status(400).json({
-        message: "Nedostaju podaci za pretragu smještaja.",
+        message: "Missing accommodation search data.",
       });
     }
 
@@ -571,7 +571,7 @@ app.post("/api/accommodations", async (req, res) => {
 
     if (!foundDestination) {
       return res.status(400).json({
-        message: "Upisana destinacija trenutno nije dostupna.",
+        message: "The selected destination is currently unavailable.",
       });
     }
 
@@ -606,12 +606,12 @@ app.post("/api/accommodations", async (req, res) => {
     if (!response.ok) {
       console.error("Hotelbeds availability error:", data);
       return res.status(response.status).json({
-        message: "Pretraga smještaja nije uspjela",
+        message: "Accommodation search failed.",
         details: data,
       });
     }
 
-    console.log("Hotelbeds odgovor:", data);
+    console.log("Hotelbeds outputs:", data);
 
     const avaliableHotels = data.hotels?.hotels || [];
     const hotelbedsCode = avaliableHotels.map((hotel) => Number(hotel.code));
@@ -691,7 +691,7 @@ app.post("/api/accommodations", async (req, res) => {
       .filter((hotel) => hotel !== null);
 
     return res.status(200).json({
-      message: "Smještaji su uspješno dohvaćeni.",
+      message: "Accommodations retrieved successfully.",
       recievedData: {
         destination,
         checkin,
@@ -703,7 +703,7 @@ app.post("/api/accommodations", async (req, res) => {
   } catch (error) {
     console.error("Accomodation search error:", error);
     return res.status(500).json({
-      message: "Došlo je do greške prilikom pretrage smještaja",
+      message: "An error occurred while searching for accommodations.",
     });
   }
 });
@@ -789,7 +789,7 @@ app.post("/search-flights", async (req, res) => {
     console.error("Duffel error:", error);
 
     res.status(500).json({
-      error: "Greška pri dohvaćanju letova.",
+      error: "rror retrieving flights.",
       details: error.message,
     });
   }
@@ -811,6 +811,8 @@ app.post("/trips", authenticateToken, async (req, res) => {
     ai_cost,
     ai_description,
     total_cost,
+    departure,
+    notes,
   } = req.body;
 
   if (
@@ -819,23 +821,23 @@ app.post("/trips", authenticateToken, async (req, res) => {
     end_date === "" ||
     transport_type === ""
   ) {
-    return res
-      .status(400)
-      .json({ error: "Neki od podataka za putovanje je prazan!" });
+    return res.status(400).json({ error: "Some trip information is missing." });
   }
 
   if (new Date(start_date) > new Date(end_date)) {
     return res.status(400).json({
-      error: "Datum početka putovanja ne može biti nakon datuma završetka!",
+      error: "The trip departure date cannot be later than the return date.",
     });
   }
 
   if (passengers_num < 1) {
-    return res.status(400).json({ error: "Broj putnika mora biti veći od 0!" });
+    return res
+      .status(400)
+      .json({ error: "The number of passengers must be greater than 0." });
   }
 
   if (!["plane", "car"].includes(transport_type)) {
-    return res.status(400).json({ error: "Nepoznat tip prijevoza!" });
+    return res.status(400).json({ error: "Unknown transport type." });
   }
 
   try {
@@ -850,7 +852,7 @@ app.post("/trips", authenticateToken, async (req, res) => {
 
       if (!selectedHotel) {
         return res.status(404).json({
-          error: "Odabrani hotel nije pronađen!",
+          error: "The selected hotel was not found.",
         });
       }
     }
@@ -871,6 +873,8 @@ app.post("/trips", authenticateToken, async (req, res) => {
           ai_cost !== null && ai_cost !== undefined ? Number(ai_cost) : null,
         ai_description: ai_description || null,
         total_cost: total_cost || null,
+        departure: departure || null,
+        notes: notes || null,
       },
     });
 
@@ -919,6 +923,8 @@ app.post("/trips", authenticateToken, async (req, res) => {
           fuel_cost: Number(carDetails.fuelCost),
 
           toll_cost: Number(carDetails.tollCost || 0),
+          departure_address: carDetails.startAddress,
+          destination_address: carDetails.destinationAddress,
         },
       });
     }
@@ -927,7 +933,7 @@ app.post("/trips", authenticateToken, async (req, res) => {
   } catch (error) {
     console.error(error);
 
-    res.status(500).json({ error: "Greška kod stvaranja putovanja" });
+    res.status(500).json({ error: "Error creating trip." });
   }
 });
 
@@ -943,9 +949,9 @@ app.delete("/trips/:id", authenticateToken, async (req, res) => {
     });
 
     if (!trip) {
-      return res
-        .status(404)
-        .json({ error: "Putovanje nije pronađeno ili ne pripada korisniku!" });
+      return res.status(404).json({
+        error: "rip not found or you don't have permission to access it.",
+      });
     }
 
     const deletedTrip = await prisma.trips.delete({
@@ -955,86 +961,11 @@ app.delete("/trips/:id", authenticateToken, async (req, res) => {
     });
 
     res.status(200).json({
-      message: "Putovanje uspješno obrisano!",
+      message: "Trip successfully deleted.",
       trip: deletedTrip,
     });
   } catch (error) {
-    res.status(500).json({ error: "Greška kod brisanja putovanja" });
-  }
-});
-
-app.put("/trips/:id", authenticateToken, async (req, res) => {
-  const user_id = req.user.id;
-  const trip_id = Number(req.params.id);
-  const { destination, start_date, end_date, transport_type, passengers_num } =
-    req.body;
-
-  if (Object.keys(req.body).length !== 5) {
-    return res
-      .status(400)
-      .json({ error: "Nisu uneseni svi podaci za putovanje!" });
-  }
-
-  if (
-    destination === "" ||
-    start_date === "" ||
-    end_date === "" ||
-    transport_type === ""
-  ) {
-    return res
-      .status(400)
-      .json({ error: "Neki od podataka za putovanje je prazan!" });
-  }
-
-  if (new Date(start_date) > new Date(end_date)) {
-    return res.status(400).json({
-      error: "Datum početka putovanja ne može biti nakon datuma završetka!",
-    });
-  }
-
-  if (passengers_num < 1) {
-    return res.status(400).json({ error: "Broj putnika mora biti veći od 0!" });
-  }
-
-  if (!["plane", "car"].includes(transport_type)) {
-    return res.status(400).json({ error: "Nepoznat tip prijevoza!" });
-  }
-
-  try {
-    const trip = await prisma.trips.findFirst({
-      where: {
-        user_id,
-        id: trip_id,
-      },
-    });
-
-    if (!trip) {
-      return res
-        .status(404)
-        .json({ error: "Putovanje nije pronađeno ili ne pripada korisniku!" });
-    }
-
-    const updatedTrip = {
-      destination,
-      start_date: new Date(start_date),
-      end_date: new Date(end_date),
-      transport_type,
-      passengers_num,
-    };
-
-    await prisma.trips.update({
-      where: {
-        id: trip_id,
-      },
-      data: updatedTrip,
-    });
-
-    res.status(200).json({
-      message: "Detalji putovanja uspješno promijenjeni!",
-      trip: updatedTrip,
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Greška kod ažuriranja putovanja" });
+    res.status(500).json({ error: "Error deleting trip." });
   }
 });
 
@@ -1058,9 +989,9 @@ app.patch("/trips/:id", authenticateToken, async (req, res) => {
     });
 
     if (!trip) {
-      return res
-        .status(404)
-        .json({ error: "Putovanje nije pronađeno ili ne pripada korisniku!" });
+      return res.status(404).json({
+        error: "Trip not found or you don't have permission to access it.",
+      });
     }
 
     const data = {};
@@ -1069,9 +1000,7 @@ app.patch("/trips/:id", authenticateToken, async (req, res) => {
       if (destination !== "") {
         data.destination = destination;
       } else {
-        return res
-          .status(400)
-          .json({ error: "Destination ne smije biti prazan!" });
+        return res.status(400).json({ error: "Destination cannot be empty." });
       }
     }
 
@@ -1081,7 +1010,7 @@ app.patch("/trips/:id", authenticateToken, async (req, res) => {
       } else {
         return res
           .status(400)
-          .json({ error: "Start date ne smije biti prazan!" });
+          .json({ error: "Departure date cannot be empty." });
       }
     }
 
@@ -1089,9 +1018,7 @@ app.patch("/trips/:id", authenticateToken, async (req, res) => {
       if (end_date !== "") {
         data.end_date = new Date(end_date);
       } else {
-        return res
-          .status(400)
-          .json({ error: "End date ne smije biti prazan!" });
+        return res.status(400).json({ error: "Return date cannot be empty." });
       }
     }
 
@@ -1099,7 +1026,7 @@ app.patch("/trips/:id", authenticateToken, async (req, res) => {
       if (["plane", "car"].includes(transport_type)) {
         data.transport_type = transport_type;
       } else {
-        return res.status(400).json({ error: "Nepoznat tip prijevoza!" });
+        return res.status(400).json({ error: "Unknown transport type." });
       }
     }
 
@@ -1109,12 +1036,12 @@ app.patch("/trips/:id", authenticateToken, async (req, res) => {
       } else {
         return res
           .status(400)
-          .json({ error: "Broj putnika mora biti veći od 0!" });
+          .json({ error: "The number of passengers must be greater than 0." });
       }
     }
 
     if (Object.keys(req.body).length === 0) {
-      return res.status(400).json({ error: "Nema podataka za ažuriranje!" });
+      return res.status(400).json({ error: "No data to update." });
     }
 
     const finalStartDate = data.start_date ?? new Date(trip.start_date);
@@ -1123,7 +1050,7 @@ app.patch("/trips/:id", authenticateToken, async (req, res) => {
     if (finalStartDate > finalEndDate) {
       return res
         .status(400)
-        .json({ error: "Start date ne može biti nakon end date!" });
+        .json({ error: "The start date cannot be later than the end date." });
     }
 
     const updatedTrip = await prisma.trips.update({
@@ -1134,11 +1061,11 @@ app.patch("/trips/:id", authenticateToken, async (req, res) => {
     });
 
     res.status(200).json({
-      message: "Detalji putovanja uspješno promijenjeni!",
+      message: "Trip details updated successfully.",
       trip: updatedTrip,
     });
   } catch (error) {
-    res.status(500).json({ error: "Greška kod ažuriranja putovanja" });
+    res.status(500).json({ error: "Error updating trip." });
   }
 });
 
@@ -1148,14 +1075,14 @@ app.post("/signup", async (req, res) => {
   if (Object.keys(req.body).length !== 3) {
     return res
       .status(400)
-      .json({ error: "Nisu uneseni svi podaci za registraciju!" });
+      .json({ error: "Required registration information is missing." });
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (!emailRegex.test(email)) {
     return res.status(400).json({
-      error: "Neispravan format email adrese!",
+      error: "Invalid email address format.",
     });
   }
 
@@ -1167,9 +1094,9 @@ app.post("/signup", async (req, res) => {
     });
 
     if (existingUser) {
-      return res
-        .status(409)
-        .json({ error: "Korisnik s ovim emailom već postoji - prijavite se!" });
+      return res.status(409).json({
+        error: "An account with this email already exists. Please sign in.",
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -1194,7 +1121,7 @@ app.post("/signup", async (req, res) => {
     );
 
     res.status(201).json({
-      message: "Uspješna registracija",
+      message: "User registration successfull.",
       token,
       user: {
         id: user.id,
@@ -1205,7 +1132,7 @@ app.post("/signup", async (req, res) => {
   } catch (error) {
     console.error(error);
 
-    res.status(500).json({ error: "Greška kod registracije korisnika" });
+    res.status(500).json({ error: "Error signing up." });
   }
 });
 
@@ -1215,14 +1142,14 @@ app.post("/login", async (req, res) => {
   if (Object.keys(req.body).length !== 2) {
     return res
       .status(400)
-      .json({ error: "Nisu uneseni svi podaci za prijavu!" });
+      .json({ error: "Required registration information is missing." });
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (!emailRegex.test(email)) {
     return res.status(400).json({
-      error: "Neispravan format email adrese!",
+      error: "Invalid email address format.",
     });
   }
 
@@ -1234,13 +1161,13 @@ app.post("/login", async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({ error: "Korisnik nije pronađen" });
+      return res.status(404).json({ error: "User not found." });
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password_hash);
 
     if (!passwordMatch) {
-      return res.status(401).json({ error: "Pogrešna lozinka" });
+      return res.status(401).json({ error: "Invalid password." });
     }
 
     const token = jwt.sign(
@@ -1255,7 +1182,7 @@ app.post("/login", async (req, res) => {
     );
 
     res.status(200).json({
-      message: "Uspješna prijava",
+      message: "Login successful.",
       token,
       user: {
         id: user.id,
@@ -1266,7 +1193,7 @@ app.post("/login", async (req, res) => {
   } catch (error) {
     console.error(error);
 
-    res.status(500).json({ error: "Greška kod prijave korisnika" });
+    res.status(500).json({ error: "Error loging in." });
   }
 });
 
@@ -1281,7 +1208,7 @@ app.post("/change_password", authenticateToken, async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({ error: "Korisnik nije pronađen!" });
+      return res.status(404).json({ error: "User not found." });
     }
 
     if (old_password !== undefined && old_password !== "") {
@@ -1291,12 +1218,12 @@ app.post("/change_password", authenticateToken, async (req, res) => {
         if (!isMatch) {
           return res
             .status(400)
-            .json({ error: "Stara lozinka nije ispravna!" });
+            .json({ error: "The old password is incorrect." });
         } else {
           if (new_password === old_password) {
             return res
               .status(400)
-              .json({ error: "Nova lozinka je ista kao stara!" });
+              .json({ error: "New password cannot be the same as old one." });
           }
 
           const new_password_hash = await bcrypt.hash(new_password, 10);
@@ -1310,18 +1237,16 @@ app.post("/change_password", authenticateToken, async (req, res) => {
             },
           });
 
-          res
-            .status(200)
-            .json({ message: "Uspješno ste promijenili lozinku!" });
+          res.status(200).json({ message: "Password successfuly changed." });
         }
       } else {
-        res.status(400).json({ error: "Niste unijeli novu lozinku!" });
+        res.status(400).json({ error: "No new password provided." });
       }
     } else {
-      res.status(400).json({ error: "Niste unijeli staru lozinku!" });
+      res.status(400).json({ error: "No old password provided." });
     }
   } catch (error) {
-    res.status(500).json({ error: "Greška kod promjene lozinke" });
+    res.status(500).json({ error: "Error changing password." });
   }
 });
 
@@ -1333,7 +1258,7 @@ app.post(
     try {
       if (!req.file) {
         return res.status(400).json({
-          error: "Slika nije odabrana",
+          error: "No image selected.",
         });
       }
 
@@ -1349,14 +1274,14 @@ app.post(
       });
 
       res.status(200).json({
-        message: "Profilna slika uspješno promijenjena.",
+        message: "Profile image successfully changed.",
         profile_image: profileImage,
       });
     } catch (error) {
       console.error(error);
 
       res.status(500).json({
-        error: "Greška kod spremanja profilne slike.",
+        error: "Error changing profile image.",
       });
     }
   },
@@ -1372,7 +1297,7 @@ app.patch("/profile", authenticateToken, async (req, res) => {
       (email === undefined || email.trim() === "")
     ) {
       return res.status(400).json({
-        error: "Niste unijeli podatke za promjenu!",
+        error: "No information was provided for the update.",
       });
     }
 
@@ -1384,7 +1309,7 @@ app.patch("/profile", authenticateToken, async (req, res) => {
 
     if (!user) {
       return res.status(404).json({
-        error: "Korisnik nije pronađen!",
+        error: "User not found.",
       });
     }
 
@@ -1404,7 +1329,7 @@ app.patch("/profile", authenticateToken, async (req, res) => {
 
       if (existingUser && existingUser.id !== user_id) {
         return res.status(409).json({
-          error: "Korisnik s tom email adresom već postoji!",
+          error: "An account with this email address already exists.",
         });
       }
 
@@ -1435,7 +1360,7 @@ app.patch("/profile", authenticateToken, async (req, res) => {
     );
 
     return res.status(200).json({
-      message: "Podaci su uspješno promijenjeni!",
+      message: "User information updated successfully.",
       user: updatedUser,
       token,
     });
@@ -1443,11 +1368,11 @@ app.patch("/profile", authenticateToken, async (req, res) => {
     console.error(error);
 
     return res.status(500).json({
-      error: "Greška kod promjene korisničkih podataka.",
+      error: "Error updating user information.",
     });
   }
 });
 
 app.listen(5000, () => {
-  console.log("Server radi na http://localhost:5000");
+  console.log("Server active at http://localhost:5000");
 });

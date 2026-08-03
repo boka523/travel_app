@@ -85,7 +85,7 @@
   margin-top: 15px;
 }
 
-.info-row {
+.profile-info-row {
   display: grid;
   grid-template-columns: 30px 120px 200px;
   align-items: center;

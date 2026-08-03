@@ -15,6 +15,7 @@ const TripPreview = ({
   AICost,
   AIDescription,
   totalPrice,
+  notes,
 }) => {
   const formatDate = (date) => {
     if (!date) {
@@ -49,11 +50,11 @@ const TripPreview = ({
             <strong>{destination || "Not avaliable"}</strong>
           </div>
           <div className="trip-preview-detail">
-            <span>Start date</span>
+            <span>Departure date</span>
             <strong>{formatDate(startDate)}</strong>
           </div>
           <div className="trip-preview-detail">
-            <span>End date</span>
+            <span>Return date</span>
             <strong>{formatDate(endDate)}</strong>
           </div>
           <div className="trip-preview-detail">
@@ -72,7 +73,7 @@ const TripPreview = ({
           {selectedAccommodation ? (
             <>
               <div className="trip-preview-detail">
-                <span>Hotel</span>
+                <span>Accommodation</span>
                 <strong>{selectedAccommodation.name || "Not avaliable"}</strong>
               </div>
               <div className="trip-preview-detail">
@@ -82,7 +83,7 @@ const TripPreview = ({
                 </strong>
               </div>
               <div className="trip-preview-detail">
-                <span>Board</span>
+                <span>Type</span>
                 <strong>
                   {selectedAccommodation.boardName || "Not avaliable"}
                 </strong>
@@ -168,16 +169,20 @@ const TripPreview = ({
         <div
           className={`trip-preview-section ${darkMode ? "tint  white-letters" : ""}`}
         >
-          <h3>AI details</h3>
+          <h3>Additional details</h3>
 
           <div className="trip-preview-detail">
-            <span>AI cost</span>
+            <span>AI calculated cost</span>
             <strong>{formatPrice(AICost)}</strong>
           </div>
 
           <div className="trip-preview-description">
-            <span>AI description</span>
+            <span>Description</span>
             <p>{AIDescription || "Description not entered."}</p>
+          </div>
+          <div className="trip-preview-description">
+            <span>Notes</span>
+            <p>{notes || "Notes not entered."}</p>
           </div>
         </div>
       </div>
