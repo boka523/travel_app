@@ -77,7 +77,7 @@
 .trip {
   background-color: white;
   border-radius: 30px;
-  padding: 20px;
+  padding: 10px;
 }
 
 .trip h1 {
@@ -97,7 +97,7 @@
 }
 
 .trip-details {
-  margin: 30px;
+  margin: 30px 10px;
 }
 
 .trip-details h2 {
@@ -111,4 +111,122 @@
 .card-buttons {
   display: flex;
   justify-content: center;
+}
+
+@media (max-width: 1260px) {
+  .trip h1 {
+    font-size: 26px;
+  }
+  .trip-details h2 {
+    font-size: 20px;
+  }
+  .trip-subdetails {
+    font-size: 18px;
+  }
+  .card-buttons .btn {
+    font-size: 16px;
+    padding: 14px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .title .my-trips-text {
+    font-size: 13px;
+    width: 160px;
+    padding: 10px 20px;
+  }
+  .all-trips {
+    padding: 25px;
+  }
+
+  .trip {
+    height: 350px;
+  }
+
+  .trip h1 {
+    font-size: 24px;
+  }
+  .trip-details h2 {
+    font-size: 18px;
+  }
+  .trip-subdetails {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 850px) {
+  .all-trips {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+  }
+  .trip {
+    padding: 25px;
+  }
+}
+
+@media (max-width: 750px) {
+  .title {
+    top: 100px;
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+    padding-top: 20px;
+  }
+
+  .title .my-trips-text {
+    font-size: 12px;
+    width: 140px;
+    padding: 10px 16px;
+  }
+
+  .my-trips-text {
+    position: static;
+    transform: none;
+    margin-top: 30px;
+  }
+
+  .buttons {
+    align-self: flex-start;
+    margin-left: 20px;
+  }
+
+  .all-trips {
+    margin-top: 80px;
+    min-height: 55vh;
+  }
+}
+
+@media (max-width: 650px) {
+  .trip {
+    padding: 10px;
+    height: 300px;
+  }
+  .trip h1 {
+    font-size: 22px;
+  }
+  .trip-details h2 {
+    font-size: 16px;
+  }
+  .trip-subdetails {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 550px) {
+  .all-trips {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .trip {
+    padding: 10px 30px;
+  }
+}
+
+@media (max-width: 400px) {
+  .buttons .btn {
+    padding: 9px 12px;
+  }
 }

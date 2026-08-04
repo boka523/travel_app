@@ -17,6 +17,7 @@ const FlightSearch = ({
   passengersNum,
   selectedFlight,
   setSelectedFlight,
+  screenWidth,
 }) => {
   const [selectedDepartureAirport, setSelectedDepartureAirport] = useState("");
   const [selectedArrivalAirport, setSelectedArrivalAirport] = useState("");
@@ -26,7 +27,7 @@ const FlightSearch = ({
   const flightsRef = useRef(null);
 
   const [currentFlightSlide, setCurrentFlightSlide] = useState(0);
-  const flightsPerSlide = 2;
+  const flightsPerSlide = screenWidth < 1000 ? 1 : 2;
   const flightSlides = Array.from(
     {
       length: Math.ceil(flights.length / flightsPerSlide),
@@ -46,8 +47,9 @@ const FlightSearch = ({
       backgroundColor: darkMode ? "white" : "black",
       border: "none",
       borderRadius: "30px",
-      height: "46px",
-      width: "309px",
+      height: screenWidth < 1000 ? "38px" : "46px",
+      width:
+        screenWidth < 1000 ? (screenWidth < 400 ? "240px" : "280px") : "309px",
       boxShadow: "none",
       transition: "0.3s",
       cursor: "pointer",
@@ -55,14 +57,16 @@ const FlightSearch = ({
     placeholder: (provided) => ({
       ...provided,
       color: darkMode ? "black" : "white",
-      fontSize: "20px",
+      fontSize:
+        screenWidth < 1000 ? (screenWidth < 400 ? "16px" : "18px") : "20px",
       transition: "0.3s",
       textAlign: "center",
     }),
     singleValue: (provided) => ({
       ...provided,
       color: darkMode ? "black" : "white",
-      fontSize: "20px",
+      fontSize:
+        screenWidth < 1000 ? (screenWidth < 400 ? "16px" : "18px") : "20px",
       transition: "0.3s",
       textAlign: "center",
     }),
@@ -73,6 +77,8 @@ const FlightSearch = ({
       backgroundColor: darkMode ? "white" : "black",
       transition: "0.3s",
       overflow: "hidden",
+      width:
+        screenWidth < 1000 ? (screenWidth < 400 ? "240px" : "280px") : "309px",
     }),
     menuList: (provided) => ({
       ...provided,
@@ -98,7 +104,8 @@ const FlightSearch = ({
           ? "black"
           : "white",
       cursor: "pointer",
-      fontSize: "18px",
+      fontSize:
+        screenWidth < 1000 ? (screenWidth < 400 ? "14px" : "16px") : "18px",
     }),
     dropdownIndicator: (provided) => ({
       ...provided,

@@ -1,4 +1,4 @@
-import { useState, React, useRef } from "react";
+import { useState, React, useRef, useEffect } from "react";
 import "./AccommodationResults.css";
 import dark_left_arrow from "../../../../assets/dark_left_arrow.png";
 import white_left_arrow from "../../../../assets/white_left_arrow.png";
@@ -12,9 +12,17 @@ const AccommodationResults = ({
   resultsRef,
   selectedAccommodation,
   setSelectedAccommodation,
+  screenWidth,
 }) => {
   const [currentAccommodationSlide, setCurrentAccommodationSlide] = useState(0);
-  const accommodationsPerSlide = 4;
+  const accommodationsPerSlide =
+    screenWidth < 1000
+      ? screenWidth < 750
+        ? screenWidth < 550
+          ? 1
+          : 2
+        : 3
+      : 4;
   const accommodationSlides = Array.from(
     {
       length: Math.ceil(accommodations.length / accommodationsPerSlide),
@@ -102,14 +110,6 @@ const AccommodationResults = ({
                             {accommodation.address && (
                               <p>Address: {accommodation.address}</p>
                             )}
-                            {accommodation.reviewScore && (
-                              <p>
-                                Rating: {accommodation.reviewScore}
-                                {accommodation.reviewCount
-                                  ? `(${accommodation.reviewCount} reviews)`
-                                  : ""}
-                              </p>
-                            )}
                             <p className="accommodation-boardName">
                               {accommodation.boardName
                                 ? `Type: ${accommodation.boardName}`
@@ -120,16 +120,6 @@ const AccommodationResults = ({
                                 ? `${accommodation.totalPrice} ${accommodation.currency}`
                                 : "Price unavaliable"}
                             </p>
-                            {accommodation.url && (
-                              <a
-                                href={accommodation.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={`btn ${darkMode ? "" : "dark-btn"}`}
-                              >
-                                View accommodation
-                              </a>
-                            )}
                           </div>
                         </article>
                       ))}

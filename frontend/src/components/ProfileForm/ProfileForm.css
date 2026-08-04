@@ -110,3 +110,57 @@
   border-style: none;
   text-align: center;
 }
+
+@media (max-width: 1000px) {
+  .profile-text {
+    font-size: 13px;
+    width: 200px;
+  }
+  .profile-info-label,
+  .profile-info-value {
+    font-size: 24px;
+  }
+  .profile-form .btn {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 800px) {
+  .profile-form .btn {
+    font-size: 16px;
+  }
+  .profile-info-row {
+    grid-template-columns: 25px 90px 180px;
+  }
+}
+
+@media (max-width: 650px) {
+  .profile-content {
+    gap: 0px;
+  }
+  .default-profile-picture {
+    width: 140px;
+    height: 140px;
+  }
+  .profile-info-row {
+    grid-template-columns: 25px 90px 200px;
+  }
+  .profile-info-label,
+  .profile-info-value {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .profile-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    padding: 50px 0;
+  }
+  .change-password-form input {
+    font-size: 16px;
+  }
+}

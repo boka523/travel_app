@@ -102,8 +102,10 @@
   .trip-preview-grid {
     grid-template-columns: 1fr;
   }
-
   .trip-preview {
     padding: 20px;
+  }
+  .total-price {
+    font-size: 22px;
   }
 }

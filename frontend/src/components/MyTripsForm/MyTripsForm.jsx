@@ -22,14 +22,29 @@ const MyTripsForm = ({ darkMode }) => {
     { value: "dateDesc", label: "By date - descending" },
   ];
 
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const customStyles = {
     control: (provided) => ({
       ...provided,
       backgroundColor: darkMode ? "white" : "black",
       border: "none",
       borderRadius: "30px",
-      height: "46px",
-      width: "309px",
+      height:
+        screenWidth < 800 ? (screenWidth < 400 ? "30px" : "40px") : "46px",
+      width:
+        screenWidth < 1250
+          ? screenWidth < 600
+            ? screenWidth < 400
+              ? "130px"
+              : "150px"
+            : "200px"
+          : "309px",
       boxShadow: "none",
       transition: "0.3s",
       cursor: "pointer",
@@ -38,7 +53,8 @@ const MyTripsForm = ({ darkMode }) => {
     placeholder: (provided) => ({
       ...provided,
       color: darkMode ? "black" : "white",
-      fontSize: "20px",
+      fontSize:
+        screenWidth < 600 ? (screenWidth < 400 ? "16px" : "18px") : "20px",
       transition: "0.3s",
       textAlign: "center",
     }),
@@ -46,7 +62,8 @@ const MyTripsForm = ({ darkMode }) => {
     singleValue: (provided) => ({
       ...provided,
       color: darkMode ? "black" : "white",
-      fontSize: "20px",
+      fontSize:
+        screenWidth < 600 ? (screenWidth < 400 ? "14px" : "18px") : "20px",
       transition: "0.3s",
       textAlign: "center",
     }),
@@ -85,7 +102,8 @@ const MyTripsForm = ({ darkMode }) => {
           ? "black"
           : "white",
       cursor: "pointer",
-      fontSize: "18px",
+      fontSize:
+        screenWidth < 600 ? (screenWidth < 400 ? "14px" : "16px") : "18px",
     }),
 
     dropdownIndicator: (provided) => ({
@@ -216,6 +234,11 @@ const MyTripsForm = ({ darkMode }) => {
   return (
     <div className="my-trips-form container">
       <div className="title">
+        <div
+          className={`my-trips-text ${darkMode ? "tint white-letters" : ""}`}
+        >
+          <h1>My trips</h1>
+        </div>
         <div className="buttons">
           <Select
             options={sortOptions}
@@ -243,11 +266,6 @@ const MyTripsForm = ({ darkMode }) => {
               />
             </div>
           </button>
-        </div>
-        <div
-          className={`my-trips-text ${darkMode ? "tint white-letters" : ""}`}
-        >
-          <h1>My trips</h1>
         </div>
       </div>
       <div className={`all-trips ${darkMode ? "tint white-letters" : ""}`}>

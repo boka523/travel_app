@@ -219,7 +219,7 @@ const ProfileForm = ({ darkMode }) => {
             htmlFor="profile-upload"
             className={darkMode ? "btn" : "btn dark-btn"}
           >
-            Change profile picture
+            Change picture
           </label>
         </div>
         <div className="profile-column">

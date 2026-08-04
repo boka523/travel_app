@@ -95,6 +95,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 40px;
 }
 
@@ -292,4 +293,123 @@
 
 .fuel-results p {
   margin: 10px 0;
+}
+
+@media (max-width: 1200px) {
+  .car-route-field input {
+    min-width: 400px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .car-route-search h2 {
+    font-size: 24px;
+  }
+  .car-route-field input {
+    min-width: 300px;
+    padding: 10px 12px;
+    font-size: 16px;
+  }
+  .route-map {
+    width: 90%;
+    height: 400px;
+  }
+  .car-route-text {
+    padding: 20px;
+    gap: 25px;
+  }
+  .info h3 {
+    font-size: 22px;
+  }
+  .info p {
+    font-size: 18px;
+  }
+  .tolls h3 {
+    font-size: 22px;
+  }
+  .toll-detail {
+    font-size: 18px;
+  }
+  .fuel-calculator h3,
+  .fuel-results h3 {
+    font-size: 22px;
+  }
+  .fuel-calculator strong,
+  .fuel-type-options,
+  .fuel-field,
+  .fuel-results p {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 900px) {
+  .info-tolls {
+    flex-direction: column;
+  }
+  .fuel-calculator-results {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 750px) {
+  .car-route-search h2 {
+    font-size: 24px;
+  }
+  .fields {
+    flex-direction: column;
+    gap: 30px;
+  }
+  .show-route-btn {
+    margin-top: 30px;
+    font-size: 18px;
+    padding: 16px;
+    width: 160px;
+  }
+}
+
+@media (max-width: 600px) {
+  .tolls-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+
+    transform: scale(0.85);
+    transform-origin: top center;
+    margin-bottom: -25px;
+  }
+}
+
+@media (max-width: 500px) {
+  .car-route-field input {
+    min-width: 250px;
+    padding: 6px 9px;
+    font-size: 14px;
+  }
+  .car-route-text {
+    padding: 10px 0;
+  }
+  .tolls-slider {
+    grid-template-columns: 36px minmax(0, 200px) 36px;
+  }
+
+  .tolls-slider-viewport {
+    width: 200px;
+  }
+  .tolls-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+
+    transform: scale(0.75);
+    transform-origin: top center;
+    margin-bottom: -25px;
+  }
+  .fuel-field {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 }

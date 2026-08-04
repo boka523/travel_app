@@ -190,10 +190,98 @@
   margin-top: 16px;
   text-align: center;
   font-size: 16px;
+  font-weight: 600;
 }
 
 .flight-divider {
   height: 1px;
   margin: 28px 0;
   background: rgba(0, 0, 0, 0.25);
+}
+
+@media (max-width: 1200px) {
+  .flight-card {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .flight-slider {
+    grid-template-columns: 40px minmax(0, 1fr) 40px;
+  }
+
+  .flight-slider .email-icon {
+    width: 90%;
+    height: 90%;
+    position: relative;
+  }
+
+  .flight-slider .btn {
+    width: 35px;
+    height: 35px;
+  }
+
+  .flight-slide {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 750px) {
+  .airport-selection {
+    flex-direction: column;
+    gap: 60px;
+  }
+  .show-flights.btn {
+    width: 180px;
+    font-size: 20px;
+  }
+
+  .flight-card-header h3 {
+    font-size: 23px;
+  }
+
+  .flight-price {
+    font-size: 21px;
+  }
+  .flight-airport strong {
+    font-size: 26px;
+  }
+
+  .flight-airport span {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 550px) {
+  .transport-results h2 {
+    font-size: 22px;
+  }
+  .show-flights.btn {
+    width: 150px;
+    font-size: 18px;
+  }
+  .flight-route {
+    gap: 5px;
+    grid-template-columns: 100px 1fr 100px;
+  }
+  .flight-line {
+    width: 60%;
+  }
+  .flight-airport span {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 500px) {
+  .flight-route {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .flight-airport {
+    text-align: center;
+  }
+  .flight-airport:last-child {
+    text-align: center;
+  }
 }

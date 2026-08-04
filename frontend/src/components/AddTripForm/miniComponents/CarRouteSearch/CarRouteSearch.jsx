@@ -410,67 +410,69 @@ const CarRouteSearch = ({
                 {route.toll && route.tollCost.details.length > 0 && (
                   <>
                     <h3>Toll details</h3>
-                    <div className="tolls-slider">
-                      <button
-                        type="button"
-                        className={`tolls-slider-btn ${
-                          darkMode ? "btn" : "btn dark-btn"
-                        }`}
-                        onClick={handlePreviousTollSlide}
-                        disabled={currentTollSlide === 0}
-                        aria-label="Previous toll details"
-                      >
-                        ←
-                      </button>
-                      <div className="tolls-slider-viewport">
-                        <div
-                          className="tolls-slider-track"
-                          style={{
-                            transform: `translateX(-${currentTollSlide * 100}%)`,
-                          }}
+                    <div className="tolls-content">
+                      <div className="tolls-slider">
+                        <button
+                          type="button"
+                          className={`tolls-slider-btn ${
+                            darkMode ? "btn" : "btn dark-btn"
+                          }`}
+                          onClick={handlePreviousTollSlide}
+                          disabled={currentTollSlide === 0}
+                          aria-label="Previous toll details"
                         >
-                          {tollSlides.map((slide, slideIndex) => (
-                            <div className="tolls-slide" key={slideIndex}>
-                              {slide.map((detail, detailIndex) => (
-                                <div
-                                  className={`toll-detail ${darkMode ? "tint" : ""}`}
-                                  key={`${detail.tollSystem}-${slideIndex}-${detailIndex}`}
-                                >
-                                  {detail.collectionLocations.length > 0 ? (
-                                    <>
-                                      <p>Collection points:</p>
+                          ←
+                        </button>
+                        <div className="tolls-slider-viewport">
+                          <div
+                            className="tolls-slider-track"
+                            style={{
+                              transform: `translateX(-${currentTollSlide * 100}%)`,
+                            }}
+                          >
+                            {tollSlides.map((slide, slideIndex) => (
+                              <div className="tolls-slide" key={slideIndex}>
+                                {slide.map((detail, detailIndex) => (
+                                  <div
+                                    className={`toll-detail ${darkMode ? "tint" : ""}`}
+                                    key={`${detail.tollSystem}-${slideIndex}-${detailIndex}`}
+                                  >
+                                    {detail.collectionLocations.length > 0 ? (
+                                      <>
+                                        <p>Collection points:</p>
 
-                                      <p>
-                                        {detail.collectionLocations
-                                          .map((location) => location.name)
-                                          .join(" → ")}
-                                      </p>
-                                    </>
-                                  ) : (
-                                    <p>No collection points available.</p>
-                                  )}
+                                        <p>
+                                          {detail.collectionLocations
+                                            .map((location) => location.name)
+                                            .join(" → ")}
+                                        </p>
+                                      </>
+                                    ) : (
+                                      <p>No collection points available.</p>
+                                    )}
 
-                                  <p>Price: {detail.price} €</p>
-                                </div>
-                              ))}
-                            </div>
-                          ))}
+                                    <p>Price: {detail.price} €</p>
+                                  </div>
+                                ))}
+                              </div>
+                            ))}
+                          </div>
                         </div>
+                        <button
+                          type="button"
+                          className={`tolls-slider-btn ${
+                            darkMode ? "btn" : "btn dark-btn"
+                          }`}
+                          onClick={handleNextTollSlide}
+                          disabled={
+                            currentTollSlide === totalTollSlides - 1 ||
+                            totalTollSlides === 0
+                          }
+                          aria-label="Next toll details"
+                        >
+                          →
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        className={`tolls-slider-btn ${
-                          darkMode ? "btn" : "btn dark-btn"
-                        }`}
-                        onClick={handleNextTollSlide}
-                        disabled={
-                          currentTollSlide === totalTollSlides - 1 ||
-                          totalTollSlides === 0
-                        }
-                        aria-label="Next toll details"
-                      >
-                        →
-                      </button>
                     </div>
                     <p className="total-toll-cost">
                       <strong>Total toll cost: </strong>
@@ -526,34 +528,39 @@ const CarRouteSearch = ({
                   <label htmlFor="fuel-consumption">
                     <strong>Fuel consumption:</strong>
                   </label>
-                  <input
-                    type="number"
-                    value={fuelConsumption}
-                    onChange={(e) => {
-                      setFuelConsumption(e.target.value);
-                      setFuelCalculation(null);
-                      setCarDetails(null);
-                    }}
-                  />
-                  L/100km
+                  <div>
+                    <input
+                      type="number"
+                      value={fuelConsumption}
+                      onChange={(e) => {
+                        setFuelConsumption(e.target.value);
+                        setFuelCalculation(null);
+                        setCarDetails(null);
+                      }}
+                    />{" "}
+                    L/100km
+                  </div>
                 </div>
                 <div className="fuel-field">
                   <label htmlFor="fuel-price">
                     <strong>Fuel price:</strong>
                   </label>
-                  <input
-                    id="fuel-price"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={fuelPrice}
-                    onChange={(e) => {
-                      setFuelPrice(e.target.value);
-                      setFuelCalculation(null);
-                      setCarDetails(null);
-                    }}
-                  />
-                  €
+                  <div>
+                    <input
+                      id="fuel-price"
+                      className="fuel-field-input"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={fuelPrice}
+                      onChange={(e) => {
+                        setFuelPrice(e.target.value);
+                        setFuelCalculation(null);
+                        setCarDetails(null);
+                      }}
+                    />{" "}
+                    €
+                  </div>
                 </div>
               </div>
               <button

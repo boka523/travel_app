@@ -346,6 +346,55 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
+@media (max-width: 1000px) {
+  .edit-trip-text {
+    font-size: 13px;
+    width: 300px;
+  }
+}
+
+@media (max-width: 850px) {
+  .partial-info {
+    grid-template-columns: repeat(1, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 750px) {
+  .edit-trip-text {
+    font-size: 12px;
+    width: 280px;
+    margin-top: 30px;
+  }
+}
+
+@media (max-width: 600px) {
+  .partial-info-sub h2 {
+    font-size: 20px;
+  }
+  .info-label,
+  .info-value {
+    font-size: 14px;
+  }
+  .route-address strong {
+    font-size: 16px;
+  }
+  .route-section-header h3 {
+    font-size: 16px;
+  }
+  .route-direction-btn {
+    font-size: 12px;
+  }
+  .detail-value span {
+    font-size: 16px;
+  }
+  .partial-info-sub .ai-description,
+  .additional-ai-cost {
+    padding: 15px 20px;
+  }
+}
+
+/* 
 @media (max-width: 700px) {
   .partial-info {
     grid-template-columns: 1fr;
@@ -408,4 +457,4 @@
   .route-direction-buttons {
     margin-left: 0;
   }
-}
+} */

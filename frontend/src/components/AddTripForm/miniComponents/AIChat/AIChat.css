@@ -278,3 +278,26 @@
   color: black;
   transition: 0.3s;
 }
+
+@media (max-width: 1000px) {
+  .ai-chat {
+    width: 320px;
+    height: 450px;
+  }
+}
+
+@media (max-width: 880px) {
+  .ai-chat {
+    width: 280px;
+    height: 420px;
+  }
+  .ai-chat-messages {
+    font-size: 14px;
+  }
+  .ai-chat-input-wrapper textarea {
+    font-size: 13px;
+  }
+  .ai-chat-send {
+    height: 32px;
+  }
+}

@@ -87,3 +87,17 @@ a {
   height: 100%;
   transition: 0.3s;
 }
+
+@media (max-width: 1160px) {
+  .container {
+    padding-left: 5%;
+    padding-right: 5%;
+  }
+}
+
+@media (max-width: 1030px) {
+  .container {
+    padding-left: 1%;
+    padding-right: 1%;
+  }
+}

@@ -175,6 +175,15 @@ const AddTripForm = ({ darkMode }) => {
     }
   };
 
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setScreenWidth(window.innerWidth);
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <div className="add-trips-form container">
       <div className="title">
@@ -212,6 +221,7 @@ const AddTripForm = ({ darkMode }) => {
         resultsRef={resultsRef}
         selectedAccommodation={selectedAccommodation}
         setSelectedAccommodation={setSelectedAccommodation}
+        screenWidth={screenWidth}
       />
 
       {hasSearched &&
@@ -227,6 +237,7 @@ const AddTripForm = ({ darkMode }) => {
             passengersNum={passengers_num}
             selectedFlight={selectedFlight}
             setSelectedFlight={setSelectedFlight}
+            screenWidth={screenWidth}
           />
         )}
 
@@ -308,7 +319,7 @@ const AddTripForm = ({ darkMode }) => {
 
       {hasSearched && (
         <div className={darkMode ? "white-letters" : ""}>
-          <h2>Trip preview:</h2>
+          <h2 className="trip-preview-title">Trip preview:</h2>
           <TripPreview
             darkMode={darkMode}
             departure={departure}
