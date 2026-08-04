@@ -8,6 +8,7 @@ import dark_password from "../../assets/dark_password.png";
 import white_password from "../../assets/white_password.png";
 import dark_name from "../../assets/dark_name.png";
 import white_name from "../../assets/white_name.png";
+import { API_URL } from "../../config";
 
 const SignupForm = ({ darkMode }) => {
   const navigate = useNavigate("");
@@ -23,7 +24,7 @@ const SignupForm = ({ darkMode }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/signup", {
+      const response = await fetch(`${API_URL}/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

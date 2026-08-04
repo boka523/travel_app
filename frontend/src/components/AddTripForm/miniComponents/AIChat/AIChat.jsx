@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, React } from "react";
 import toast from "react-hot-toast";
 import "./AIChat.css";
+import { API_URL } from "../../../../config";
 
 const AIChat = ({ darkMode, trip }) => {
   const [message, setMessage] = useState("");
@@ -43,7 +44,7 @@ const AIChat = ({ darkMode, trip }) => {
       setMessages((prev) => [...prev, userMessage]);
       setMessage("");
 
-      const response = await fetch("http://localhost:5000/api/ai/chat", {
+      const response = await fetch(`${API_URL}/api/ai/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

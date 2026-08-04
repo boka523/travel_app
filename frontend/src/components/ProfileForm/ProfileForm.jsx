@@ -9,6 +9,7 @@ import dark_password from "../../assets/dark_password.png";
 import white_password from "../../assets/white_password.png";
 import dark_name from "../../assets/dark_name.png";
 import white_name from "../../assets/white_name.png";
+import { API_URL } from "../../config";
 
 const ProfileForm = ({ darkMode }) => {
   const [profileImage, setProfileImage] = useState(null);
@@ -37,7 +38,7 @@ const ProfileForm = ({ darkMode }) => {
 
       formData.append("profile_image", file);
 
-      const response = await fetch("http://localhost:5000/profile-picture", {
+      const response = await fetch(`${API_URL}/profile-picture`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -52,7 +53,7 @@ const ProfileForm = ({ darkMode }) => {
         return;
       }
 
-      setProfileImage(`http://localhost:5000${data.profile_image}`);
+      setProfileImage(`${API_URL}${data.profile_image}`);
       toast.success(data.message);
     } catch (error) {
       toast.error(error.message);
@@ -64,7 +65,7 @@ const ProfileForm = ({ darkMode }) => {
       try {
         const token = localStorage.getItem("token");
 
-        const response = await fetch("http://localhost:5000/me", {
+        const response = await fetch(`${API_URL}/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -80,7 +81,7 @@ const ProfileForm = ({ darkMode }) => {
         setUser(data);
 
         if (data.profile_image) {
-          setProfileImage(`http://localhost:5000${data.profile_image}`);
+          setProfileImage(`${API_URL}${data.profile_image}`);
         }
       } catch (error) {
         console.error("Profile error:", error);
@@ -105,7 +106,7 @@ const ProfileForm = ({ darkMode }) => {
 
       const token = localStorage.getItem("token");
 
-      const response = await fetch("http://localhost:5000/change_password", {
+      const response = await fetch(`${API_URL}/change_password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -148,7 +149,7 @@ const ProfileForm = ({ darkMode }) => {
 
       const token = localStorage.getItem("token");
 
-      const response = await fetch("http://localhost:5000/profile", {
+      const response = await fetch(`${API_URL}/profile`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

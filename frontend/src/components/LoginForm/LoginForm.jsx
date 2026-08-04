@@ -6,6 +6,7 @@ import dark_email from "../../assets/dark_email.png";
 import white_email from "../../assets/white_email.png";
 import dark_password from "../../assets/dark_password.png";
 import white_password from "../../assets/white_password.png";
+import { API_URL } from "../../config";
 
 const LoginForm = ({ darkMode }) => {
   const navigate = useNavigate(); //sluzi za programsku navigaciju izmedu ruta iz JS koda, a ne klikom na <Link>
@@ -20,7 +21,7 @@ const LoginForm = ({ darkMode }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/login", {
+      const response = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json", //podaci koje ti saljen su u JSON formatu

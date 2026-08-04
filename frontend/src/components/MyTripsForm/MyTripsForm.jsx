@@ -5,6 +5,7 @@ import Select from "react-select"; //koristin umisto <select> jer je puno manipu
 import "./MyTripsForm.css";
 import dark_plus_sign from "../../assets/dark_plus_sign.png";
 import white_plus_sign from "../../assets/white_plus_sign.png";
+import { API_URL } from "../../config";
 
 const MyTripsForm = ({ darkMode }) => {
   const navigate = useNavigate();
@@ -154,7 +155,7 @@ const MyTripsForm = ({ darkMode }) => {
       }
 
       try {
-        const response = await fetch("http://localhost:5000/my_trips", {
+        const response = await fetch(`${API_URL}/my_trips`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -200,7 +201,7 @@ const MyTripsForm = ({ darkMode }) => {
 
       const token = localStorage.getItem("token");
 
-      const response = await fetch(`http://localhost:5000/trips/${tripId}`, {
+      const response = await fetch(`${API_URL}/trips/${tripId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

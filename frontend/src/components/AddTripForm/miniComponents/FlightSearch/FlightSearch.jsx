@@ -7,6 +7,7 @@ import dark_left_arrow from "../../../../assets/dark_left_arrow.png";
 import white_left_arrow from "../../../../assets/white_left_arrow.png";
 import dark_right_arrow from "../../../../assets/dark_right_arrow.png";
 import white_right_arrow from "../../../../assets/white_right_arrow.png";
+import { API_URL } from "../../../../config";
 
 const FlightSearch = ({
   darkMode,
@@ -125,7 +126,7 @@ const FlightSearch = ({
     try {
       setFlightsLoading(true);
       setFlights([]);
-      const response = await fetch("http://localhost:5000/search-flights", {
+      const response = await fetch(`${API_URL}/search-flights`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

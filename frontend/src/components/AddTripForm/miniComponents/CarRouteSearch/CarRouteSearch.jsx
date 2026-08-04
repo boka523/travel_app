@@ -17,6 +17,7 @@ import dark_right_arrow from "../../../../assets/dark_right_arrow.png";
 import white_right_arrow from "../../../../assets/white_right_arrow.png";
 import red_destination from "../../../../assets/red_destination.png";
 import green_start from "../../../../assets/green_start.png";
+import { API_URL } from "../../../../config";
 
 const CarRouteSearch = ({
   darkMode,
@@ -88,7 +89,7 @@ const CarRouteSearch = ({
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/addresses/autocomplete?text=${encodeURIComponent(value)}&city=${encodeURIComponent(departureCity)}`,
+        `${API_URL}/api/addresses/autocomplete?text=${encodeURIComponent(value)}&city=${encodeURIComponent(departureCity)}`,
       );
 
       const data = await response.json();
@@ -120,7 +121,7 @@ const CarRouteSearch = ({
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/addresses/autocomplete?text=${encodeURIComponent(value)}&city=${encodeURIComponent(destinationCity)}`,
+        `${API_URL}/api/addresses/autocomplete?text=${encodeURIComponent(value)}&city=${encodeURIComponent(destinationCity)}`,
       );
 
       const data = await response.json();
@@ -148,7 +149,7 @@ const CarRouteSearch = ({
     setCarDetails(null);
 
     try {
-      const response = await fetch("http://localhost:5000/api/car-route", {
+      const response = await fetch(`${API_URL}/api/car-route`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

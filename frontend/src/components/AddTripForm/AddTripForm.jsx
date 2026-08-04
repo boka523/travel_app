@@ -8,6 +8,7 @@ import CarRouteSearch from "./miniComponents/CarRouteSearch/CarRouteSearch";
 import { formatDate } from "./utilities/DateUtilities";
 import AIChat from "./miniComponents/AIChat/AIChat";
 import TripPreview from "./miniComponents/TripPreview/TripPreview";
+import { API_URL } from "../../config";
 
 const AddTripForm = ({ darkMode }) => {
   const [departure, setDeparture] = useState("");
@@ -57,7 +58,7 @@ const AddTripForm = ({ darkMode }) => {
     try {
       setLoading(true);
 
-      const response = await fetch("http://localhost:5000/api/accommodations", {
+      const response = await fetch(`${API_URL}/api/accommodations`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -81,12 +82,8 @@ const AddTripForm = ({ darkMode }) => {
 
       if (transport_type === "plane" || transport_type === "aeroplane") {
         const [departureResponse, arrivalResponse] = await Promise.all([
-          fetch(
-            `http://localhost:5000/airports?city=${encodeURIComponent(departure)}`,
-          ),
-          fetch(
-            `http://localhost:5000/airports?city=${encodeURIComponent(destination)}`,
-          ),
+          fetch(`${API_URL}/airports?city=${encodeURIComponent(departure)}`),
+          fetch(`${API_URL}/airports?city=${encodeURIComponent(destination)}`),
         ]);
 
         const departureData = await departureResponse.json();
@@ -126,7 +123,7 @@ const AddTripForm = ({ darkMode }) => {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await fetch("http://localhost:5000/trips", {
+      const response = await fetch(`${API_URL}/trips`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
