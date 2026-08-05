@@ -275,7 +275,7 @@ const MyTripsForm = ({ darkMode }) => {
         ) : trips.length === 0 ? (
           <div className="message">
             You don't seem to have any planed trips. Wait no more and start
-            planing!.
+            planing!
           </div>
         ) : (
           sortedTrips.map((trip) => (

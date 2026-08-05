@@ -186,7 +186,7 @@ const TripPreview = ({
           </div>
         </div>
       </div>
-      <div className="total-price">
+      <div className={`total-price ${darkMode ? "white-letters" : ""}`}>
         <strong>Total price: {totalPrice} €</strong>
       </div>
     </div>

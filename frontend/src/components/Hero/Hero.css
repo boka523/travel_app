@@ -4,6 +4,7 @@
   background:
     linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
     url(../../assets/hero.jpg);
+  background-size: cover;
   color: #fff;
   display: flex;
   align-items: center;
@@ -15,6 +16,7 @@
   background:
     linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
     url(../../assets/hero.jpg);
+  background-size: cover;
   transition: 0.3s;
 }
 
@@ -107,6 +109,25 @@
     margin: 20px;
     font-size: 20px;
     padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    background-image:
+      linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+      url("../../assets/hero-mobile.jpg");
+    background-size: cover;
+    background-position: center;
+    transition: 0.3s;
+  }
+  .dark {
+    background-image:
+      linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+      url("../../assets/hero-mobile.jpg");
+    background-size: cover;
+    background-position: center;
+    transition: 0.3s;
   }
 }
 
