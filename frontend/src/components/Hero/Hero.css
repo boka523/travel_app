@@ -1,6 +1,6 @@
 .hero {
   width: 100%;
-  min-height: 100svh;
+  min-height: 100dvh;
   /*samo proba za vercel*/
   background:
     linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
