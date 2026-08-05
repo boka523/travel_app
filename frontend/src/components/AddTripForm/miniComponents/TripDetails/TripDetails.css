@@ -51,10 +51,6 @@
   width: 300px;
 }
 
-.icon-show {
-  transition: 0.3s;
-}
-
 @media (max-width: 1000px) {
   .trip-form .inputs input {
     font-size: 14px;

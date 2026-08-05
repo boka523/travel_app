@@ -60,14 +60,23 @@ const TripDetails = ({
       },
     };
 
-    const selectedIcons = transportIcons[transport];
+    // const selectedIcons = transportIcons[transport];
 
-    if (!selectedIcons) {
-      return darkMode ? white_question : dark_question;
-    }
+    // if (!selectedIcons) {
+    //   return darkMode ? white_question : dark_question;
+    // }
 
-    return darkMode ? selectedIcons.dark : selectedIcons.white;
+    // return darkMode ? selectedIcons.dark : selectedIcons.white;
+
+    return (
+      transportIcons[transport] || {
+        white: dark_question,
+        dark: white_question,
+      }
+    );
   };
+
+  const selectedTransportIcons = getTransportIcon();
 
   return (
     <div className={`add-trips-card ${darkMode ? "tint white-letters" : ""}`}>
@@ -190,8 +199,20 @@ const TripDetails = ({
           />
         </div>
         <div className="inputs">
-          <div className="email-icon">
+          {/* <div className="email-icon">
             <img src={getTransportIcon()} alt="" className="icon show" />
+          </div> */}
+          <div className="email-icon">
+            <img
+              src={selectedTransportIcons.white}
+              alt=""
+              className={`icon ${darkMode ? "hide" : "show"}`}
+            />
+            <img
+              src={selectedTransportIcons.dark}
+              alt=""
+              className={`icon ${darkMode ? "show" : "hide"}`}
+            />
           </div>
           <input
             id="transport_type"
