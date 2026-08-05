@@ -265,7 +265,12 @@ const ProfileForm = ({ darkMode }) => {
           <button
             type="button"
             className={darkMode ? "btn" : "btn dark-btn"}
-            onClick={() => setShowPasswordForm((prev) => !prev)}
+            onClick={() => {
+              setShowPasswordForm((prev) => !prev);
+              (setOldPassword(""),
+                setNewPassword(""),
+                setConfirmedPassword(""));
+            }}
           >
             {showPasswordForm ? "Cancel" : "Change password"}
           </button>
@@ -307,7 +312,11 @@ const ProfileForm = ({ darkMode }) => {
           <button
             type="button"
             className={darkMode ? "btn" : "btn dark-btn"}
-            onClick={() => setShowProfileForm((prev) => !prev)}
+            onClick={() => {
+              setShowProfileForm((prev) => !prev);
+              setNewName("");
+              setNewEmail("");
+            }}
           >
             {showProfileForm ? "Cancel" : "Change profile details"}
           </button>

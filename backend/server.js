@@ -416,22 +416,20 @@ app.post("/api/ai/chat", async (req, res) => {
     Preferred currency: EUR`.trim();
 
     const response = await openai.responses.create({
-      model: "gpt-5-mini",
-      reasoning: {
-        effort: "minimal",
-      },
+      model: "gpt-5",
       input: [
         {
           role: "developer",
-          content:
-            `You are WayAway AI, a concise travel cost estimation assistant.
-            Trip information: ${tripContext} . 
-            Give realistic approximate price ranges. 
-            Use the trip information when it is relevant to the user's question. 
-            Use additional details provided by the user. 
-            If important details are missing, make simple conservative assumptions and state them briefly. 
-            Do not assume luxury meals, multiple courses, alcohol, or extra services unless the user mentions them. 
-            Keep the answer under 70 words.`.trim(),
+          content: `You are WayAway AI, a concise travel cost estimation assistant.
+            Current trip: ${tripContext} . 
+            Use the current trip information as the default context for your answers.
+            If the user explicitly asks about another destination, trip, or scenario, answer for that destination only and do not merge it with the current trip.
+            Never permanently replace the current trip context with information from previous user questions. Use another destination only for the specific question in which it is mentioned.
+            If the user's question is general (for example about travel, budgeting, transportation, accommodation, or expenses) and does not mention another destination, always assume they are referring to the current trip.
+            If important details are missing, make simple conservative assumptions and briefly mention them.
+            Do not assume luxury meals, multiple courses, alcohol, or extra services unless the user explicitly mentions them.
+            Give realistic approximate price ranges.
+            Keep the answer under 70 words.`,
         },
         ...previousMessages,
         {

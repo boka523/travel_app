@@ -9,6 +9,7 @@ import { formatDate } from "./utilities/DateUtilities";
 import AIChat from "./miniComponents/AIChat/AIChat";
 import TripPreview from "./miniComponents/TripPreview/TripPreview";
 import { API_URL } from "../../config";
+import { useNavigate } from "react-router-dom";
 
 const AddTripForm = ({ darkMode }) => {
   const [departure, setDeparture] = useState("");
@@ -36,6 +37,14 @@ const AddTripForm = ({ darkMode }) => {
   const [notes, setNotes] = useState("");
   const [showNotes, setShowNotes] = useState(false);
 
+  const navigate = useNavigate();
+
+  const handleGoToMyTrips = () => {
+    setTimeout(() => {
+      navigate("/mytrips");
+    }, 2000);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -55,6 +64,18 @@ const AddTripForm = ({ darkMode }) => {
       return;
     }
 
+    if (
+      transport_type !== "car" &&
+      transport_type !== "auto" &&
+      transport_type !== "plane" &&
+      transport_type !== "airplane"
+    ) {
+      toast.error(
+        "Unsupported transport type. Plase choose between car and plane.",
+      );
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -64,7 +85,7 @@ const AddTripForm = ({ darkMode }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          destination,
+          destination: destination.toLowerCase(),
           checkin: formatDate(startDate),
           checkout: formatDate(endDate),
           adults: Number(passengers_num),
@@ -164,7 +185,7 @@ const AddTripForm = ({ darkMode }) => {
         return;
       }
 
-      toast.success("Trip saved successfully.");
+      toast.success("Trip saved successfully. Redirecting to trips page.");
       console.log("Saved trip:", data);
     } catch (error) {
       console.error("Save trip error:", error);
@@ -340,7 +361,10 @@ const AddTripForm = ({ darkMode }) => {
         <div className="save-trip-wrapper">
           <button
             type="button"
-            onClick={handleSaveTrip}
+            onClick={() => {
+              handleSaveTrip();
+              handleGoToMyTrips();
+            }}
             className={`btn ${darkMode ? "" : "dark-btn"}`}
           >
             Save trip

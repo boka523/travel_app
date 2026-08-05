@@ -49,7 +49,10 @@ const AccommodationResults = ({
   };
 
   return (
-    <div className={`accommodation-results ${darkMode ? "white-letters" : ""}`}>
+    <div
+      className={`accommodation-results ${darkMode ? "white-letters" : ""}`}
+      ref={resultsRef}
+    >
       {!loading &&
         accommodations.length > 0 && ( //ako se vec loadalo i ako postoji bar jedan smjestaj, prikazi sljedece
           <>
@@ -75,7 +78,7 @@ const AccommodationResults = ({
                   />
                 </div>
               </button>
-              <div className="slider-viewport" ref={resultsRef}>
+              <div className="slider-viewport">
                 <div
                   className="slider-track"
                   style={{
