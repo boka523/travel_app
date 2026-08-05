@@ -40,7 +40,7 @@ const fetchHotelsPage = async (from, to) => {
 
   if (!response.ok) {
     console.error("Hotelbeds error:", data);
-    throw new Error("Dohvat hotela nije uspio.");
+    throw new Error("Failed to fetch hotels.");
   }
 
   return data.hotels || [];
@@ -136,7 +136,7 @@ const main = async () => {
   const progress = await getImportProgress();
 
   if (progress.completed) {
-    console.log("Import hotela je dovršen.");
+    console.log("Hotles import successfully completed.");
     return;
   }
 
@@ -150,14 +150,16 @@ const main = async () => {
     const to = from + PAGE_SIZE - 1;
 
     console.log(
-      `Zahtjev ${requestNumber}/${MAX_REQUESTS_PER_RUN}: dohvaćam hotele od ${from} do ${to}...`,
+      `Request No.${requestNumber}/${MAX_REQUESTS_PER_RUN}: fetching hotels from ${from} to ${to}...`,
     );
 
     const hotels = await fetchHotelsPage(from, to);
 
     if (hotels.length === 0) {
       await updateImportProgress(from, true);
-      console.log("Nema više hotela. Import je dovršen.");
+      console.log(
+        "No more hotels to fetch. Hotels import successfully completed.",
+      );
       return;
     }
 
@@ -168,24 +170,24 @@ const main = async () => {
     await updateImportProgress(nextFrom, importCompleted);
 
     console.log(
-      `API je vratio ${hotels.length} hotela. Spremljeno novih hotela: ${savedCount}`,
+      `API fetched ${hotels.length} hotels. New ${savedCount} hotels added to database.`,
     );
 
     if (importCompleted) {
-      console.log("Dohvaćena je zadnja stranica. Import je dovršen.");
+      console.log("Last page fetched. Hotels import successfully completed.");
       return;
     }
 
     from = nextFrom;
   }
 
-  console.log(`Dosegnut je dnevni limit od ${MAX_REQUESTS_PER_RUN} zahtjeva.`);
-  console.log(`Sljedeći import nastavlja se od pozicije ${from}.`);
+  console.log(`Daily limit of ${MAX_REQUESTS_PER_RUN} requests reached.`);
+  console.log(`Next import continues from hotel No.${from}.`);
 };
 
 main()
   .catch((error) => {
-    console.error("Greška tijekom importa hotela:", error);
+    console.error("Error importing hotels:", error);
     process.exitCode = 1;
   })
   .finally(async () => {

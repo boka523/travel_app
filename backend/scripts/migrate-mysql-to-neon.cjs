@@ -7,11 +7,11 @@ const MYSQL_DATABASE_URL = process.env.MYSQL_DATABASE_URL;
 const DATABASE_URL = process.env.DATABASE_URL;
 
 if (!MYSQL_DATABASE_URL) {
-  throw new Error("MYSQL_DATABASE_URL nije postavljen u .env datoteci.");
+  throw new Error("MYSQL_DATABASE_URL is not in .env file.");
 }
 
 if (!DATABASE_URL) {
-  throw new Error("DATABASE_URL nije postavljen u .env datoteci.");
+  throw new Error("DATABASE_URL is not in .env file.");
 }
 
 const mysqlUrl = new URL(MYSQL_DATABASE_URL);
@@ -20,7 +20,7 @@ const postgresUrl = new URL(DATABASE_URL);
 // Zaštita da slučajno ne čitamo iz pogrešne MySQL baze.
 if (mysqlUrl.pathname.replace("/", "") !== "travel_app") {
   throw new Error(
-    `Očekivana MySQL baza je "travel_app", ali URL pokazuje na "${mysqlUrl.pathname.replace(
+    `Expected MySQL database is "travel_app", but URL points to "${mysqlUrl.pathname.replace(
       "/",
       "",
     )}".`,
@@ -30,7 +30,7 @@ if (mysqlUrl.pathname.replace("/", "") !== "travel_app") {
 // Zaštita da se podaci šalju na Neon, a ne na neku drugu PostgreSQL bazu.
 if (!postgresUrl.hostname.includes("neon.tech")) {
   throw new Error(
-    "DATABASE_URL ne izgleda kao Neon URL. Prekidam prijenos radi sigurnosti.",
+    "DATABASE_URL is not looking like Neon URL. Stopping for safety reasons.",
   );
 }
 
@@ -115,10 +115,10 @@ async function insertBatch(client, tableName, rows) {
 async function migrateTable(tableName) {
   const totalRows = await getMySqlCount(tableName);
 
-  console.log(`\n${tableName}: pronađeno ${totalRows} redaka u MySQL-u.`);
+  console.log(`\n${tableName}: ${totalRows} rows found in MySQL`);
 
   if (totalRows === 0) {
-    console.log(`${tableName}: nema podataka za prijenos.`);
+    console.log(`${tableName}: no data to transfer.`);
     return;
   }
 
@@ -144,12 +144,12 @@ async function migrateTable(tableName) {
       offset += rows.length;
 
       console.log(
-        `${tableName}: preneseno ${Math.min(offset, totalRows)}/${totalRows}`,
+        `${tableName}: ${Math.min(offset, totalRows)}/${totalRows} transfered.`,
       );
     }
 
     await client.query("COMMIT");
-    console.log(`${tableName}: prijenos završen.`);
+    console.log(`${tableName}: transfer completed.`);
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;
@@ -200,7 +200,7 @@ async function resetSequence(tableName) {
 }
 
 async function verifyCounts() {
-  console.log("\nProvjera broja redaka:");
+  console.log("\nCheking row number:");
 
   for (const tableName of TABLES) {
     const mysqlCount = await getMySqlCount(tableName);
@@ -217,20 +217,20 @@ async function verifyCounts() {
     );
 
     if (!matches) {
-      throw new Error(`Broj redaka nije jednak za tablicu ${tableName}.`);
+      throw new Error(`Row number does not match with table ${tableName}.`);
     }
   }
 }
 
 async function main() {
-  console.log("Provjeravam veze s bazama...");
+  console.log("Checking databse connection...");
 
   await mysqlConnection.query("SELECT 1");
   await postgresPool.query("SELECT 1");
 
-  console.log("Veze su uspješne.");
+  console.log("Connection successfull.");
   console.log(
-    "Brišem postojeće podatke samo iz Neon tablica kako bi se skripta mogla sigurno ponovno pokrenuti...",
+    "Deleting existing data only from Neon tables so the script can restart safely...",
   );
 
   await postgresPool.query(`
@@ -255,12 +255,12 @@ async function main() {
 
   await verifyCounts();
 
-  console.log("\n✓ Svi podaci uspješno su preneseni u Neon.");
+  console.log("\n✓ All data successfully transfered to Neon.");
 }
 
 main()
   .catch((error) => {
-    console.error("\n✗ Prijenos nije uspio:");
+    console.error("\n✗ Transfer failed:");
     console.error(error);
     process.exitCode = 1;
   })

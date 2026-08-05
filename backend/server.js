@@ -9,6 +9,8 @@ const duffel = require("./duffel");
 const crypto = require("crypto"); //triba nan za sha256 hashiranje, to je ka "tip teksta" koji hotelbeds zahtjeva u svojoj dokumentaciji
 const path = require("path"); //ovo nam je za ekstenzije tipa .jpg ili .png
 
+const PORT = process.env.PORT || 5000;
+
 const OpenAI = require("openai");
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -423,8 +425,7 @@ app.post("/api/ai/chat", async (req, res) => {
           role: "developer",
           content:
             `You are WayAway AI, a concise travel cost estimation assistant.
-            Trip information: ${tripContext} .
-            Always respond in English. 
+            Trip information: ${tripContext} . 
             Give realistic approximate price ranges. 
             Use the trip information when it is relevant to the user's question. 
             Use additional details provided by the user. 
@@ -950,7 +951,7 @@ app.delete("/trips/:id", authenticateToken, async (req, res) => {
 
     if (!trip) {
       return res.status(404).json({
-        error: "rip not found or you don't have permission to access it.",
+        error: "Trip not found or you don't have permission to access it.",
       });
     }
 
@@ -1026,7 +1027,9 @@ app.patch("/trips/:id", authenticateToken, async (req, res) => {
       if (["plane", "car"].includes(transport_type)) {
         data.transport_type = transport_type;
       } else {
-        return res.status(400).json({ error: "Unknown transport type." });
+        return res.status(400).json({
+          error: "Unknown transport type. Choose between a car or a plane.",
+        });
       }
     }
 
@@ -1373,6 +1376,6 @@ app.patch("/profile", authenticateToken, async (req, res) => {
   }
 });
 
-app.listen(5000, () => {
-  console.log("Server active at http://localhost:5000");
+app.listen(PORT, () => {
+  console.log(`Server active on port ${PORT} and at http://localhost:${PORT}`);
 });

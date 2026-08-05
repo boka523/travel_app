@@ -38,7 +38,7 @@ const fetchDestinationsPage = async (from, to) => {
 
   if (!response.ok) {
     console.error("Hotelbeds error:", data);
-    throw new Error("Dohvat destinacija nije uspio.");
+    throw new Error("Failed to fetch destinations.");
   }
 
   return data.destinations || [];
@@ -61,10 +61,12 @@ const saveDestinations = async (destinations) => {
     data: formattedDestinations,
     skipDuplicates: true,
   });
-  console.log(`${formattedDestinations.length} destinacija spremljeno.`);
+  console.log(
+    `${formattedDestinations.length} destinations successfully saved.`,
+  );
 
   if (skipped > 0) {
-    console.log(`${skipped} neispravnih destinacija preskočeno.`);
+    console.log(`${skipped} incorrect destinations skipped.`);
   }
 };
 
@@ -77,25 +79,25 @@ const main = async () => {
     let from = existingDestinations + 1;
     let to = from + pageSize - 1;
 
-    console.log(`U bazi već postoji ${existingDestinations} destinacija.`);
-    console.log(`Import nastavljam od destinacije ${from}.`);
+    console.log(`${existingDestinations} destination already in database.`);
+    console.log(`Import continues from destination No.${from}.`);
 
     while (true) {
-      console.log(`Dohvaćam destinacije od ${from} do ${to}...`);
+      console.log(`Fetching destinations from ${from} to ${to}...`);
 
       const destinations = await fetchDestinationsPage(from, to);
 
-      console.log(`${destinations.length} destinacija dohvaćeno!`);
+      console.log(`${destinations.length} destinations fetched.`);
 
       if (destinations.length === 0) {
-        console.log("Nema više destinacija za dohvat.");
+        console.log("No more destinations to fetch.");
         break;
       }
 
       await saveDestinations(destinations);
 
       if (destinations.length < pageSize) {
-        console.log("Dohvaćena je posljednja stranica.");
+        console.log("Fetched the last page.");
         break;
       }
 
@@ -103,7 +105,7 @@ const main = async () => {
       to = from + pageSize - 1;
     }
 
-    console.log("Import uspješno završen.");
+    console.log("Destinations import successfully completed.");
   } catch (error) {
     console.error(error);
   } finally {
