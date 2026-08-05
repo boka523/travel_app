@@ -36,19 +36,19 @@ const LoginForm = ({ darkMode }) => {
       const data = await response.json(); //.json pretvara odgovor servera iz JSON formata u JS objekt
 
       if (!response.ok) {
-        toast.error(data.error || "Prijava nije uspjela.");
+        toast.error(data.error || "Login failed.");
         return;
       }
 
       localStorage.setItem("token", data.token);
-      toast.success(data.message || "Uspješna prijava!");
+      toast.success(data.message || "Login successfull.");
 
       setTimeout(() => {
         navigate("/mytrips");
       }, 1000);
     } catch (error) {
-      console.error("Login error", error);
-      toast.error("Greška pri spajanju na server!");
+      console.error("Login error:", error);
+      toast.error("Error connectiong to server.");
     } finally {
       setIsLoading(false);
     }

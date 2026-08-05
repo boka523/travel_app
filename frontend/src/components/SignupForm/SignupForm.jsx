@@ -39,20 +39,20 @@ const SignupForm = ({ darkMode }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.error || "Signup nije uspio.");
+        toast.error(data.error || "Signup failed.");
         return;
       }
 
       localStorage.setItem("token", data.token);
 
-      toast.success(data.message || "Uspješna prijava!");
+      toast.success(data.message || "Successful signup.");
       setTimeout(() => {
         navigate("/mytrips");
       }, 1000);
     } catch (error) {
-      console.error("Signup error", error);
+      console.error("Signup error:", error);
 
-      toast.error("Greška pri spajanju na server!");
+      toast.error("Error connecting with server.");
     } finally {
       setIsLoading(false);
     }

@@ -46,12 +46,12 @@ const AddTripForm = ({ darkMode }) => {
     setArrivalAirports([]);
 
     if (!startDate || !endDate) {
-      toast.error("Odaberi datum dolaska i odlaska.");
+      toast.error("Enter departure and return date.");
       return;
     }
 
     if (endDate <= startDate) {
-      toast.error("Datum odlaska mora biti nakon datuma dolaska.");
+      toast.error("Return date must be after departure date.");
       return;
     }
 
@@ -74,7 +74,7 @@ const AddTripForm = ({ darkMode }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.message || "Dohvat smještaja nije uspio.");
+        toast.error(data.message || "Accommodations fetch failed.");
         return;
       }
 
@@ -90,7 +90,7 @@ const AddTripForm = ({ darkMode }) => {
         const arrivalData = await arrivalResponse.json();
 
         if (!departureResponse.ok || !arrivalResponse.ok) {
-          toast.error("Dohvat aerodroma nije uspio.");
+          toast.error("Airport fetch failed.");
           return;
         }
 

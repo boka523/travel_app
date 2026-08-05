@@ -49,7 +49,7 @@ const ProfileForm = ({ darkMode }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.error || "Spremanje slike nije uspjelo.");
+        toast.error(data.error || "Image save failed.");
         return;
       }
 
@@ -74,7 +74,7 @@ const ProfileForm = ({ darkMode }) => {
         const data = await response.json();
 
         if (!response.ok) {
-          toast.error(data.error || "Dohvaćanje korisnika nije uspjelo.");
+          toast.error(data.error || "User fetch failed.");
           return;
         }
 
@@ -85,7 +85,7 @@ const ProfileForm = ({ darkMode }) => {
         }
       } catch (error) {
         console.error("Profile error:", error);
-        toast.error("Greška kod dohvaćanja profila.");
+        toast.error("Error fetching profile.");
       } finally {
         setLoading(false);
       }
@@ -97,7 +97,7 @@ const ProfileForm = ({ darkMode }) => {
     e.preventDefault();
 
     if (newPassword !== confirmedPassword) {
-      toast.error("Confirmed password nije dobra.");
+      toast.error("Confirmed password is not the same as new one.");
       return;
     }
 
@@ -121,7 +121,7 @@ const ProfileForm = ({ darkMode }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.error || "Promjena lozinke nije uspjela.");
+        toast.error(data.error || "Password change failed.");
         return;
       }
 
@@ -164,7 +164,7 @@ const ProfileForm = ({ darkMode }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.error || "Promjena detalja profila nije uspjela.");
+        toast.error(data.error || "Profile details change failed.");
         return;
       }
 

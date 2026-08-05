@@ -217,7 +217,7 @@ const TripDetails = ({
           <input
             id="transport_type"
             type="text"
-            placeholder="Enter transport type:"
+            placeholder="Enter transport type (car or plane):"
             value={transportType}
             onChange={(e) => setTransportType(e.target.value)}
             required

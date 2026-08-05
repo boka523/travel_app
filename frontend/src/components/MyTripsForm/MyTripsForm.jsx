@@ -146,7 +146,7 @@ const MyTripsForm = ({ darkMode }) => {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        toast.error("Morate se prijaviti!");
+        toast.error("Login required.");
 
         setTimeout(() => {
           navigate("/login");
@@ -165,10 +165,10 @@ const MyTripsForm = ({ darkMode }) => {
         const data = await response.json();
 
         if (!response.ok) {
-          toast.error(data.error || "Putovanja nisu učitana.");
+          toast.error(data.error || "Trip loading failed.");
 
           if (response.status === 401 || response.status === 403) {
-            toast.error("Neautoriziran pristup! Odjava...");
+            toast.error("Unauthorized access. Logging out...");
             localStorage.removeItem("token");
 
             setTimeout(() => {
@@ -181,7 +181,7 @@ const MyTripsForm = ({ darkMode }) => {
         }
         setTrips(data);
       } catch (error) {
-        toast.error("Greška pri spajanju na server.");
+        toast.error("Error connecting to server.");
       } finally {
         setIsLoadingTrips(false);
       }
@@ -211,7 +211,7 @@ const MyTripsForm = ({ darkMode }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.error || "Brisanje nije uspjelo.");
+        toast.error(data.error || "Trip delete failed.");
         return;
       }
 

@@ -120,7 +120,7 @@ const FlightSearch = ({
   };
   const handleShowFlights = async () => {
     if (!selectedDepartureAirport || !selectedArrivalAirport) {
-      toast.error("Odaberi oba aerodroma.");
+      toast.error("Choose both departure and return airport.");
       return;
     }
     try {
@@ -141,7 +141,7 @@ const FlightSearch = ({
       });
       const data = await response.json();
       if (!response.ok) {
-        toast.error(data.message || "Dohvat letova nije moguć.");
+        toast.error(data.message || "Flight fetch failed.");
         return;
       }
       setFlights(data || []);
