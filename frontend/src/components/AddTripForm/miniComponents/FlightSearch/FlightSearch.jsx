@@ -7,6 +7,8 @@ import dark_left_arrow from "../../../../assets/dark_left_arrow.png";
 import white_left_arrow from "../../../../assets/white_left_arrow.png";
 import dark_right_arrow from "../../../../assets/dark_right_arrow.png";
 import white_right_arrow from "../../../../assets/white_right_arrow.png";
+import dark_plane from "../../../../assets/dark_plane.png";
+import white_plane from "../../../../assets/white_plane.png";
 import { API_URL } from "../../../../config";
 
 const FlightSearch = ({
@@ -300,7 +302,20 @@ const FlightSearch = ({
                               {formatFlightDuration(flight.outbound.duration)}
                             </span>
                             <div className="flight-line">
-                              <span>✈</span>
+                              <span>
+                                <div className="flight-icon-div">
+                                  <img
+                                    src={white_plane}
+                                    alt=""
+                                    className={`flight-icon ${darkMode ? "show" : "hide"}`}
+                                  />
+                                  <img
+                                    src={dark_plane}
+                                    alt=""
+                                    className={`flight-icon ${darkMode ? "hide" : "show"}`}
+                                  />
+                                </div>
+                              </span>
                             </div>
                             <span>
                               {flight.outbound.stops === 0
@@ -348,7 +363,20 @@ const FlightSearch = ({
                               {formatFlightDuration(flight.return.duration)}
                             </span>
                             <div className="flight-line">
-                              <span>✈</span>
+                              <span>
+                                <div className="flight-icon-div">
+                                  <img
+                                    src={white_plane}
+                                    alt=""
+                                    className={`flight-icon ${darkMode ? "show" : "hide"}`}
+                                  />
+                                  <img
+                                    src={dark_plane}
+                                    alt=""
+                                    className={`flight-icon ${darkMode ? "hide" : "show"}`}
+                                  />
+                                </div>
+                              </span>
                             </div>
                             <span>
                               {flight.return.stops === 0

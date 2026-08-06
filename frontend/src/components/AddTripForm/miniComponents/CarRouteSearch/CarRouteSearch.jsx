@@ -39,6 +39,7 @@ const CarRouteSearch = ({
   const [destinationSuggestions, setDestinationSuggestions] = useState([]);
 
   const [isLoadingRoute, setIsLoadingRoute] = useState(false);
+  const [routeDirection, setRouteDirection] = useState("two-way");
 
   const defaultFuelPrices = {
     diesel: 1.72,
@@ -390,17 +391,46 @@ const CarRouteSearch = ({
               )}
             </MapContainer>
           </div>
+          <div className="route-direction-buttons">
+            <button
+              type="button"
+              className={`route-direction-btn ${
+                routeDirection === "one-way" ? "route-direction-btn-active" : ""
+              }`}
+              onClick={() => setRouteDirection("one-way")}
+            >
+              ONE WAY
+            </button>
+            <button
+              type="button"
+              className={`route-direction-btn ${
+                routeDirection === "two-way" ? "route-direction-btn-active" : ""
+              }`}
+              onClick={() => setRouteDirection("two-way")}
+            >
+              TWO WAY
+            </button>
+          </div>
           <div className={`car-route-text ${darkMode ? "tint" : ""}`}>
             <div className="info-tolls">
               <div className="info">
                 <h3>Info</h3>
                 <div>
                   <p>
-                    <strong>Distance:</strong> {route.distanceKm} km
+                    <strong>Distance: </strong>
+                    {route.distanceKm
+                      ? routeDirection === "one-way"
+                        ? `${Number(route.distanceKm).toFixed(2)} km`
+                        : `${Number(route.distanceKm).toFixed(2) * 2} km`
+                      : "Not avaliable"}
                   </p>
                   <p>
-                    <strong>Duration:</strong>{" "}
-                    {transformTime(route.durationSeconds)}
+                    <strong>Duration: </strong>
+                    {route.durationSeconds
+                      ? routeDirection === "one-way"
+                        ? `${transformTime(Number(route.durationSeconds).toFixed(2))}`
+                        : `${transformTime(Number(route.durationSeconds).toFixed(2) * 2)}`
+                      : "Not avaliable"}
                   </p>
                   <p>
                     <strong>Toll road:</strong> {route.toll ? "Yes" : "No"}
@@ -477,7 +507,11 @@ const CarRouteSearch = ({
                     </div>
                     <p className="total-toll-cost">
                       <strong>Total toll cost: </strong>
-                      {route.tollCost.total * 2} €
+                      {route.tollCost.total
+                        ? routeDirection === "one-way"
+                          ? `${Number(route.tollCost.total).toFixed(2)} €`
+                          : `${Number(route.tollCost.total).toFixed(2) * 2} €`
+                        : "Not avaliable"}
                     </p>
                   </>
                 )}
@@ -578,15 +612,27 @@ const CarRouteSearch = ({
                 <div>
                   <p>
                     <strong>Fuel needed: </strong>
-                    {`${fuelCalculation.litersNeeded} L`}
+                    {fuelCalculation.litersNeeded
+                      ? routeDirection === "one-way"
+                        ? `${(fuelCalculation.litersNeeded / 2).toFixed(2)} L`
+                        : `${fuelCalculation.litersNeeded} L`
+                      : "Not avaliable"}
                   </p>
                   <p>
                     <strong>Total fuel cost: </strong>
-                    {`${fuelCalculation.totalCost} €`}
+                    {fuelCalculation.totalCost
+                      ? routeDirection === "one-way"
+                        ? `${(fuelCalculation.totalCost / 2).toFixed(2)} €`
+                        : `${fuelCalculation.totalCost} €`
+                      : "Not avaliable"}
                   </p>
                   <p>
                     <strong>Cost per passenger: </strong>
-                    {`${fuelCalculation.costPerPassenger} €`}
+                    {fuelCalculation.costPerPassenger
+                      ? routeDirection === "one-way"
+                        ? `${(fuelCalculation.costPerPassenger / 2).toFixed(2)} €`
+                        : `${fuelCalculation.costPerPassenger} €`
+                      : "Not avaliable"}
                   </p>
                 </div>
               </div>
