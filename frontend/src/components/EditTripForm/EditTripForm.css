@@ -346,16 +346,58 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
+@media (max-width: 1280px) {
+  .flight-routes {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 1150px) {
+  .flight-routes {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (max-width: 1120px) {
+  .flight-routes {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 1030px) {
+  .flight-routes {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+}
+
 @media (max-width: 1000px) {
   .edit-trip-text {
     font-size: 13px;
     width: 300px;
+  }
+  .flight-routes {
+    display: flex;
+    flex-direction: column;
   }
 }
 
 @media (max-width: 850px) {
   .partial-info {
     grid-template-columns: repeat(1, 1fr);
+    gap: 20px;
+  }
+  .flight-routes {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px;
   }
 }
@@ -365,6 +407,13 @@
     font-size: 12px;
     width: 280px;
     margin-top: 30px;
+  }
+}
+
+@media (max-width: 610px) {
+  .flight-routes {
+    display: flex;
+    flex-direction: column;
   }
 }
 

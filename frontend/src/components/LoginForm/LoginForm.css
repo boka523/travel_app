@@ -97,16 +97,19 @@
   .login-text {
     font-size: 12px;
   }
-  .inputs label {
-    font-size: 16px;
+  .log-form .inputs label {
+    font-size: 18px;
   }
   .log-form .inputs {
-    grid-template-columns: 20px 80px 150px;
+    grid-template-columns: 20px 90px 150px;
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 380px) {
+  .log-form .inputs label {
+    font-size: 16px;
+  }
   .log-form .inputs {
-    grid-template-columns: 20px 70px 150px;
+    grid-template-columns: 20px 75px 150px;
   }
 }

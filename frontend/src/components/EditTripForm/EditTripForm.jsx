@@ -124,7 +124,13 @@ const EditTripForm = ({ darkMode, trip, setTrip }) => {
                             {trip.trip_flights.outbound_departure_time
                               ? new Date(
                                   trip.trip_flights.outbound_departure_time,
-                                ).toLocaleString("hr-HR")
+                                ).toLocaleString("hr-HR", {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
                               : "Not avaliable"}
                           </strong>
                         </div>
@@ -135,7 +141,13 @@ const EditTripForm = ({ darkMode, trip, setTrip }) => {
                             {trip.trip_flights.outbound_arrival_time
                               ? new Date(
                                   trip.trip_flights.outbound_arrival_time,
-                                ).toLocaleString("hr-HR")
+                                ).toLocaleString("hr-HR", {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
                               : "Not avaliable"}
                           </strong>
                         </div>
@@ -153,7 +165,13 @@ const EditTripForm = ({ darkMode, trip, setTrip }) => {
                             {trip.trip_flights.return_departure_time
                               ? new Date(
                                   trip.trip_flights.return_departure_time,
-                                ).toLocaleString("hr-HR")
+                                ).toLocaleString("hr-HR", {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
                               : "Not avaliable"}
                           </strong>
                         </div>
@@ -164,7 +182,13 @@ const EditTripForm = ({ darkMode, trip, setTrip }) => {
                             {trip.trip_flights.return_arrival_time
                               ? new Date(
                                   trip.trip_flights.return_arrival_time,
-                                ).toLocaleString("hr-HR")
+                                ).toLocaleString("hr-HR", {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
                               : "Not avaliable"}
                           </strong>
                         </div>
