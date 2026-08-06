@@ -416,10 +416,11 @@ app.post("/api/ai/chat", async (req, res) => {
     Preferred currency: EUR`.trim();
 
     const response = await openai.responses.create({
-      model: "gpt-5",
+      model: "gpt",
       reasoning: {
         effort: "minimal",
       },
+      text: { verbosity: "low" },
       input: [
         {
           role: "developer",
@@ -440,7 +441,7 @@ app.post("/api/ai/chat", async (req, res) => {
           content: message.trim(),
         },
       ],
-      max_output_tokens: 200,
+      max_output_tokens: 500,
     });
 
     res.json({
