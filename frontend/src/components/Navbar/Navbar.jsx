@@ -12,6 +12,8 @@ import white_logout from "../../assets/white_logout.png";
 import dark_logout from "../../assets/dark_logout.png";
 import white_back_button from "../../assets/white_back_button.png";
 import dark_back_button from "../../assets/dark_back_button.png";
+import white_menu from "../../assets/white_menu.png";
+import dark_menu from "../../assets/dark_menu.png";
 
 const Navbar = ({ darkMode, toggleMode, variant }) => {
   const navigate = useNavigate();
@@ -206,7 +208,18 @@ const Navbar = ({ darkMode, toggleMode, variant }) => {
           onClick={() => setMenuOpen((prev) => !prev)}
           aria-expanded={menuOpen}
         >
-          ☰
+          <div className="email-icon-menu">
+            <img
+              src={white_menu}
+              alt=""
+              className={`icon-menu ${darkMode ? "show" : "hide"}`}
+            />
+            <img
+              src={dark_menu}
+              alt=""
+              className={`icon-menu ${darkMode ? "hide" : "show"}`}
+            />
+          </div>
         </button>
         <div className={`mobile-navbar-menu ${menuOpen ? "open" : ""}`}>
           {renderNavbarButtons()}
