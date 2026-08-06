@@ -417,6 +417,9 @@ app.post("/api/ai/chat", async (req, res) => {
 
     const response = await openai.responses.create({
       model: "gpt-5",
+      reasoning: {
+        effort: "minimal",
+      },
       input: [
         {
           role: "developer",
