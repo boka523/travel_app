@@ -378,8 +378,15 @@ app.post("/api/ai/chat", async (req, res) => {
       ? messages
           .filter(
             (chatMessage) =>
-              chatMessage.role === "user" || chatMessage.role === "assistant",
+              (chatMessage.role === "user" ||
+                chatMessage.role === "assistant") &&
+              typeof chatMessage.content === "string" &&
+              chatMessage.content.trim(),
           )
+          .map((chatMessage) => ({
+            role: chatMessage.role,
+            content: chatMessage.content.trim(),
+          }))
           .slice(-10)
       : [];
 
@@ -416,7 +423,7 @@ app.post("/api/ai/chat", async (req, res) => {
     Preferred currency: EUR`.trim();
 
     const response = await openai.responses.create({
-      model: "gpt",
+      model: "gpt-5",
       reasoning: {
         effort: "minimal",
       },
@@ -448,9 +455,15 @@ app.post("/api/ai/chat", async (req, res) => {
       reply: response.output_text,
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: "AI request failed.",
+    console.error("OpenAI error:", error);
+
+    console.error("Status:", error.status);
+    console.error("Message:", error.message);
+    console.error("Code:", error.code);
+    console.error("Type:", error.type);
+
+    res.status(error.status || 500).json({
+      error: error.message || "AI request failed.",
     });
   }
 });
