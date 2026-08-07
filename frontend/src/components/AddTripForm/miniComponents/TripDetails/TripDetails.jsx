@@ -231,7 +231,7 @@ const TripDetails = ({
                     className="address-suggestion"
                     onClick={() => {
                       setDestination(formatDestinationName(suggestion.name));
-                      setDepartureCountryCode(suggestion.countryCode);
+                      setDestinationCountryCode(suggestion.countryCode);
                       console.log(suggestion.countryCode);
                       setSelectedDestination(suggestion);
                       setDestinationSuggestions([]);
