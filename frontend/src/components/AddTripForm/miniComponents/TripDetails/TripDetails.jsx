@@ -187,7 +187,8 @@ const TripDetails = ({
                       setDepartureSuggestions([]);
                     }}
                   >
-                    {formatDestinationName(suggestion.name)}
+                    {formatDestinationName(suggestion.name)}{" "}
+                    {`(${suggestion.countryCode})`}
                   </button>
                 ))}
               </div>
@@ -229,7 +230,8 @@ const TripDetails = ({
                       setDestinationSuggestions([]);
                     }}
                   >
-                    {formatDestinationName(suggestion.name)}
+                    {formatDestinationName(suggestion.name)}{" "}
+                    {`(${suggestion.countryCode})`}
                   </button>
                 ))}
               </div>

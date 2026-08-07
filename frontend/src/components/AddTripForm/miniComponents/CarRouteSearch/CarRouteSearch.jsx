@@ -90,7 +90,7 @@ const CarRouteSearch = ({
 
     try {
       const response = await fetch(
-        `${API_URL}/api/addresses/autocomplete?text=${encodeURIComponent(value)}&city=${encodeURIComponent(departureCity)}`,
+        `${API_URL}/api/addresses/autocomplete?text=${encodeURIComponent(value)}&city=${encodeURIComponent(departureCity)}&country=${encodeURIComponent(departureCity.countryCode)}`,
       );
 
       const data = await response.json();

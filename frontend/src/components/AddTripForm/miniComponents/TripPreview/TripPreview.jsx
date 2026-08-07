@@ -123,6 +123,90 @@ const TripPreview = ({
                     {selectedFlight.airlineName || "Not available"}
                   </strong>
                 </div>
+                <div className="flight-routes">
+                  <div className="flight-route-card">
+                    <div className="flight-route-title">
+                      <span>OUTBOUND</span>
+                      <h3>Outbound flight</h3>
+                    </div>
+                    <div className="flight-time-row">
+                      <div className="flight-time">
+                        <span>Departure:</span>
+                        <strong>
+                          {selectedFlight.outbound.departureTime
+                            ? new Date(
+                                selectedFlight.outbound.departureTime,
+                              ).toLocaleString("hr-HR", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : "Not avaliable"}
+                        </strong>
+                      </div>
+                      <div className="flight-route-arrow">→</div>
+                      <div className="flight-time">
+                        <span>Arrival:</span>
+                        <strong>
+                          {selectedFlight.outbound.arrivalTime
+                            ? new Date(
+                                selectedFlight.outbound.arrivalTime,
+                              ).toLocaleString("hr-HR", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : "Not avaliable"}
+                        </strong>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flight-route-card">
+                    <div className="flight-route-title">
+                      <span>RETURN</span>
+                      <h3>Return flight</h3>
+                    </div>
+                    <div className="flight-time-row">
+                      <div className="flight-time">
+                        <span>Departure:</span>
+                        <strong>
+                          {selectedFlight.return.departureTime
+                            ? new Date(
+                                selectedFlight.return.departureTime,
+                              ).toLocaleString("hr-HR", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : "Not avaliable"}
+                        </strong>
+                      </div>
+                      <div className="flight-route-arrow">→</div>
+                      <div className="flight-time">
+                        <span>Arrival:</span>
+                        <strong>
+                          {selectedFlight.return.arrivalTime
+                            ? new Date(
+                                selectedFlight.return.arrivalTime,
+                              ).toLocaleString("hr-HR", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : "Not avaliable"}
+                        </strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 <div className="trip-preview-detail">
                   <span>Price</span>

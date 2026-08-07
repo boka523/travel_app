@@ -323,7 +323,7 @@ app.get("/api/destinations/autocomplete", async (req, res) => {
 });
 
 app.get("/api/addresses/autocomplete", async (req, res) => {
-  const { text, city } = req.query;
+  const { text, city, country } = req.query;
 
   if (!text) {
     return res.status(400).json({
@@ -334,8 +334,12 @@ app.get("/api/addresses/autocomplete", async (req, res) => {
   try {
     const searchText = city ? `${text}, ${city}` : text;
 
+    const filter = country
+      ? `&filter=countrycode:${country.toLowerCase()}`
+      : "";
+
     const response = await fetch(
-      `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(searchText)}&limit=10&apiKey=${process.env.GEOAPIFY_API_KEY}`,
+      `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(searchText)}&limit=10${filter}&apiKey=${process.env.GEOAPIFY_API_KEY}`,
     );
 
     const data = await response.json();
@@ -824,6 +828,9 @@ app.post("/search-flights", async (req, res) => {
         airlineName: offer.owner.name,
         airlineCode: offer.owner.iata_code,
         price: offer.total_amount,
+        pricePerPerson: (
+          Number(offer.total_amount) / Number(passengers)
+        ).toFixed(2),
         currency: offer.total_currency,
         outbound: {
           departureAirport: outboundSlice.origin.iata_code,
