@@ -26,11 +26,23 @@ const EditTripForm = ({ darkMode, trip, setTrip }) => {
             <div className="info-list">
               <div className="info-row">
                 <span className="info-label">Departure</span>
-                <strong className="info-value">{trip.departure}</strong>
+                <strong className="info-value">
+                  {trip.departure
+                    .toLowerCase()
+                    .split(" ")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ")}
+                </strong>
               </div>
               <div className="info-row">
                 <span className="info-label">Destination</span>
-                <strong className="info-value">{trip.destination}</strong>
+                <strong className="info-value">
+                  {trip.destination
+                    .toLowerCase()
+                    .split(" ")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ")}
+                </strong>
               </div>
               <div className="info-row">
                 <span className="info-label">Departure date</span>

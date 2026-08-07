@@ -43,11 +43,23 @@ const TripPreview = ({
           <h3>Trip details</h3>
           <div className="trip-preview-detail">
             <span>Departure</span>
-            <strong>{departure || "Not avaliable"}</strong>
+            <strong>
+              {departure
+                .toLowerCase()
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ") || "Not avaliable"}
+            </strong>
           </div>
           <div className="trip-preview-detail">
             <span>Destination</span>
-            <strong>{destination || "Not avaliable"}</strong>
+            <strong>
+              {destination
+                .toLowerCase()
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ") || "Not avaliable"}
+            </strong>
           </div>
           <div className="trip-preview-detail">
             <span>Departure date</span>

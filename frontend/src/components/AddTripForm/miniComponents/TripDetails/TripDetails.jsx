@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./TripDetails.css";
@@ -18,6 +18,7 @@ import dark_plane from "../../../../assets/dark_plane.png";
 import white_plane from "../../../../assets/white_plane.png";
 import dark_question from "../../../../assets/dark_question.png";
 import white_question from "../../../../assets/white_question.png";
+import toast from "react-hot-toast";
 
 const TripDetails = ({
   darkMode,
@@ -41,6 +42,9 @@ const TripDetails = ({
   const getTransportIcon = () => {
     const transport = transportType.trim().toLowerCase();
 
+    const [departureSuggestions, setDepartureSuggestions] = useState([]);
+    const [selectedDeparture, setSelectedDeparture] = useState(null);
+
     const transportIcons = {
       car: {
         white: dark_car,
@@ -60,14 +64,6 @@ const TripDetails = ({
       },
     };
 
-    // const selectedIcons = transportIcons[transport];
-
-    // if (!selectedIcons) {
-    //   return darkMode ? white_question : dark_question;
-    // }
-
-    // return darkMode ? selectedIcons.dark : selectedIcons.white;
-
     return (
       transportIcons[transport] || {
         white: dark_question,
@@ -77,6 +73,36 @@ const TripDetails = ({
   };
 
   const selectedTransportIcons = getTransportIcon();
+
+  const handleDepartureChange = async (e) => {
+    const value = e.target.value;
+
+    setDeparture(value);
+    setSelectedDeparture(null);
+
+    if (value.trim().length < 2) {
+      setDepartureSuggestions([]);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/destinations/autocomplete?text=${encodeURIComponent(value)}`,
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.message || "Autocomplete request failed.");
+        return;
+      }
+
+      setDepartureSuggestions(data);
+    } catch (error) {
+      console.error("Failed to load departure suggestions:", error);
+      setDepartureSuggestions([]);
+    }
+  };
 
   return (
     <div className={`add-trips-card ${darkMode ? "tint white-letters" : ""}`}>
@@ -102,9 +128,28 @@ const TripDetails = ({
             type="text"
             placeholder="Enter your departure:"
             value={departure}
-            onChange={(e) => setDeparture(e.target.value)}
+            onChange={handleDepartureChange}
             required
           />
+
+          {departureSuggestions.length > 0 && (
+            <div className="address-suggestions">
+              {departureSuggestions.map((suggestion) => (
+                <button
+                  key={suggestion.id}
+                  type="button"
+                  className="address-suggestion"
+                  onClick={() => {
+                    setDeparture(suggestion.name);
+                    setSelectedDeparture(suggestion);
+                    setDepartureSuggestions([]);
+                  }}
+                >
+                  {suggestion.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div className="inputs">
           <div className="email-icon">

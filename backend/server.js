@@ -260,6 +260,39 @@ app.get("/airports", async (req, res) => {
   }
 });
 
+app.get("/api/destinations/autocomplete", async (req, res) => {
+  const { text, city } = req.query;
+
+  if (!text) {
+    return res.status(400).json({
+      message: "Missing query parameter 'text'.",
+    });
+  }
+
+  try {
+    const destinations = await prisma.destination.findMany({
+      where: {
+        name: {
+          contains: text,
+          mode: "insensitive",
+        },
+      },
+      take: 10,
+      orderBy: {
+        name: "asc",
+      },
+    });
+
+    res.json(destinations);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch destinations.",
+    });
+  }
+});
+
 app.get("/api/addresses/autocomplete", async (req, res) => {
   const { text, city } = req.query;
 

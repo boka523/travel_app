@@ -280,7 +280,13 @@ const MyTripsForm = ({ darkMode }) => {
         ) : (
           sortedTrips.map((trip) => (
             <div key={trip.id} className={`trip ${darkMode ? "tint" : ""}`}>
-              <h1>{trip.destination}</h1>
+              <h1>
+                {trip.destination
+                  .toLowerCase()
+                  .split(" ")
+                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(" ")}
+              </h1>
               <h1>{trip.total_cost} €</h1>
               <div className="trip-details">
                 <h2>
