@@ -53,7 +53,7 @@ const ProfileForm = ({ darkMode }) => {
         return;
       }
 
-      setProfileImage(`${API_URL}${data.profile_image}`);
+      setProfileImage(data.profile_image);
       toast.success(data.message);
     } catch (error) {
       toast.error(error.message);
@@ -81,7 +81,7 @@ const ProfileForm = ({ darkMode }) => {
         setUser(data);
 
         if (data.profile_image) {
-          setProfileImage(`${API_URL}${data.profile_image}`);
+          setProfileImage(data.profile_image);
         }
       } catch (error) {
         console.error("Profile error:", error);

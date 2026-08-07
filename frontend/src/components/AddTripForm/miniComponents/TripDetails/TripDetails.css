@@ -51,6 +51,47 @@
   width: 300px;
 }
 
+.input-wrapper {
+  position: relative;
+  width: 300px;
+}
+
+.input-wrapper input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.address-suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.address-suggestion {
+  display: block;
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  border-bottom: 1px solid rgba(73, 41, 0, 0.8);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.address-suggestion:last-child {
+  border-bottom: none;
+}
+
+.address-suggestion:hover {
+  background: rgba(73, 41, 0, 0.2);
+}
+
 @media (max-width: 1000px) {
   .trip-form .inputs input {
     font-size: 14px;

@@ -8,6 +8,13 @@ const jwt = require("jsonwebtoken");
 const duffel = require("./duffel");
 const crypto = require("crypto"); //triba nan za sha256 hashiranje, to je ka "tip teksta" koji hotelbeds zahtjeva u svojoj dokumentaciji
 const path = require("path"); //ovo nam je za ekstenzije tipa .jpg ili .png
+const { v2: cloudinary } = require("cloudinary");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const PORT = process.env.PORT || 5000;
 
@@ -17,9 +24,8 @@ const openai = new OpenAI({
 });
 
 const { PrismaClient } = require("@prisma/client");
-const { error } = require("console");
-const { start } = require("repl");
-//const { off } = require("cluster");
+// const { error } = require("console");
+// const { start } = require("repl");
 
 const HOTELBEDS_BASE_URL = "https://api.test.hotelbeds.com";
 
@@ -44,18 +50,20 @@ const getHotelbedsHeaders = () => {
 };
 
 //storage govori gdje i pod kojim imenom spremiti sliku
-const storage = multer.diskStorage({
-  //"spremi datoteku na fizicki disk, tj. backend"
-  destination: (req, file, cb) => {
-    //parametri su request, slika koju je korisnik posla i callback (govori di triba spremit datoteku ili jel sve okej)
-    cb(null, "uploads/profile-images"); //"nema greske, datoteku spremi u backend/uploads/profile-images"
-  },
-  filename: (req, file, cb) => {
-    //odreduje ime spremljene slike
-    const uniqueName = `${req.user.id}-${Date.now()}${path.extname(file.originalname)}`; //file.originalname je npr. slika.png, a path.extname uzima samo .png
-    cb(null, uniqueName); //"nema greske, datoteku spremi pod ovim imenom"
-  },
-});
+// const storage = multer.diskStorage({
+//   //"spremi datoteku na fizicki disk, tj. backend"
+//   destination: (req, file, cb) => {
+//     //parametri su request, slika koju je korisnik posla i callback (govori di triba spremit datoteku ili jel sve okej)
+//     cb(null, "uploads/profile-images"); //"nema greske, datoteku spremi u backend/uploads/profile-images"
+//   },
+//   filename: (req, file, cb) => {
+//     //odreduje ime spremljene slike
+//     const uniqueName = `${req.user.id}-${Date.now()}${path.extname(file.originalname)}`; //file.originalname je npr. slika.png, a path.extname uzima samo .png
+//     cb(null, uniqueName); //"nema greske, datoteku spremi pod ovim imenom"
+//   },
+// });
+
+const storage = multer.memoryStorage();
 
 //upload govori kako multer smije prihvatiti datoteku
 const upload = multer({
@@ -72,6 +80,27 @@ const upload = multer({
     }
   },
 });
+
+const uploadProfileImageToCloudinary = (fileBuffer, userId) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: "wayaway/profile-images",
+        public_id: `user-${userId}-${Date.now()}`,
+        resource_type: "image",
+      },
+      (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      },
+    );
+
+    uploadStream.end(fileBuffer);
+  });
+};
 
 const app = express();
 const prisma = new PrismaClient();
@@ -1313,7 +1342,12 @@ app.post(
         });
       }
 
-      const profileImage = `/uploads/profile-images/${req.file.filename}`;
+      const cloudinaryResult = await uploadProfileImageToCloudinary(
+        req.file.buffer,
+        req.user.id,
+      );
+
+      const profileImage = cloudinaryResult.secure_url;
 
       await prisma.users.update({
         where: {
@@ -1329,7 +1363,7 @@ app.post(
         profile_image: profileImage,
       });
     } catch (error) {
-      console.error(error);
+      console.error("Profile image change error:", error);
 
       res.status(500).json({
         error: "Error changing profile image.",

@@ -19,6 +19,7 @@ import white_plane from "../../../../assets/white_plane.png";
 import dark_question from "../../../../assets/dark_question.png";
 import white_question from "../../../../assets/white_question.png";
 import toast from "react-hot-toast";
+import { API_URL } from "../../../../config";
 
 const TripDetails = ({
   darkMode,
@@ -41,9 +42,6 @@ const TripDetails = ({
 }) => {
   const getTransportIcon = () => {
     const transport = transportType.trim().toLowerCase();
-
-    const [departureSuggestions, setDepartureSuggestions] = useState([]);
-    const [selectedDeparture, setSelectedDeparture] = useState(null);
 
     const transportIcons = {
       car: {
@@ -73,6 +71,19 @@ const TripDetails = ({
   };
 
   const selectedTransportIcons = getTransportIcon();
+
+  const [departureSuggestions, setDepartureSuggestions] = useState([]);
+  const [selectedDeparture, setSelectedDeparture] = useState(null);
+  const [destinationSuggestions, setDestinationSuggestions] = useState([]);
+  const [selectedDestination, setSelectedDestination] = useState(null);
+
+  const formatDestinationName = (name) => {
+    return name
+      .split("-")[0]
+      .trim()
+      .toLowerCase()
+      .replace(/\b\w/g, (letter) => letter.toUpperCase());
+  };
 
   const handleDepartureChange = async (e) => {
     const value = e.target.value;
@@ -104,6 +115,36 @@ const TripDetails = ({
     }
   };
 
+  const handleDestinationChange = async (e) => {
+    const value = e.target.value;
+
+    setDestination(value);
+    setSelectedDestination(null);
+
+    if (value.trim().length < 2) {
+      setDestinationSuggestions([]);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/destinations/autocomplete?text=${encodeURIComponent(value)}`,
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.message || "Autocomplete request failed.");
+        return;
+      }
+
+      setDestinationSuggestions(data);
+    } catch (error) {
+      console.error("Failed to load destination suggestions:", error);
+      setDestinationSuggestions([]);
+    }
+  };
+
   return (
     <div className={`add-trips-card ${darkMode ? "tint white-letters" : ""}`}>
       <form
@@ -123,33 +164,35 @@ const TripDetails = ({
               className={`icon ${darkMode ? "hide" : "show"}`}
             />
           </div>
-          <input
-            id="departure"
-            type="text"
-            placeholder="Enter your departure:"
-            value={departure}
-            onChange={handleDepartureChange}
-            required
-          />
+          <div className="input-wrapper">
+            <input
+              id="departure"
+              type="text"
+              placeholder="Enter your departure:"
+              value={departure}
+              onChange={handleDepartureChange}
+              required
+            />
 
-          {departureSuggestions.length > 0 && (
-            <div className="address-suggestions">
-              {departureSuggestions.map((suggestion) => (
-                <button
-                  key={suggestion.id}
-                  type="button"
-                  className="address-suggestion"
-                  onClick={() => {
-                    setDeparture(suggestion.name);
-                    setSelectedDeparture(suggestion);
-                    setDepartureSuggestions([]);
-                  }}
-                >
-                  {suggestion.name}
-                </button>
-              ))}
-            </div>
-          )}
+            {departureSuggestions.length > 0 && (
+              <div className="address-suggestions">
+                {departureSuggestions.map((suggestion) => (
+                  <button
+                    key={suggestion.id}
+                    type="button"
+                    className="address-suggestion"
+                    onClick={() => {
+                      setDeparture(formatDestinationName(suggestion.name));
+                      setSelectedDeparture(suggestion);
+                      setDepartureSuggestions([]);
+                    }}
+                  >
+                    {formatDestinationName(suggestion.name)}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         <div className="inputs">
           <div className="email-icon">
@@ -164,14 +207,34 @@ const TripDetails = ({
               className={`icon ${darkMode ? "hide" : "show"}`}
             />
           </div>
-          <input
-            id="destination"
-            type="text"
-            placeholder="Enter your destination:"
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-            required
-          />
+          <div className="input-wrapper">
+            <input
+              id="destination"
+              type="text"
+              placeholder="Enter your destination:"
+              value={destination}
+              onChange={handleDestinationChange}
+              required
+            />
+            {destinationSuggestions.length > 0 && (
+              <div className="address-suggestions">
+                {destinationSuggestions.map((suggestion) => (
+                  <button
+                    key={suggestion.id}
+                    type="button"
+                    className="address-suggestion"
+                    onClick={() => {
+                      setDestination(formatDestinationName(suggestion.name));
+                      setSelectedDestination(suggestion);
+                      setDestinationSuggestions([]);
+                    }}
+                  >
+                    {formatDestinationName(suggestion.name)}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         <div className="inputs">
           <div className="email-icon">
