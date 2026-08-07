@@ -282,7 +282,7 @@ const FlightSearch = ({
                             {new Intl.NumberFormat("hr-HR", {
                               style: "currency",
                               currency: flight.currency,
-                            }).format(Number(flight.price))}
+                            }).format(Number(flight.pricePerPerson))}
                           </p>
                         </div>
                         <div className="flight-route">

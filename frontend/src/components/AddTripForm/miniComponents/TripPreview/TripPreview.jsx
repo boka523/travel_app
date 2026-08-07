@@ -209,10 +209,8 @@ const TripPreview = ({
                 </div>
 
                 <div className="trip-preview-detail">
-                  <span>Price</span>
-                  <strong>
-                    {formatPrice(selectedFlight.price * passengersNum)}
-                  </strong>
+                  <span>Total price</span>
+                  <strong>{formatPrice(selectedFlight.price)}</strong>
                 </div>
               </>
             ) : (

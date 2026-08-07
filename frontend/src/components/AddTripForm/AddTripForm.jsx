@@ -127,7 +127,7 @@ const AddTripForm = ({ darkMode }) => {
   };
 
   const transportPrice = selectedFlight
-    ? Number(selectedFlight.price * passengers_num)
+    ? Number(selectedFlight.price)
     : Number((carDetails?.fuelCost || 0) + (carDetails?.tollCost || 0));
   const totalPrice = (
     Number(selectedAccommodation?.totalPrice || 0) +

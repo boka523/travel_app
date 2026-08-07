@@ -52,6 +52,7 @@
 .trip-preview-detail:nth-last-child(2) {
   border-bottom: none;
 }
+
 .trip-preview-detail:last-child {
   border-bottom: none;
   border-top: 1px solid rgba(0, 0, 0, 0.12);
@@ -67,7 +68,11 @@
 }
 
 .trip-preview-description {
-  margin-top: 15px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+.trip-preview-description:last-child {
+  border-bottom: none;
 }
 
 .trip-preview-description span {

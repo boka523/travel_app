@@ -874,7 +874,7 @@ app.post("/search-flights", async (req, res) => {
     console.error("Duffel error:", error);
 
     res.status(500).json({
-      error: "rror retrieving flights.",
+      error: "Error retrieving flights.",
       details: error.message,
     });
   }
