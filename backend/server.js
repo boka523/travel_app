@@ -107,7 +107,7 @@ const prisma = new PrismaClient();
 
 app.use(cors());
 app.use(express.json());
-app.use("/uploads", express.static("uploads")); //ovime omogućujemo expressu da posluzuje slike
+//app.use("/uploads", express.static("uploads")); //ovime omogućujemo expressu da posluzuje slike
 
 app.get("/", (req, res) => {
   res.send("Backend works fine.");
