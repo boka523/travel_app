@@ -244,12 +244,12 @@ const TripPreview = ({
                 </div>
 
                 <div className="trip-preview-detail">
-                  <span>Fuel cost</span>
+                  <span>Total fuel cost</span>
                   <strong>{formatPrice(carDetails.fuelCost)}</strong>
                 </div>
 
                 <div className="trip-preview-detail">
-                  <span>Toll cost</span>
+                  <span>Total toll cost</span>
                   <strong>{formatPrice(carDetails.tollCost)}</strong>
                 </div>
               </>
