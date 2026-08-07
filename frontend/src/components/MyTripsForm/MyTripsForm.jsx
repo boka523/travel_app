@@ -303,6 +303,7 @@ const MyTripsForm = ({ darkMode }) => {
               </div>
               <div className="card-buttons">
                 <button
+                  type="button"
                   className={darkMode ? "btn" : "btn dark-btn"}
                   onClick={() => handleDeleteTrip(trip.id)}
                   disabled={isDeletingTripId === trip.id}
