@@ -90,13 +90,13 @@ const CarRouteSearch = ({
 
     try {
       const response = await fetch(
-        `${API_URL}/api/addresses/autocomplete?text=${encodeURIComponent(value)}&city=${encodeURIComponent(departureCity)}&country=${encodeURIComponent(departureCity.countryCode)}`,
+        `${API_URL}/api/addresses/autocomplete?text=${encodeURIComponent(value)}&city=${encodeURIComponent(departureCity.name)}&country=${encodeURIComponent(departureCity.countryCode)}`,
       );
 
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.error || "Autocomplete request failed.");
+        toast.error(data.message || "Autocomplete request failed.");
         return;
       }
 
