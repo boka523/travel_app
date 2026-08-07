@@ -121,4 +121,8 @@
   .date-input {
     width: 200px;
   }
+
+  .input-wrapper {
+    width: 200px;
+  }
 }

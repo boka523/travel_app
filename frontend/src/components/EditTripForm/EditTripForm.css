@@ -441,69 +441,7 @@
   .additional-ai-cost {
     padding: 15px 20px;
   }
-}
-
-/* 
-@media (max-width: 700px) {
-  .partial-info {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .partial-info-sub {
-    margin: 0;
-  }
-
-  .info-row {
-    grid-template-columns: 1fr;
-    gap: 5px;
-  }
-
-  .info-label,
-  .info-value {
-    text-align: left;
+  .flight-time strong {
+    font-size: 14px;
   }
 }
-
-@media (max-width: 900px) {
-  .flight-routes {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 600px) {
-  .flight-time-row {
-    grid-template-columns: 1fr;
-  }
-
-  .flight-route-arrow {
-    transform: rotate(90deg);
-  }
-
-  .flight-summary {
-    grid-template-columns: 1fr;
-  }
-
-  .flight-airline {
-    flex-direction: column;
-    text-align: center;
-  }
-}
-
-@media (max-width: 700px) {
-  .route-addresses {
-    grid-template-columns: 1fr;
-  }
-
-  .route-address-arrow {
-    transform: rotate(90deg);
-  }
-
-  .route-section-header {
-    flex-direction: column;
-  }
-
-  .route-direction-buttons {
-    margin-left: 0;
-  }
-} */
