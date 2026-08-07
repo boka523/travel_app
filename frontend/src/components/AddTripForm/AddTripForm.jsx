@@ -13,7 +13,9 @@ import { useNavigate } from "react-router-dom";
 
 const AddTripForm = ({ darkMode }) => {
   const [departure, setDeparture] = useState("");
+  const [departureCountryCode, setDepartureCountryCode] = useState("");
   const [destination, setDestination] = useState("");
+  const [destinationCountryCode, setDestinationCountryCode] = useState("");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [passengers_num, setPassengersNum] = useState(1);
@@ -216,8 +218,12 @@ const AddTripForm = ({ darkMode }) => {
         darkMode={darkMode}
         departure={departure}
         setDeparture={setDeparture}
+        departureCountryCode={departureCountryCode}
+        setDepartureCountryCode={setDepartureCountryCode}
         destination={destination}
         setDestination={setDestination}
+        destinationCountryCode={destinationCountryCode}
+        setDestinationCountryCode={setDestinationCountryCode}
         startDate={startDate}
         setStartDate={setStartDate}
         endDate={endDate}
@@ -264,7 +270,9 @@ const AddTripForm = ({ darkMode }) => {
           <CarRouteSearch
             darkMode={darkMode}
             departureCity={departure}
+            departureCountryCode={departureCountryCode}
             destinationCity={destination}
+            destinationCountryCode={destinationCountryCode}
             passengersNum={passengers_num}
             carDetails={carDetails}
             setCarDetails={setCarDetails}

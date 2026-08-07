@@ -25,8 +25,12 @@ const TripDetails = ({
   darkMode,
   departure,
   setDeparture,
+  departureCountryCode,
+  setDepartureCountryCode,
   destination,
   setDestination,
+  destinationCountryCode,
+  setDestinationCountryCode,
   startDate,
   setStartDate,
   endDate,
@@ -107,7 +111,6 @@ const TripDetails = ({
         toast.error(data.message || "Autocomplete request failed.");
         return;
       }
-
       setDepartureSuggestions(data);
     } catch (error) {
       console.error("Failed to load departure suggestions:", error);
@@ -183,6 +186,8 @@ const TripDetails = ({
                     className="address-suggestion"
                     onClick={() => {
                       setDeparture(formatDestinationName(suggestion.name));
+                      setDepartureCountryCode(suggestion.countryCode);
+                      console.log(suggestion.countryCode);
                       setSelectedDeparture(suggestion);
                       setDepartureSuggestions([]);
                     }}
@@ -226,6 +231,8 @@ const TripDetails = ({
                     className="address-suggestion"
                     onClick={() => {
                       setDestination(formatDestinationName(suggestion.name));
+                      setDepartureCountryCode(suggestion.countryCode);
+                      console.log(suggestion.countryCode);
                       setSelectedDestination(suggestion);
                       setDestinationSuggestions([]);
                     }}

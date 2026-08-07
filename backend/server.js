@@ -338,11 +338,25 @@ app.get("/api/addresses/autocomplete", async (req, res) => {
       ? `&filter=countrycode:${country.toLowerCase()}`
       : "";
 
+    const url =
+      `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(searchText)}` +
+      `&limit=10${filter}` +
+      `&apiKey=${process.env.GEOAPIFY_API_KEY}`;
+
+    console.log("CITY:", city);
+    console.log("COUNTRY:", country);
+    console.log("SEARCH TEXT:", searchText);
+    console.log("GEOAPIFY URL:", url);
+
+    // const response = await fetch(url);
+
     const response = await fetch(
       `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(searchText)}&limit=10${filter}&apiKey=${process.env.GEOAPIFY_API_KEY}`,
     );
 
     const data = await response.json();
+
+    console.log("Geoapify response:", data);
 
     const suggestions = data.features.map((feature) => ({
       placeId: feature.properties.place_id,

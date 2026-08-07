@@ -33,7 +33,6 @@ const TripPreview = ({
     return `${Number(price).toFixed(2)} €`;
   };
 
-  console.log("CAR DETAILS:", carDetails);
   return (
     <div className={`trip-preview ${darkMode ? "tint" : ""}`}>
       <div className="trip-preview-grid">

@@ -22,7 +22,9 @@ import { API_URL } from "../../../../config";
 const CarRouteSearch = ({
   darkMode,
   departureCity,
+  departureCountryCode,
   destinationCity,
+  destinationCountryCode,
   passengersNum,
   carDetails,
   setCarDetails,
@@ -90,7 +92,7 @@ const CarRouteSearch = ({
 
     try {
       const response = await fetch(
-        `${API_URL}/api/addresses/autocomplete?text=${encodeURIComponent(value)}&city=${encodeURIComponent(departureCity.name)}&country=${encodeURIComponent(departureCity.countryCode)}`,
+        `${API_URL}/api/addresses/autocomplete?text=${encodeURIComponent(value)}&city=${encodeURIComponent(departureCity)}&country=${encodeURIComponent(departureCountryCode)}`,
       );
 
       const data = await response.json();
@@ -122,7 +124,7 @@ const CarRouteSearch = ({
 
     try {
       const response = await fetch(
-        `${API_URL}/api/addresses/autocomplete?text=${encodeURIComponent(value)}&city=${encodeURIComponent(destinationCity)}`,
+        `${API_URL}/api/addresses/autocomplete?text=${encodeURIComponent(value)}&city=${encodeURIComponent(destinationCity)}&country=${encodeURIComponent(destinationCountryCode)}`,
       );
 
       const data = await response.json();
@@ -187,8 +189,6 @@ const CarRouteSearch = ({
         startAddress: startAddress,
         destinationAddress: destinationAddress,
       });
-
-      console.log("Route:", data);
     } catch (error) {
       console.error("Failed to load route:", error);
     } finally {

@@ -92,7 +92,6 @@ const AccommodationResults = ({
                           className={`accommodation-card ${darkMode ? "tint" : ""} ${selectedAccommodation?.id === accommodation.id ? "selected" : ""}`}
                           key={accommodation.id}
                           onClick={() => {
-                            console.log(accommodation);
                             setSelectedAccommodation(accommodation);
                           }}
                         >
