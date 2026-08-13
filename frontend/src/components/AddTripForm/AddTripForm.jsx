@@ -103,7 +103,10 @@ const AddTripForm = ({ darkMode }) => {
 
       setAccommodations(data.accommodations || []);
 
-      if (transport_type === "plane" || transport_type === "aeroplane") {
+      if (
+        transport_type.toLowerCase() === "plane" ||
+        transport_type.toLowerCase() === "aeroplane"
+      ) {
         const [departureResponse, arrivalResponse] = await Promise.all([
           fetch(`${API_URL}/airports?city=${encodeURIComponent(departure)}`),
           fetch(`${API_URL}/airports?city=${encodeURIComponent(destination)}`),
@@ -156,19 +159,21 @@ const AddTripForm = ({ darkMode }) => {
           destination,
           start_date: formatDate(startDate),
           end_date: formatDate(endDate),
-          transport_type,
+          transport_type: transport_type.toLowerCase(),
           passengers_num: Number(passengers_num),
           hotel_id: selectedAccommodation?.id || null,
           hotel_price: selectedAccommodation?.totalPrice || null,
           hotel_currency: selectedAccommodation?.currency || null,
           hotel_board_name: selectedAccommodation?.boardName || null,
           selectedFlight:
-            (transport_type === "plane" || transport_type === "aeroplane") &&
+            (transport_type.toLowerCase() === "plane" ||
+              transport_type.toLowerCase() === "aeroplane") &&
             selectedFlight
               ? selectedFlight
               : null,
           carDetails:
-            (transport_type === "car" || transport_type === "auto") &&
+            (transport_type.toLowerCase() === "car" ||
+              transport_type.toLowerCase() === "auto") &&
             carDetails
               ? carDetails
               : null,
@@ -249,7 +254,8 @@ const AddTripForm = ({ darkMode }) => {
       />
 
       {hasSearched &&
-        (transport_type === "plane" || transport_type === "aeroplane") &&
+        (transport_type.toLowerCase() === "plane" ||
+          transport_type.toLowerCase() === "aeroplane") &&
         departureAirports.length > 0 &&
         arrivalAirports.length > 0 && (
           <FlightSearch
@@ -266,7 +272,8 @@ const AddTripForm = ({ darkMode }) => {
         )}
 
       {hasSearched &&
-        (transport_type === "car" || transport_type === "auto") && (
+        (transport_type.toLowerCase() === "car" ||
+          transport_type.toLowerCase() === "auto") && (
           <CarRouteSearch
             darkMode={darkMode}
             departureCity={departure}
@@ -287,7 +294,7 @@ const AddTripForm = ({ darkMode }) => {
           startDate,
           endDate,
           passengers_num,
-          transport_type,
+          transport_type: transport_type.toLowerCase(),
         }}
       />
       {hasSearched && (
@@ -353,7 +360,7 @@ const AddTripForm = ({ darkMode }) => {
             startDate={startDate}
             endDate={endDate}
             passengersNum={passengers_num}
-            transportType={transport_type}
+            transportType={transport_type.toLowerCase()}
             selectedAccommodation={selectedAccommodation}
             selectedFlight={selectedFlight}
             carDetails={carDetails}
