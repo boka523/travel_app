@@ -67,10 +67,10 @@ const AddTripForm = ({ darkMode }) => {
     }
 
     if (
-      transport_type !== "car" &&
-      transport_type !== "auto" &&
-      transport_type !== "plane" &&
-      transport_type !== "airplane"
+      transport_type.toLowerCase() !== "car" &&
+      transport_type.toLowerCase() !== "auto" &&
+      transport_type.toLowerCase() !== "plane" &&
+      transport_type.toLowerCase() !== "airplane"
     ) {
       toast.error(
         "Unsupported transport type. Plase choose between car and plane.",
