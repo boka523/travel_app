@@ -3,6 +3,10 @@
   scroll-margin-top: 100px;
 }
 
+.sort-accommodation {
+  margin: 20px 10px;
+}
+
 .accommodation-slider {
   width: 100%;
   display: grid;
